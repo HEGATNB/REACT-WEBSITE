@@ -1,27 +1,109 @@
 .Card{
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
-padding: 30px;
-border-radius: 10px;
-margin: 20px 0;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+  color: #1a1a1a;
+  padding: 30px;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.Card:hover {
+  transform: translateY(-2px);
 }
 
 .RoadMap{
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-color: white;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-padding-left:20px;
-padding-top:10px;
-border-radius: 10px;
+  user-select: none;
+  background: white;
+  margin-left: 20px;
+  color: #1a1a1a;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 10px;
+}
+
+.progress-container {
+  position: relative;
+  width: 70%;
+  display: flex;
+  align-items: center;
+}
+
+/* Заменяем progress на кастомный контейнер */
+.progress-bar-container {
+  width: 100%;
+  height: 25px;
+  margin: 10px 0;
+  outline: 3px solid #1a1a1a;
+  background: white;
+  border-radius: 20px;
+  position: relative;
+  user-select: none;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+  background-size: 200% 200%; /* Позволяет анимировать background-position */
+  border-radius: 20px;
+  position: relative;
+  transition: width 0.8s ease-in-out;
+  min-width: 0%;
+}
+
+.progress-bar-fill.animated {
+  animation: gradientShift 3s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .progressBar {
-  width: 100%;
-  height: 20px;
-  margin: 10px 0;
-  background: white;
-  border-radius:10p;
+  display: none;
+}
+
+.PercentText {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: bold;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+  z-index: 1;
+  transition: all 0.5s ease-in-out;
+}
+
+.PercentText.animated {
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .progress-header {
