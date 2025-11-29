@@ -1,6 +1,6 @@
-.Card{
-  background: white;
-  color: #1a1a1a;
+.Card {
+  background: green;
+  color: #ffffff;
   padding: 30px;
   border-radius: 10px;
   margin: 20px 0;
@@ -8,36 +8,67 @@
   user-select: none;
   cursor: pointer;
   transition: transform 0.2s ease;
+  height: 200px;
+  width: 220px;
+}
+
+.Card:active {
+  background: #a8a0a0;
 }
 
 .Card:hover {
   transform: translateY(-2px);
 }
 
-.RoadMap{
+.RoadMap {
   user-select: none;
-  background: white;
+  background: #262332;
   margin-left: 20px;
-  color: #1a1a1a;
+  color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding-left: 20px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 20px;
   border-radius: 10px;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
 }
 
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 5%;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.stats-container p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  font-size: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Progress Bar Styles */
 .progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
-  width: 70%;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-/* Заменяем progress на кастомный контейнер */
 .progress-bar-container {
   width: 100%;
   height: 25px;
-  margin: 10px 0;
   outline: 3px solid #1a1a1a;
   background: white;
   border-radius: 20px;
@@ -47,9 +78,10 @@
 }
 
 .progress-bar-fill {
+  display: flex;
   height: 100%;
   background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
-  background-size: 200% 200%; /* Позволяет анимировать background-position */
+  background-size: 200% 200%;
   border-radius: 20px;
   position: relative;
   transition: width 0.8s ease-in-out;
@@ -85,7 +117,7 @@
   font-size: 18px;
   font-weight: bold;
   color: #1a1a1a;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
   z-index: 1;
   transition: all 0.5s ease-in-out;
 }
@@ -106,6 +138,63 @@
   }
 }
 
-.progress-header {
-  width: 100%;
+/* Filter Styles */
+.filter {
+  position: relative;
+  display: flex;
+  justify-content: left;
+  margin-top: 15px;
+}
+
+.filter-button {
+  background-color: #1f1d2b;
+  border-radius: 25px;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-button:hover {
+  background-color: #2a2738;
+}
+
+.filters-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  margin-top: 10px;
+}
+
+.filters-list {
+  background: #262332;
+  border: 1px solid #1f1d2b;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  padding: 10px 0;
+}
+
+.filters-text {
+  margin: 0;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.filters-text:hover {
+  background-color: #1f1d2b;
+}
+
+.filters-text.active {
+  background-color: #1f1d2b;
+  color: #FFD700;
 }
