@@ -79,8 +79,7 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext }: QuickActionsP
 }
 
 function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersProps) {
-  const filtersRef = useRef<HTMLDivElement>(null);
-  const closeTimerRef = useRef<NodeJS.Timeout>();
+  const closeTimerRef = useRef<number | null>(null);
 
   const handleMouseEnter = () => {
     if (closeTimerRef.current) {
@@ -89,9 +88,9 @@ function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersP
   };
 
   const handleMouseLeave = () => {
-    closeTimerRef.current = setTimeout(() => {
+    closeTimerRef.current = window.setTimeout(() => {
       onClose();
-    }, 300); //
+    }, 300);
   };
 
   const handleFilterClick = (filter: string) => {
@@ -111,7 +110,6 @@ function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersP
   return (
     <div
       className="filters-overlay"
-      ref={filtersRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -171,7 +169,6 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
 
   const handleFilterClick = (filter: string) => {
     onFilterChange(filter);
-    // Не закрываем фильтры сразу после выбора
   };
 
   const handleCloseFilters = () => {
