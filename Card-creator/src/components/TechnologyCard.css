@@ -42,7 +42,7 @@
 }
 
 .note-text-area:focus {
-  outline: 2px solid #white;
+  outline: 2px solid white;
   outline-offset: 2px;
 }
 
@@ -101,45 +101,79 @@
   font-size: 20px;
   text-align: center;
   white-space: nowrap;
-}
-.search-window {
-  position: absolute;
-  right: 20px;
-  width: 300px;
-  height: 35px;
-  color: #cccccc;
-  background-color:#4d5156;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  border-radius:25px;
-  font-size: 18px;
+  color: #ffffff;
 }
 
-.filter-search-container{
+/* Поле поиска */
+.filter-search-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.filter-section {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 15px;
-  gap: 60%;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.search-window {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  height: 35px;
+  background-color: #4d5156;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  padding: 0 15px;
+  position: relative;
 }
 
 .input-window {
   flex: 1;
-  border-radius: 25px;
   border: none;
   height: 100%;
-  width:230px;
   font-size: 16px;
-  padding: 0 15px;
+  padding: 0 10px;
   background-color: transparent;
   color: white;
   outline: none;
 }
 
-.input-window:focus {
-  outline: none;
+.input-window::placeholder {
+  color: #cccccc;
 }
 
-/* Progress Bar Styles */
+.search-icon {
+  color: #cccccc;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.clear-search {
+  color: #cccccc;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.results-text {
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 5px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Прогресс бар */
 .progress-container {
   display: flex;
   flex-direction: column;
@@ -150,7 +184,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 .progress-bar-container {
   width: 100%;
@@ -220,12 +253,11 @@
   }
 }
 
-/* Filter Styles */
+/* Фильтры */
 .filter {
- position: relative;
+  position: relative;
   display: flex;
   align-items: center;
-  margin-top: 0;
 }
 
 .filter-button {
@@ -237,7 +269,7 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
-  border-right:auto;
+  display: flex;
   align-items: center;
   gap: 8px;
 }
@@ -281,7 +313,7 @@
   color: #FFD700;
 }
 
-/* Quick Actions Styles */
+/* Кнопки быстрых действий*/
 .buttons-container {
   display: flex;
   gap: 10px;

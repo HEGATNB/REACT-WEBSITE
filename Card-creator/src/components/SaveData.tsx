@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 export const useSaveData = (technologies: any[], setTechnologies: (tech: any[]) => void) => {
-  // Load data on mount
   useEffect(() => {
     const saved = localStorage.getItem('techTrackerData');
     if (saved) {
@@ -14,8 +13,6 @@ export const useSaveData = (technologies: any[], setTechnologies: (tech: any[]) 
       }
     }
   }, [setTechnologies]);
-
-  // Save data when technologies change
   useEffect(() => {
     if (technologies && technologies.length > 0) {
       localStorage.setItem('techTrackerData', JSON.stringify(technologies));

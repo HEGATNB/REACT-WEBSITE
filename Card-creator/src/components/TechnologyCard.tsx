@@ -1,8 +1,8 @@
-
 import './TechnologyCard.css';
 import { useState, useEffect, useRef } from 'react';
 import { GiSettingsKnobs } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
+
 type Status = 'completed' | 'in-progress' | 'not-started';
 
 interface CardProps {
@@ -22,6 +22,9 @@ interface RoadMapProps {
   inProgress: number;
   currentFilter: string;
   onFilterChange: (filter: string) => void;
+  onSearch: (query: string) => void;
+  searchResultsCount: number;
+  searchQuery: string;
 }
 
 interface QuickActionsProps {
@@ -175,13 +178,26 @@ function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersP
   );
 }
 
-
-function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilterChange }: RoadMapProps) {
+function RoadMap({
+  total,
+  learned,
+  notStarted,
+  inProgress,
+  currentFilter,
+  onFilterChange,
+  onSearch,
+  searchResultsCount,
+  searchQuery
+}: RoadMapProps) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const progressPercentage = total > 0 ? (learned / total) * 100 : 0;
+
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     setIsAnimating(true);
@@ -202,13 +218,35 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
 
   const handleFilterClick = (filter: string) => {
     onFilterChange(filter);
+    setLocalSearchQuery('');
+    onSearch('');
   };
 
   const handleCloseFilters = () => {
     setShowFilters(false);
   };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    setLocalSearchQuery(value);
+    if (value === '') {
+      onSearch('');
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSearch(localSearchQuery);
+    }
+  };
+
+  const handleSearchIconClick = () => {
+    onSearch(localSearchQuery);
+  };
+
+  const handleClearSearch = () => {
+    setLocalSearchQuery('');
+    onSearch('');
   };
 
   return (
@@ -236,16 +274,8 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
           {Math.round(displayedProgress)}%
         </span>
       </div>
-      <div className = "filter-search-container">
-          <div className = "search-window">
-            <input
-             className = "input-window"
-             placeholder = "Введите запрос"
-             value={searchQuery}
-             onChange={handleSearchChange}
-             />
-            <FaSearch />
-          </div>
+      <div className="filter-search-container">
+        <div className="filter-section">
           <div className="filter">
             <button
               className="filter-button"
@@ -254,15 +284,44 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
             >
               <GiSettingsKnobs /> Фильтры
             </button>
+            <Filters
+              currentFilter={currentFilter}
+              onFilterChange={handleFilterClick}
+              isVisible={showFilters}
+              onClose={handleCloseFilters}
+            />
           </div>
-      </div>
+        </div>
 
-      <Filters
-        currentFilter={currentFilter}
-        onFilterChange={handleFilterClick}
-        isVisible={showFilters}
-        onClose={handleCloseFilters}
-      />
+        <div className="search-section">
+          <div className="search-window">
+            <input
+              className="input-window"
+              placeholder="Введите запрос и нажмите Enter"
+              value={localSearchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={handleSearchKeyPress}
+            />
+            <FaSearch
+              onClick={handleSearchIconClick}
+              className="search-icon"
+            />
+            {localSearchQuery && (
+              <span
+                onClick={handleClearSearch}
+                className="clear-search"
+              >
+                ×
+              </span>
+            )}
+          </div>
+          {searchQuery && searchQuery.trim() !== '' && (
+            <div className="results-text">
+              Найдено результатов: {searchResultsCount}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
