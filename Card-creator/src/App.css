@@ -7,7 +7,6 @@
   min-width: 0;
 }
 
-
 .quick-actions {
   width: 250px;
   flex-shrink: 0;
@@ -21,6 +20,7 @@
   flex-direction: column;
   margin-right: auto;
 }
+
 
 .quick-actions-button {
   background-color: #262332;
@@ -37,5 +37,53 @@
 
 .progress-header {
   margin-bottom: 30px;
-  width: 100%;
+  width: 1200px;
+}
+
+.technology-card-wrapper {
+  margin-bottom: 20px;
+}
+
+.search-info {
+  background-color: #e3f2fd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin: 15px auto;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.clear-search-button {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.clear-search-button:hover {
+  background-color: #ff5252;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+  grid-column: 1 / -1;
+}
+
+.search-icon {
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.search-icon:hover {
+  color: #2196f3;
 }

@@ -1,23 +1,29 @@
+
 import './App.css';
 import Card, { RoadMap, QuickActions } from './components/TechnologyCard';
 import { useState, useMemo } from 'react';
+import { useSaveData, TechnologyNotes } from './components/SaveData'; // Fixed import
 
 interface Technology {
   id: number;
   title: string;
   description: string;
   status: 'completed' | 'in-progress' | 'not-started';
+  notes: string; // Added notes property
 }
 
 const initialTechnologies: Technology[] = [
-  { id: 1, title: 'React Components', description: 'Изучение базовых компонентов', status: 'completed' },
-  { id: 2, title: 'JSX Syntax', description: 'Освоение синтаксиса JSX', status: 'in-progress' },
-  { id: 3, title: 'State Management', description: 'Работа с состоянием компонентов', status: 'not-started' }
+  { id: 1, title: 'React Components', description: 'Изучение базовых компонентов', status: 'completed', notes: '' },
+  { id: 2, title: 'JSX Syntax', description: 'Освоение синтаксиса JSX', status: 'in-progress', notes: '' },
+  { id: 3, title: 'State Management', description: 'Работа с состоянием компонентов', status: 'not-started', notes: '' }
 ];
 
 function App() {
   const [technologies, setTechnologies] = useState<Technology[]>(initialTechnologies);
   const [currentFilter, setCurrentFilter] = useState<string>('all');
+
+  // Use the save data hook
+  useSaveData(technologies, setTechnologies);
 
   const changeStatus = (id: number) => {
     const statusOrder: Technology['status'][] = ['not-started', 'in-progress', 'completed'];
@@ -34,6 +40,15 @@ function App() {
         }
         return tech;
       })
+    );
+  };
+
+  // Fixed: Added this function
+  const updateTechnologyNotes = (techId: number, newNotes: string) => {
+    setTechnologies(prevTech =>
+      prevTech.map(tech =>
+        tech.id === techId ? { ...tech, notes: newNotes } : tech
+      )
     );
   };
 
@@ -117,13 +132,17 @@ function App() {
         <div className="cards-section">
           <div className="card-container">
             {filteredTechnologies.map(tech => (
-              <Card
-                key={tech.id}
+              <div key={tech.id} className="technology-card-wrapper">
+                <Card
                 title={tech.title}
                 description={tech.description}
                 status={tech.status}
+                notes={tech.notes} // вместо note={tech.notes}
+                techId={tech.id}
                 onStatusChange={() => changeStatus(tech.id)}
-              />
+                onNotesChange={updateTechnologyNotes}
+                />
+              </div>
             ))}
           </div>
         </div>

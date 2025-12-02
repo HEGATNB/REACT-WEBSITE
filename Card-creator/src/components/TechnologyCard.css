@@ -1,29 +1,78 @@
+/* TechnologyCard.css */
 .Card {
   background: green;
   color: #ffffff;
-  padding: 30px;
+  padding: 20px;
   border-radius: 10px;
   margin: 20px 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   user-select: none;
   cursor: pointer;
   transition: transform 0.2s ease;
-  height: 200px;
   width: 220px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.notes-section {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.note-text-area {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 4px;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  resize: vertical;
+  overflow: auto;
+  background: #1f1d2b;
+  color: white;
+  font-family: inherit;
+  margin-top: 10px;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+.note-text-area:focus {
+  outline: 2px solid #white;
+  outline-offset: 2px;
+}
+
+.notes-hint {
+  font-size: 12px;
+  color: #cccccc;
+  margin-top: 5px;
+  text-align: center;
 }
 
 .Card:active {
-  background: #a8a0a0;
+  transform: scale(0.98);
 }
 
 .Card:hover {
   transform: translateY(-2px);
 }
 
+.note-text-area,
+.note-text-area:active,
+.note-text-area:focus,
+.note-text-area:hover {
+  cursor: text;
+}
+
+/* Стили для RoadMap */
 .RoadMap {
   user-select: none;
   background: #262332;
-  margin-left: 20px;
+  margin: 20px;
   color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
@@ -53,6 +102,42 @@
   text-align: center;
   white-space: nowrap;
 }
+.search-window {
+  position: absolute;
+  right: 20px;
+  width: 300px;
+  height: 35px;
+  color: #cccccc;
+  background-color:#4d5156;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius:25px;
+  font-size: 18px;
+}
+
+.filter-search-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 60%;
+}
+
+.input-window {
+  flex: 1;
+  border-radius: 25px;
+  border: none;
+  height: 100%;
+  width:230px;
+  font-size: 16px;
+  padding: 0 15px;
+  background-color: transparent;
+  color: white;
+  outline: none;
+}
+
+.input-window:focus {
+  outline: none;
+}
 
 /* Progress Bar Styles */
 .progress-container {
@@ -65,6 +150,7 @@
   align-items: center;
   justify-content: center;
 }
+
 
 .progress-bar-container {
   width: 100%;
@@ -105,10 +191,6 @@
   }
 }
 
-.progressBar {
-  display: none;
-}
-
 .PercentText {
   position: absolute;
   left: 50%;
@@ -140,10 +222,10 @@
 
 /* Filter Styles */
 .filter {
-  position: relative;
+ position: relative;
   display: flex;
-  justify-content: left;
-  margin-top: 15px;
+  align-items: center;
+  margin-top: 0;
 }
 
 .filter-button {
@@ -155,7 +237,7 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
-  display: flex;
+  border-right:auto;
   align-items: center;
   gap: 8px;
 }
@@ -197,4 +279,28 @@
 .filters-text.active {
   background-color: #1f1d2b;
   color: #FFD700;
+}
+
+/* Quick Actions Styles */
+.buttons-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.quick-actions-button {
+  background-color: #262332;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  min-height:45px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.quick-actions-button:hover {
+  background-color: #2a2738;
 }

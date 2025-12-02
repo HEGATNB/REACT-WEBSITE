@@ -1,14 +1,18 @@
+
 import './TechnologyCard.css';
 import { useState, useEffect, useRef } from 'react';
 import { GiSettingsKnobs } from "react-icons/gi";
-
+import { FaSearch } from "react-icons/fa";
 type Status = 'completed' | 'in-progress' | 'not-started';
 
 interface CardProps {
   title: string;
   description: string;
   status: Status;
-  onStatusChange: () => void;
+  notes: string;
+  techId: number;
+  onStatusChange: (id: number) => void;
+  onNotesChange: (techId: number, notes: string) => void;
 }
 
 interface RoadMapProps {
@@ -36,28 +40,56 @@ interface FiltersProps {
 const getColorByStatus = (status: Status): string => {
   switch (status) {
     case 'completed':
-      return '#4caf50'; // зеленый
+      return '#4caf50';
     case 'in-progress':
-      return '#ff9800'; // оранжевый
+      return '#ff9800';
     case 'not-started':
-      return '#f44336'; // красный
+      return '#f44336';
     default:
       return '#f44336';
   }
 };
 
-function Card({ title, description, status, onStatusChange }: CardProps) {
+function Card({ title, description, status, notes, techId, onStatusChange, onNotesChange }: CardProps) {
   const cardColor = getColorByStatus(status);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'TEXTAREA' || target.closest('textarea')) {
+      return;
+    }
+    onStatusChange(techId);
+  };
+
+  const handleTextareaClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onNotesChange(techId, e.target.value);
+  };
 
   return (
     <div
       className="Card"
-      onClick={onStatusChange}
+      onClick={handleCardClick}
       style={{ backgroundColor: cardColor }}
     >
       <h2>{title}</h2>
       <p>{description}</p>
       <p>Статус: {status}</p>
+      <textarea
+        className="note-text-area"
+        value={notes}
+        onClick={handleTextareaClick}
+        onChange={handleTextareaChange}
+        placeholder="Впишите сюда свою заметку..."
+        rows={3}
+      />
+      <div className="notes-hint">
+        {notes.length > 0 ? `Заметка сохранена (${notes.length} символов)` :
+          'Добавьте заметку'}
+      </div>
     </div>
   );
 }
@@ -143,11 +175,12 @@ function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersP
   );
 }
 
+
 function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilterChange }: RoadMapProps) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
   const progressPercentage = total > 0 ? (learned / total) * 100 : 0;
 
   useEffect(() => {
@@ -173,6 +206,9 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
 
   const handleCloseFilters = () => {
     setShowFilters(false);
+  };
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -200,14 +236,25 @@ function RoadMap({ total, learned, notStarted, inProgress, currentFilter, onFilt
           {Math.round(displayedProgress)}%
         </span>
       </div>
-      <div className="filter">
-        <button
-          className="filter-button"
-          type="button"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <GiSettingsKnobs /> Фильтры
-        </button>
+      <div className = "filter-search-container">
+          <div className = "search-window">
+            <input
+             className = "input-window"
+             placeholder = "Введите запрос"
+             value={searchQuery}
+             onChange={handleSearchChange}
+             />
+            <FaSearch />
+          </div>
+          <div className="filter">
+            <button
+              className="filter-button"
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <GiSettingsKnobs /> Фильтры
+            </button>
+          </div>
       </div>
 
       <Filters
