@@ -31,6 +31,7 @@ interface QuickActionsProps {
   onMarkAllDone: () => void;
   onResetAll: () => void;
   onRandomNext: () => void;
+  onExportData?: () => string;
 }
 
 interface FiltersProps {
@@ -96,8 +97,18 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
     </div>
   );
 }
+function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }: QuickActionsProps) {
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportedData, setExportedData] = useState<string>('');
 
-function QuickActions({ onMarkAllDone, onResetAll, onRandomNext }: QuickActionsProps) {
+  const handleExport = () => {
+    if (onExportData) {
+      const data = onExportData();
+      setExportedData(data);
+      setShowExportModal(true);
+    }
+  };
+
   return (
     <div className="buttons-container">
       <button className="quick-actions-button" type="button" onClick={onMarkAllDone}>
@@ -108,6 +119,9 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext }: QuickActionsP
       </button>
       <button className="quick-actions-button" type="button" onClick={onRandomNext}>
         Случайный выбор следующей технологии
+      </button>
+      <button className="quick-actions-button" type="button" onClick={handleExport}>
+        Экспорт данных
       </button>
     </div>
   );

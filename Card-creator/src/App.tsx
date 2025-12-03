@@ -1,71 +1,38 @@
 import './App.css';
 import Card, { RoadMap, QuickActions } from './components/TechnologyCard';
-import { useState, useMemo } from 'react';
-import { useSaveData } from './components/SaveData';
-
-interface Technology {
-  id: number;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  notes: string;
-}
-
-const initialTechnologies: Technology[] = [
-  { id: 1, title: 'React Components', description: 'Изучение базовых компонентов', status: 'completed', notes: '' },
-  { id: 2, title: 'JSX Syntax', description: 'Освоение синтаксиса JSX', status: 'in-progress', notes: '' },
-  { id: 3, title: 'State Management', description: 'Работа с состоянием компонентов', status: 'not-started', notes: '' }
-];
+import Modal from './components/Modal';
+import { useState } from 'react';
+import useTechnologies from './components/useTechnologies';
 
 function App() {
-  const [technologies, setTechnologies] = useState<Technology[]>(initialTechnologies);
+  const {
+    technologies,
+    updateStatus,
+    updateNotes,
+    markAllDone,
+    resetAllStatuses,
+    exportData,
+    setTechnologies
+  } = useTechnologies();
+
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  useSaveData(technologies, setTechnologies);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportedData, setExportedData] = useState<string>('');
 
   const changeStatus = (id: number) => {
-    const statusOrder: Technology['status'][] = ['not-started', 'in-progress', 'completed'];
+    const statusOrder: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
 
-    setTechnologies(prevTech =>
-      prevTech.map(tech => {
-        if (tech.id === id) {
-          const currentIndex = statusOrder.indexOf(tech.status);
-          const nextIndex = (currentIndex + 1) % statusOrder.length;
-          return {
-            ...tech,
-            status: statusOrder[nextIndex]
-          };
-        }
-        return tech;
-      })
-    );
+    const tech = technologies.find(t => t.id === id);
+    if (tech) {
+      const currentIndex = statusOrder.indexOf(tech.status);
+      const nextIndex = (currentIndex + 1) % statusOrder.length;
+      updateStatus(id, statusOrder[nextIndex]);
+    }
   };
 
   const updateTechnologyNotes = (techId: number, newNotes: string) => {
-    setTechnologies(prevTech =>
-      prevTech.map(tech =>
-        tech.id === techId ? { ...tech, notes: newNotes } : tech
-      )
-    );
-  };
-
-  const markAllDone = () => {
-    setTechnologies(prevTech =>
-      prevTech.map(tech => ({
-        ...tech,
-        status: 'completed' as const
-      }))
-    );
-  };
-
-  const resetAllStatuses = () => {
-    setTechnologies(prevTech =>
-      prevTech.map(tech => ({
-        ...tech,
-        status: 'not-started' as const
-      }))
-    );
+    updateNotes(techId, newNotes);
   };
 
   const randomNextTechnology = () => {
@@ -77,14 +44,7 @@ function App() {
     }
 
     const randomTech = notStartedTech[Math.floor(Math.random() * notStartedTech.length)];
-
-    setTechnologies(prevTech =>
-      prevTech.map(tech =>
-        tech.id === randomTech.id
-          ? { ...tech, status: 'in-progress' as const }
-          : tech
-      )
-    );
+    updateStatus(randomTech.id, 'in-progress');
   };
 
   const handleSearch = (query: string) => {
@@ -96,29 +56,32 @@ function App() {
     setSearchQuery('');
   };
 
-  const filteredTechnologies = useMemo(() => {
-    let result = technologies;
+  const handleExportData = () => {
+    const data = exportData();
+    setExportedData(data);
+    setShowExportModal(true);
+    return data;
+  };
 
+  const filteredTechnologies = technologies.filter(tech => {
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      result = result.filter(tech =>
-        tech.title.toLowerCase().includes(query) ||
+      return tech.title.toLowerCase().includes(query) ||
         tech.description.toLowerCase().includes(query) ||
-        tech.notes.toLowerCase().includes(query)
-      );
+        tech.notes.toLowerCase().includes(query);
     }
 
     switch (currentFilter) {
       case 'not-started':
-        return result.filter(tech => tech.status === 'not-started');
+        return tech.status === 'not-started';
       case 'in-progress':
-        return result.filter(tech => tech.status === 'in-progress');
+        return tech.status === 'in-progress';
       case 'completed':
-        return result.filter(tech => tech.status === 'completed');
+        return tech.status === 'completed';
       default:
-        return result;
+        return true;
     }
-  }, [technologies, currentFilter, searchQuery]);
+  });
 
   const total = technologies.length;
   const learned = technologies.filter(tech => tech.status === "completed").length;
@@ -146,6 +109,7 @@ function App() {
             onMarkAllDone={markAllDone}
             onResetAll={resetAllStatuses}
             onRandomNext={randomNextTechnology}
+            onExportData={handleExportData}
           />
         </div>
         <div className="cards-section">
@@ -172,6 +136,18 @@ function App() {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        title="Экспорт данных"
+      >
+        <p>Данные успешно экспортированы!</p>
+        <p>Файл был автоматически загружен на ваш компьютер.</p>
+        <p>Вы также можете просмотреть данные в консоли разработчика (F12).</p>
+        <button onClick={() => setShowExportModal(false)}>
+          Закрыть
+        </button>
+      </Modal>
     </div>
   );
 }
