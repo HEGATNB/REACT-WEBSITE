@@ -2,6 +2,7 @@ import './TechnologyCard.css';
 import { useState, useEffect, useRef } from 'react';
 import { GiSettingsKnobs } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
+import Modal from './Modal'; // Добавляем импорт Modal
 
 type Status = 'completed' | 'in-progress' | 'not-started';
 
@@ -31,6 +32,7 @@ interface QuickActionsProps {
   onMarkAllDone: () => void;
   onResetAll: () => void;
   onRandomNext: () => void;
+  onExportData?: () => string;
 }
 
 interface FiltersProps {
@@ -97,19 +99,48 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
   );
 }
 
-function QuickActions({ onMarkAllDone, onResetAll, onRandomNext }: QuickActionsProps) {
+function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }: QuickActionsProps) {
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  const handleExport = () => {
+    if (onExportData) {
+      // Вызываем функцию экспорта, которая возвращает строку с данными
+      onExportData();
+      // Показываем модальное окно
+      setShowExportModal(true);
+    }
+  };
+
   return (
-    <div className="buttons-container">
-      <button className="quick-actions-button" type="button" onClick={onMarkAllDone}>
-        Отметить все как выполненные
-      </button>
-      <button className="quick-actions-button" type="button" onClick={onResetAll}>
-        Сбросить все статусы
-      </button>
-      <button className="quick-actions-button" type="button" onClick={onRandomNext}>
-        Случайный выбор следующей технологии
-      </button>
-    </div>
+    <>
+      <div className="buttons-container">
+        <button className="quick-actions-button" type="button" onClick={onMarkAllDone}>
+          Отметить все как выполненные
+        </button>
+        <button className="quick-actions-button" type="button" onClick={onResetAll}>
+          Сбросить все статусы
+        </button>
+        <button className="quick-actions-button" type="button" onClick={onRandomNext}>
+          Случайный выбор следующей технологии
+        </button>
+        <button className="quick-actions-button" type="button" onClick={handleExport}>
+          Экспорт данных
+        </button>
+      </div>
+
+      <Modal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        title="Экспорт данных"
+      >
+        <p>Данные успешно экспортированы!</p>
+        <p>Файл был автоматически загружен на ваш компьютер.</p>
+        <p>Вы также можете просмотреть данные в консоли разработчика (F12).</p>
+        <button onClick={() => setShowExportModal(false)}>
+          Закрыть
+        </button>
+      </Modal>
+    </>
   );
 }
 
