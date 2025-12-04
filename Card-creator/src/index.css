@@ -1,3 +1,4 @@
+/* index.css - ИСПРАВЛЕННЫЙ */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -22,13 +23,20 @@ a:hover {
   color: #535bf2;
 }
 
+/* ИСПРАВЛЕНО: убрали flex и центрирование */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color:#1f1d2b;
+  background-color: #1f1d2b;
+}
+
+/* Дополнительно можно добавить для корневого элемента */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
@@ -51,6 +59,7 @@ button {
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;

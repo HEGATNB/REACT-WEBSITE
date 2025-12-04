@@ -1,0 +1,315 @@
+/* AddTechnology.css - ИСПРАВЛЕННЫЙ */
+.add-technology-page {
+  min-height: calc(100vh - 80px); /* Высота минус навигация */
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.add-tech-content {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  position: relative;
+}
+
+.add-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  margin: auto;
+}
+
+.add-tech-button {
+  padding: 25px 50px;
+  font-size: 22px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  min-width: 450px;
+  text-align: center;
+}
+
+.add-tech-button.save-mode {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.add-tech-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+}
+
+.add-tech-button.save-mode:hover {
+  box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
+}
+
+.add-tech-button:active {
+  transform: translateY(-2px);
+}
+
+/* Modal overlay */
+.modal-overlay-tech {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Карточка для редактирования */
+.tech-card-editor {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 700px;
+  min-height: 500px;
+  padding: 35px;
+  border-radius: 15px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.card-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.card-title-input,
+.card-description-input,
+.card-category-input,
+.card-notes-input {
+  width: 100%;
+  padding: 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #000;
+  font-family: inherit;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  cursor: text;
+}
+
+.card-title-input:focus,
+.card-description-input:focus,
+.card-category-input:focus,
+.card-notes-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  background-color: white;
+}
+
+.card-title-input::placeholder,
+.card-description-input::placeholder,
+.card-category-input::placeholder,
+.card-notes-input::placeholder {
+  color: #666;
+  font-size: 15px;
+}
+
+.card-description-input,
+.card-notes-input {
+  resize: vertical;
+  min-height: 120px;
+  font-size: 15px;
+}
+
+.card-notes-input {
+  min-height: 100px;
+}
+
+/* Секция статуса */
+.card-status-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.status-text {
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.card-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Кнопка закрытия */
+.card-close-button {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #ff4444;
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  z-index: 1002;
+}
+
+.card-close-button:hover {
+  background: #ff0000;
+  transform: scale(1.1);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .tech-card-editor {
+    width: 80%;
+    max-width: 600px;
+    min-height: 450px;
+    padding: 30px;
+  }
+
+  .add-tech-button {
+    min-width: 400px;
+    padding: 22px 45px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-tech-button {
+    min-width: 350px;
+    padding: 20px 40px;
+    font-size: 18px;
+  }
+
+  .tech-card-editor {
+    width: 90%;
+    max-width: 500px;
+    padding: 25px;
+    min-height: 400px;
+  }
+
+  .card-close-button {
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+
+  .card-title-input,
+  .card-description-input,
+  .card-category-input,
+  .card-notes-input {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-tech-button {
+    min-width: 300px;
+    padding: 18px 35px;
+    font-size: 16px;
+  }
+
+  .tech-card-editor {
+    width: 95%;
+    max-width: 350px;
+    padding: 20px;
+    min-height: 380px;
+    gap: 20px;
+  }
+
+  .card-title-input,
+  .card-description-input,
+  .card-category-input,
+  .card-notes-input {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .card-description-input,
+  .card-notes-input {
+    min-height: 100px;
+  }
+
+  .status-text {
+    font-size: 16px;
+  }
+}
+
+/* Эффект пульсации для кнопки */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.add-tech-button:not(.save-mode) {
+  animation: pulse 2s infinite;
+}

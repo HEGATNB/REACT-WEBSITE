@@ -118,7 +118,6 @@ function useTechnologies() {
     const dataStr = JSON.stringify(data, null, 2);
     console.log('Данные для экспорта:', dataStr);
 
-    // Создаем ссылку для скачивания файла
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

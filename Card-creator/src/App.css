@@ -1,10 +1,16 @@
-.card-container {
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.card-container {
+  display: grid;
   gap: 20px;
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .quick-actions {
@@ -21,7 +27,6 @@
   margin-right: auto;
 }
 
-
 .quick-actions-button {
   background-color: #262332;
   margin: 15px;
@@ -33,11 +38,15 @@
   gap: 20px;
   padding: 20px;
   align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .progress-header {
   margin-bottom: 30px;
-  width: 1200px;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .technology-card-wrapper {
@@ -49,11 +58,12 @@
   padding: 10px 20px;
   border-radius: 8px;
   margin: 15px auto;
-  max-width: 1200px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-sizing: border-box;
 }
 
 .clear-search-button {
@@ -77,6 +87,7 @@
   font-size: 18px;
   color: #666;
   grid-column: 1 / -1;
+  width: 100%;
 }
 
 .search-icon {
@@ -88,7 +99,6 @@
   color: #2196f3;
 }
 
-/* App.css */
 .search-results-info {
   background-color: #262332;
   color: white;
@@ -96,7 +106,8 @@
   border-radius: 8px;
   margin: 20px auto;
   text-align: center;
-  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .search-results-info p {
@@ -117,6 +128,8 @@
   gap: 20px;
   justify-content: center;
   padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .technology-card-wrapper {

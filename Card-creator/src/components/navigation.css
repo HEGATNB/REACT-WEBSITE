@@ -1,0 +1,70 @@
+.main-navigation {
+  background: #262332;
+  color: white;
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Контейнер для содержимого навигации */
+.nav-container {
+  display: flex;
+  justify-content: space-between; /* Распределяем по краям */
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-brand a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: white;
+}
+
+.nav-brand img {
+  height: 40px;
+  width: auto;
+}
+
+.nav-brand h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 15px; /* Уменьшил немного отступы между пунктами */
+  margin: 0;
+  padding: 0;
+}
+
+.nav-menu li a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  white-space: nowrap; /* Чтобы текст не переносился */
+}
+
+.nav-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-menu li a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}

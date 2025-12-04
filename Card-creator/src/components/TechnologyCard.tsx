@@ -2,7 +2,7 @@ import './TechnologyCard.css';
 import { useState, useEffect, useRef } from 'react';
 import { GiSettingsKnobs } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
-import Modal from './Modal'; // Добавляем импорт Modal
+import Modal from './Modal';
 
 type Status = 'completed' | 'in-progress' | 'not-started';
 
@@ -14,7 +14,9 @@ interface CardProps {
   techId: number;
   onStatusChange: (id: number) => void;
   onNotesChange: (techId: number, notes: string) => void;
+  isEditable?: boolean;
 }
+
 
 interface RoadMapProps {
   total: number;
@@ -54,10 +56,8 @@ const getColorByStatus = (status: Status): string => {
       return '#f44336';
   }
 };
-
-function Card({ title, description, status, notes, techId, onStatusChange, onNotesChange }: CardProps) {
+function Card({ title, description, status, notes, techId, onStatusChange, onNotesChange, isEditable = false }: CardProps) {
   const cardColor = getColorByStatus(status);
-
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === 'TEXTAREA' || target.closest('textarea')) {
@@ -76,7 +76,7 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
 
   return (
     <div
-      className="Card"
+      className={`Card ${isEditable ? 'editable-card' : ''}`}
       onClick={handleCardClick}
       style={{ backgroundColor: cardColor }}
     >
@@ -104,9 +104,7 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }:
 
   const handleExport = () => {
     if (onExportData) {
-      // Вызываем функцию экспорта, которая возвращает строку с данными
       onExportData();
-      // Показываем модальное окно
       setShowExportModal(true);
     }
   };

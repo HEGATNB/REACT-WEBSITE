@@ -1,7 +1,12 @@
 import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Card, { RoadMap, QuickActions } from './components/TechnologyCard';
 import { useState } from 'react';
 import useTechnologies from './components/UseTechnologies';
+import Navigation from './components/navigation';
+import TechnologyDetail from './pages/TechnologyDetail';
+import TechnologyList from './pages/TechnologyList';
+import AddTechnology from './pages/AddTechnology';
 
 function App() {
   const {
@@ -82,54 +87,71 @@ function App() {
   const inProgress = technologies.filter(tech => tech.status === "in-progress").length;
 
   return (
-    <div className="App">
-      <div className="progress-header">
-        <RoadMap
-          total={total}
-          learned={learned}
-          inProgress={inProgress}
-          notStarted={notStarted}
-          currentFilter={currentFilter}
-          onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
-          searchResultsCount={filteredTechnologies.length}
-          searchQuery={searchQuery}
-        />
-      </div>
-      <div className="main-content">
-        <div className="quick-actions">
-          <QuickActions
-            onMarkAllDone={markAllDone}
-            onResetAll={resetAllStatuses}
-            onRandomNext={randomNextTechnology}
-            onExportData={handleExportData}
-          />
-        </div>
-        <div className="cards-section">
-          <div className="card-container">
-            {filteredTechnologies.length > 0 ? (
-              filteredTechnologies.map(tech => (
-                <div key={tech.id} className="technology-card-wrapper">
-                  <Card
-                    title={tech.title}
-                    description={tech.description}
-                    status={tech.status}
-                    notes={tech.notes}
-                    techId={tech.id}
-                    onStatusChange={() => changeStatus(tech.id)}
-                    onNotesChange={updateTechnologyNotes}
+    <BrowserRouter>
+      <div className="App">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={
+            <>
+              <div className="progress-header">
+                <RoadMap
+                  total={total}
+                  learned={learned}
+                  inProgress={inProgress}
+                  notStarted={notStarted}
+                  currentFilter={currentFilter}
+                  onFilterChange={handleFilterChange}
+                  onSearch={handleSearch}
+                  searchResultsCount={filteredTechnologies.length}
+                  searchQuery={searchQuery}
+                />
+              </div>
+              <div className="main-content">
+                <div className="quick-actions">
+                  <QuickActions
+                    onMarkAllDone={markAllDone}
+                    onResetAll={resetAllStatuses}
+                    onRandomNext={randomNextTechnology}
+                    onExportData={handleExportData}
                   />
                 </div>
-              ))
-            ) : (
-              <div className="no-results">
-                <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
+                <div className="cards-section">
+                  <div className="card-container">
+                    {filteredTechnologies.length > 0 ? (
+                      filteredTechnologies.map(tech => (
+                        <div key={tech.id} className="technology-card-wrapper">
+                          <Card
+                            title={tech.title}
+                            description={tech.description}
+                            status={tech.status}
+                            notes={tech.notes}
+                            techId={tech.id}
+                            onStatusChange={() => changeStatus(tech.id)}
+                            onNotesChange={updateTechnologyNotes}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-results">
+                        <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </>
+          } />
+          <Route path="/technologies" element={<TechnologyList />} />
+          <Route path="/technology/:techId" element={<TechnologyDetail />} />
+          <Route path="/add-technology" element={
+            <AddTechnology
+              technologies={technologies}
+              setTechnologies={useTechnologies().setTechnologies}
+            />
+          } />
+        </Routes>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 
