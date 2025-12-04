@@ -1,11 +1,11 @@
-/* AddTechnology.css - ИСПРАВЛЕННЫЙ */
+/* AddTechnology.css */
 .add-technology-page {
   min-height: calc(100vh - 80px); /* Высота минус навигация */
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Изменено с center на flex-start */
   padding: 20px;
   box-sizing: border-box;
   width: 100%;
@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Изменено с center на flex-start */
   min-height: 100%;
   position: relative;
 }
@@ -28,22 +28,27 @@
   align-items: center;
   width: 100%;
   padding: 20px;
-  margin: auto;
+  margin: 20px 0; /* Добавлен отступ */
+  z-index: 2;
+  position: relative;
 }
 
 .add-tech-button {
-  padding: 25px 50px;
-  font-size: 22px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 18px 36px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   color: white;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 17px;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  min-width: 450px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 280px;
   text-align: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
 }
 
 .add-tech-button.save-mode {
@@ -64,31 +69,25 @@
   transform: translateY(-2px);
 }
 
-/* Modal overlay */
+/* Убираем темный фон модального окна */
 .modal-overlay-tech {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  display: none;
 }
 
-/* Карточка для редактирования */
+/* Карточка для редактирования - теперь часть потока */
 .tech-card-editor {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70%;
-  max-width: 700px;
-  min-height: 500px;
-  padding: 35px;
+  position: relative; /* Изменено с fixed на relative */
+  top: 0;
+  left: 0;
+  transform: none; /* Убираем transform */
+  margin: 30px auto;
+  width: 90%;
+  max-width: 500px; /* Уменьшена максимальная ширина */
+  min-height: 450px; /* Увеличена минимальная высота */
+  padding: 30px;
   border-radius: 15px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -96,6 +95,33 @@
   cursor: pointer;
   user-select: none;
   transition: background-color 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.card-close-button:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .card-inputs {
@@ -109,16 +135,25 @@
 .card-description-input,
 .card-category-input,
 .card-notes-input {
-  width: 100%;
+  width: 100%; /* Изменено с 90% на 100% */
   padding: 18px;
   border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   background-color: rgba(255, 255, 255, 0.95);
-  color: #000;
+  color: white; /* Исправлено: font-color на color */
   font-family: inherit;
-  font-size: 16px;
+  font-size: 14px;
   transition: border-color 0.3s, box-shadow 0.3s;
   cursor: text;
+  box-sizing: border-box;
+}
+
+.card-title-input::placeholder,
+.card-description-input::placeholder,
+.card-category-input::placeholder,
+.card-notes-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
 }
 
 .card-title-input:focus,
@@ -126,37 +161,43 @@
 .card-category-input:focus,
 .card-notes-input:focus {
   outline: none;
+  color: white;
   border-color: rgba(255, 255, 255, 0.7);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-  background-color: white;
+  background-color: rgba(38, 35, 50, 0.9);
 }
 
-.card-title-input::placeholder,
-.card-description-input::placeholder,
-.card-category-input::placeholder,
-.card-notes-input::placeholder {
-  color: #666;
-  font-size: 15px;
+/* Установка фона для всех полей ввода */
+.card-title-input,
+.card-description-input,
+.card-category-input,
+.card-notes-input {
+  background-color: rgba(38, 35, 50, 0.8);
 }
 
 .card-description-input,
 .card-notes-input {
   resize: vertical;
-  min-height: 120px;
-  font-size: 15px;
+  min-height: 70px;
+  font-size: 14px;
+  border-radius: 12px;
 }
 
 .card-notes-input {
-  min-height: 100px;
+  min-height: 80px;
 }
 
-/* Секция статуса */
+/* Статус перенесен вверх */
 .card-status-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-top: 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-right: 40px; /* Отступ для кнопки закрытия */
 }
 
 .status-text {
@@ -173,47 +214,20 @@
   line-height: 1.5;
 }
 
-/* Кнопка закрытия */
-.card-close-button {
-  position: absolute;
-  top: -18px;
-  right: -18px;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: #ff4444;
-  color: white;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
-  z-index: 1002;
-}
-
-.card-close-button:hover {
-  background: #ff0000;
-  transform: scale(1.1);
-  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
-}
-
-/* Анимации */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* Изменена анимация slideUp */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translate(-50%, -40%) scale(0.9);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -221,7 +235,7 @@
 @media (max-width: 1024px) {
   .tech-card-editor {
     width: 80%;
-    max-width: 600px;
+    max-width: 500px;
     min-height: 450px;
     padding: 30px;
   }
@@ -242,17 +256,9 @@
 
   .tech-card-editor {
     width: 90%;
-    max-width: 500px;
+    max-width: 450px;
     padding: 25px;
-    min-height: 400px;
-  }
-
-  .card-close-button {
-    top: -15px;
-    right: -15px;
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
+    min-height: 420px;
   }
 
   .card-title-input,
@@ -261,6 +267,14 @@
   .card-notes-input {
     padding: 16px;
     font-size: 15px;
+  }
+
+  .card-close-button {
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
   }
 }
 
@@ -275,7 +289,7 @@
     width: 95%;
     max-width: 350px;
     padding: 20px;
-    min-height: 380px;
+    min-height: 400px;
     gap: 20px;
   }
 
@@ -287,29 +301,41 @@
     font-size: 14px;
   }
 
-  .card-description-input,
+  .card-description-input {
+    min-height: 90px;
+  }
+
   .card-notes-input {
-    min-height: 100px;
+    min-height: 80px;
   }
 
   .status-text {
     font-size: 16px;
   }
+
+  .card-hint {
+    font-size: 13px;
+  }
+
+  .card-close-button {
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    font-size: 15px;
+  }
 }
 
-/* Эффект пульсации для кнопки */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+@media (max-width: 360px) {
+  .add-tech-button {
+    min-width: 260px;
+    padding: 16px 30px;
+    font-size: 15px;
   }
-  50% {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-  }
-  100% {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  }
-}
 
-.add-tech-button:not(.save-mode) {
-  animation: pulse 2s infinite;
+  .tech-card-editor {
+    width: 98%;
+    padding: 15px;
+    min-height: 380px;
+  }
 }

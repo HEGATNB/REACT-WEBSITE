@@ -15,7 +15,8 @@ function App() {
     updateNotes,
     markAllDone,
     resetAllStatuses,
-    exportData
+    exportData,
+    setTechnologies // Добавлено
   } = useTechnologies();
 
   const [currentFilter, setCurrentFilter] = useState<string>('all');
@@ -146,7 +147,7 @@ function App() {
           <Route path="/add-technology" element={
             <AddTechnology
               technologies={technologies}
-              setTechnologies={useTechnologies().setTechnologies}
+              setTechnologies={setTechnologies}
             />
           } />
         </Routes>
