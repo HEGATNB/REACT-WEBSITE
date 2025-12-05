@@ -175,7 +175,7 @@
   font-size: 16px;
   font-weight: 600;
   padding: 12px 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #262332;
   border-radius: 10px;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
@@ -183,6 +183,7 @@
 
 .edit-link:hover {
   transform: translateY(-3px);
+  background: #262332;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 

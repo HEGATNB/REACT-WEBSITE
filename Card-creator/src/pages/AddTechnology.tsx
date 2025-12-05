@@ -17,13 +17,24 @@ interface AddTechnologyProps {
   setTechnologies: (tech: Technology[]) => void;
 }
 
+// Добавляем интерфейс для состояния новой технологии
+interface NewTechnology {
+  title: string;
+  description: string;
+  status: 'completed' | 'in-progress' | 'not-started';
+  notes: string;
+  category: string;
+}
+
 function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
   const navigate = useNavigate();
   const [isCardVisible, setIsCardVisible] = useState(false);
-  const [newTechnology, setNewTechnology] = useState({
+
+  // Используем правильный тип для состояния
+  const [newTechnology, setNewTechnology] = useState<NewTechnology>({
     title: '',
     description: '',
-    status: 'not-started' as const,
+    status: 'not-started',
     notes: '',
     category: ''
   });
@@ -58,10 +69,10 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
     }
 
     // Генерируем новый ID (максимальный существующий + 1)
-    const maxId = technologies.length > 0 
-      ? Math.max(...technologies.map(t => t.id)) 
+    const maxId = technologies.length > 0
+      ? Math.max(...technologies.map(t => t.id))
       : 0;
-    
+
     const techWithId: Technology = {
       ...newTechnology,
       id: maxId + 1
@@ -70,7 +81,7 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
     // Обновляем состояние глобальных технологий
     const updatedTechnologies = [...technologies, techWithId];
     setTechnologies(updatedTechnologies);
-    
+
     // Сохраняем в localStorage
     localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 

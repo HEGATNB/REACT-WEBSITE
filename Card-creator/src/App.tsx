@@ -4,8 +4,8 @@ import Card, { RoadMap, QuickActions } from './components/TechnologyCard';
 import { useState } from 'react';
 import useTechnologies from './components/UseTechnologies';
 import Navigation from './components/navigation';
-import TechnologyDetail from './pages/TechnologyDetail';
-import TechnologyList from './pages/TechnologyList';
+import TechnologyDetail from './pages/technologyDetail';
+import TechnologyList from './pages/technologyList';
 import AddTechnology from './pages/AddTechnology';
 
 function App() {
