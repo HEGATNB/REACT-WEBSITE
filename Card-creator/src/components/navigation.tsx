@@ -57,7 +57,7 @@ function Navigation() {
         <div className="nav-brand">
           <Link to="/">
             <img src={isWhiteTheme ? logoDark : logoLight} alt="логотип" />
-            <h2>Трекер технологий</h2>
+            <h2 className="logo-text">Трекер технологий</h2>
           </Link>
         </div>
         <ul className="nav-menu">
@@ -74,6 +74,11 @@ function Navigation() {
           <li>
             <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''}>
               Добавить технологию
+            </Link>
+          </li>
+          <li>
+            <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
+              Статистика
             </Link>
           </li>
           <li>

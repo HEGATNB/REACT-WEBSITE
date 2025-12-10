@@ -80,7 +80,7 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
       onClick={handleCardClick}
       style={{ backgroundColor: cardColor }}
     >
-      <h2>{title}</h2>
+      <h2 >{title}</h2>
       <p>{description}</p>
       <p>Статус: {status}</p>
       <textarea

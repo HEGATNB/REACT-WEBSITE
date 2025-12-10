@@ -76,7 +76,7 @@ body {
 /* Страница списка технологий */
 [data-theme="light"] .technology-list-page,
 [data-theme="light"] .technologies-container {
-  background: #f5f5f5 !important;
+  background: none !important;
 }
 
 /* Страница добавления технологии */
@@ -91,7 +91,11 @@ body {
 }
 
 /* ОСНОВНЫЕ КОМПОНЕНТЫ С ФОНОМ - ТЕМНАЯ ТЕМА */
-
+[data-theme="light"] .add-tech-link {
+  background: #f5f5f8;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: black;
+}
 [data-theme="light"] .quick-actions-button {
   background-color: #f5f5f8;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -204,7 +208,7 @@ body {
 [data-theme="light"] .technology-list-page .technology-item-title,
 [data-theme="light"] .technology-list-page .technology-item-description,
 [data-theme="light"] .technology-list-page .technology-item-status {
-  color: black !important;
+  color: white !important;
 }
 
 /* Вкладка "Добавить технологию" - фон кнопки как в темной теме */
@@ -285,13 +289,44 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+[data-theme="light"] .CompletedStat,
+[data-theme="light"] .InProgressStat,
+[data-theme="light"] .NotStartStat,
+[data-theme="light"] .filters-text,
+[data-theme="light"] .logo-text,
+[data-theme="light"] .icon-moon{
+  color: black !important;
+}
+
+[data-theme="light"] .filters-text,
+[data-theme="light"] .filters-list{
+  background-color: #f5f5f8;
+}
+
+[data-theme="light"] .filters-text:hover{
+  background-color: #d1d1d1;
+}
+
+[data-theme="light"] .filter-button{
+  background-color: #d1d1d1 !important;
+  color: black !important;
+}
+
+[data-theme="light"] .filters-text.active{
+  background-color: #d1d1d1 !important;
+}
+
+[data-theme="light"] .filter-button:hover {
+  background-color: #b8b8b8 !important;
+}
+
 [data-theme="light"] h1,
 [data-theme="light"] h2,
 [data-theme="light"] h3,
 [data-theme="light"] p,
 [data-theme="light"] span,
 [data-theme="light"] div {
-  color: black !important;
+  color: white !important;
 }
 
 [data-theme="dark"] h1,

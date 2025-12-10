@@ -15,15 +15,15 @@
   border: none;
   color: white;
   cursor: pointer;
-  padding: 8px 15px; /* Уменьшил padding для выравнивания высоты */
+  padding: 8px 15px;
   border-radius: 5px;
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s;
-  min-width: 50px; /* Уменьшил минимальную ширину */
-  height: 40px; /* Фиксированная высота для выравнивания */
+  min-width: 50px;
+  height: 40px;
   position: relative;
   overflow: hidden;
   margin: 0; /* Убираем возможные отступы */

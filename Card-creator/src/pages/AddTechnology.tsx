@@ -146,7 +146,7 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
             onClick={handleAddButtonClick}
             className={`add-tech-button ${isCardVisible ? 'save-mode' : ''}`}
           >
-            {isCardVisible ? '💾 Сохранить технологию' : '+ Создать новую технологию'}
+            {isCardVisible ? 'Сохранить технологию' : '+ Создать новую технологию'}
           </button>
         </div>
 
