@@ -1,37 +1,108 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './navigation.css';
+import { IoMdSettings } from "react-icons/io";
+import { FaRegMoon } from "react-icons/fa";
+import { FaSun } from "react-icons/fa";
+import logoDark from '/assets/WSLogo_dark.png';
+import logoLight from '/assets/WSLogo.png';
 
-  function Navigation() {
-      const location = useLocation();
-      return (
-      <nav className="main-navigation">
-        <div className="nav-container">
-          <div className="nav-brand">
-              <Link to="/">
-              <img src="./WSLogo.png" alt="логотип" />
-              <h2> Трекер технологий</h2>
-              </Link>
-          </div>
-          <ul className="nav-menu">
-            <li>
-                <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-                Главная
-                </Link>
-            </li>
-            <li>
-                <Link to="/technologies" className={location.pathname === '/technologies' ? 'active' : ''}>
-                Все технологии
-                </Link>
-            </li>
-            <li>
-                <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''}>
-                Добавить технологию
-                </Link>
-            </li>
-          </ul>
+function Navigation() {
+  const location = useLocation();
+  const [isWhiteTheme, setWhiteTheme] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Инициализируем тему из data-theme атрибута при загрузке
+  useEffect(() => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    // Если тема не установлена, устанавливаем темную по умолчанию
+    if (!currentTheme) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      setWhiteTheme(false);
+    } else if (currentTheme === 'light') {
+      setWhiteTheme(true);
+    } else {
+      setWhiteTheme(false);
+    }
+  }, []);
+
+  const handleChangeTheme = () => {
+    if (isAnimating) return;
+
+    setIsAnimating(true);
+
+    // Определяем следующую тему
+    const nextTheme = isWhiteTheme ? 'dark' : 'light';
+
+    // Устанавливаем data-theme на корневом элементе
+    document.documentElement.setAttribute('data-theme', nextTheme);
+
+    // Сохраняем тему в localStorage для сохранения при перезагрузке
+    localStorage.setItem('theme', nextTheme);
+
+    setTimeout(() => {
+      setWhiteTheme(!isWhiteTheme);
+      setIsAnimating(false);
+    }, 300);
+  }
+
+  // Получаем текст для кнопки (доступность)
+  const getThemeButtonLabel = () => {
+    return isWhiteTheme ? "Переключить на темную тему" : "Переключить на светлую тему";
+  };
+
+  return (
+    <nav className="main-navigation">
+      <div className="nav-container">
+        <div className="nav-brand">
+          <Link to="/">
+            <img src={isWhiteTheme ? logoDark : logoLight} alt="логотип" />
+            <h2>Трекер технологий</h2>
+          </Link>
         </div>
-      </nav>
-    );
+        <ul className="nav-menu">
+          <li>
+            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+              Главная
+            </Link>
+          </li>
+          <li>
+            <Link to="/technologies" className={location.pathname === '/technologies' ? 'active' : ''}>
+              Все технологии
+            </Link>
+          </li>
+          <li>
+            <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''}>
+              Добавить технологию
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
+              <IoMdSettings />
+            </Link>
+          </li>
+          <li>
+            <button
+              className="theme-toggle-button"
+              onClick={handleChangeTheme}
+              disabled={isAnimating}
+              aria-label={getThemeButtonLabel()}
+              title={getThemeButtonLabel()}
+            >
+              <div className="icon-container">
+                <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
+                  <FaSun />
+                </div>
+                <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
+                  <FaRegMoon />
+                </div>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
 }
 
 export default Navigation;

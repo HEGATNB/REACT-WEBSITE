@@ -1,4 +1,3 @@
-/* index.css - ИСПРАВЛЕННЫЙ */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -14,29 +13,250 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Светлая тема - ПРИОРИТЕТНЫЕ СТИЛИ ФОНА */
+[data-theme="light"] {
+  color: #213547 !important;
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] body {
+  background-color: #f5f5f5 !important;
+  color: #213547 !important;
+}
+
+[data-theme="light"] #root {
+  background-color: #f5f5f5 !important;
+}
+
+/* Темная тема - ПРИОРИТЕТНЫЕ СТИЛИ ФОНА */
+[data-theme="dark"] {
+  color: rgba(255, 255, 255, 0.87) !important;
+  background-color: #242424 !important;
+}
+
+[data-theme="dark"] body {
+  background-color: #121212 !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+[data-theme="dark"] #root {
+  background-color: #121212 !important;
+}
+
+/* ФОН ВСЕЙ СТРАНИЦЫ */
+body {
+  margin: 0 !important;
+  min-width: 320px !important;
+  min-height: 100vh !important;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* Основной контейнер приложения */
+#root {
+  width: 100% !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ОСНОВНЫЕ КОМПОНЕНТЫ С ФОНОМ - СВЕТЛАЯ ТЕМА */
+
+/* App - главный контейнер */
+[data-theme="light"] .App {
+  background: white !important;
+}
+
+/* Страница деталей технологии */
+[data-theme="light"] .technology-detail-page,
+[data-theme="light"] .technology-detail-loading,
+[data-theme="light"] .technology-detail-not-found {
+  background: #f5f5f5 !important;
+}
+
+/* Страница списка технологий */
+[data-theme="light"] .technology-list-page,
+[data-theme="light"] .technologies-container {
+  background: #f5f5f5 !important;
+}
+
+/* Страница добавления технологии */
+[data-theme="light"] .add-technology-page {
+  background: #f5f5f5 !important;
+}
+
+/* Карточки и контейнеры */
+[data-theme="light"] .cards-section,
+[data-theme="light"] .main-content {
+  background: none !important;
+}
+
+/* ОСНОВНЫЕ КОМПОНЕНТЫ С ФОНОМ - ТЕМНАЯ ТЕМА */
+
+[data-theme="light"] .quick-actions-button {
+  background-color: #f5f5f8;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+[data-theme="light"] .quick-actions-button:hover {
+  background-color: #d1d1d1;
+}
+
+[data-theme="light"] .search-window,
+[data-theme="light"] .input-window,
+[data-theme="light"] .input-window::placeholder{
+  background-color: #d1d1d1;
+  color: black !important;
+}
+
+/* App - главный контейнер */
+[data-theme="dark"] .App {
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
+}
+
+/* Страница деталей технологии */
+[data-theme="dark"] .technology-detail-page,
+[data-theme="dark"] .technology-detail-loading,
+[data-theme="dark"] .technology-detail-not-found {
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
+}
+
+/* Страница списка технологий */
+[data-theme="dark"] .technology-list-page,
+[data-theme="dark"] .technologies-container {
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
+}
+
+/* Страница добавления технологии */
+[data-theme="dark"] .add-technology-page {
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
+}
+
+/* Карточки и контейнеры */
+[data-theme="dark"] .cards-section,
+[data-theme="dark"] .main-content {
+  background: transparent !important;
+}
+
+/* НАВИГАЦИЯ */
+
+/* Стили для навигации в зависимости от темы */
+[data-theme="light"] .main-navigation {
+  background-color: #f5f5f8 !important;
+  color: #213547 !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+[data-theme="light"] .RoadMap{
+  background-color: #f5f5f8 !important;
+}
+
+[data-theme="dark"] .main-navigation {
+  background-color: #262332 !important;
+  color: white !important;
+}
+
+/* Стили для ссылок в навигации */
+[data-theme="light"] .nav-menu li a {
+  color: #213547 !important;
+}
+
+[data-theme="light"] .nav-menu li a:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .nav-menu li a.active {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="dark"] .nav-menu li a {
+  color: white !important;
+}
+
+/* Стили для кнопки темы */
+[data-theme="light"] .theme-toggle-button {
+  color: #213547 !important;
+}
+
+[data-theme="light"] .theme-toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="dark"] .theme-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Статусы на главной странице - белый текст как в темной теме */
+[data-theme="light"] .status-tag,
+[data-theme="light"] .status-not-started,
+[data-theme="light"] .status-in-progress,
+[data-theme="light"] .status-completed {
+  color: #ffffff !important;
+}
+
+/* Вкладка "Все технологии" - черный текст */
+[data-theme="light"] .technology-list-page h1,
+[data-theme="light"] .technology-list-page h2,
+[data-theme="light"] .technology-list-page h3,
+[data-theme="light"] .technology-list-page p,
+[data-theme="light"] .technology-list-page span,
+[data-theme="light"] .technology-list-page .technology-item,
+[data-theme="light"] .technology-list-page .technology-item-title,
+[data-theme="light"] .technology-list-page .technology-item-description,
+[data-theme="light"] .technology-list-page .technology-item-status {
+  color: black !important;
+}
+
+/* Вкладка "Добавить технологию" - фон кнопки как в темной теме */
+[data-theme="light"] .add-technology-page button[type="submit"],
+[data-theme="light"] .add-technology-page .submit-button {
+  background-color: #262332 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+[data-theme="light"] .add-technology-page button[type="submit"]:hover,
+[data-theme="light"] .add-technology-page .submit-button:hover {
+  background-color: #1e1a2b !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .Card,
+[data-theme="light"] .technology-item,
+[data-theme="light"] .technology-detail-card,
+[data-theme="light"] .tech-card-editor {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Модальные окна */
+[data-theme="light"] .modal-content {
+  background: #ffffff !important;
+  color: #213547 !important;
+  border: 1px solid #ddd !important;
+}
+
+[data-theme="light"] .modal-body button {
+  background-color: #f0f0f0 !important;
+  color: #213547 !important;
+}
+
+[data-theme="light"] .modal-body button:hover {
+  background-color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .modal-content {
+  background: #262332 !important;
+  color: white !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
-}
-
-/* ИСПРАВЛЕНО: убрали flex и центрирование */
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #1f1d2b;
-}
-
-/* Дополнительно можно добавить для корневого элемента */
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 h1 {
@@ -65,14 +285,34 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] div {
+  color: black !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] div {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }

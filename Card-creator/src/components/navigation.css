@@ -10,10 +10,69 @@
   box-sizing: border-box;
 }
 
-/* Контейнер для содержимого навигации */
+.theme-toggle-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px 15px; /* Уменьшил padding для выравнивания высоты */
+  border-radius: 5px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  min-width: 50px; /* Уменьшил минимальную ширину */
+  height: 40px; /* Фиксированная высота для выравнивания */
+  position: relative;
+  overflow: hidden;
+  margin: 0; /* Убираем возможные отступы */
+}
+
+.theme-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-container {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-icon {
+  position: absolute;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-sun {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.icon-sun.hiding {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.icon-moon {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.icon-moon.showing {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .nav-container {
   display: flex;
-  justify-content: space-between; /* Распределяем по краям */
+  justify-content: space-between;
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
@@ -30,7 +89,7 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: white;
+  color: #424242;
 }
 
 .nav-brand img {
@@ -46,9 +105,15 @@
 .nav-menu {
   display: flex;
   list-style: none;
-  gap: 15px; /* Уменьшил немного отступы между пунктами */
+  gap: 15px;
   margin: 0;
   padding: 0;
+  align-items: center; /* Выравниваем все элементы по центру */
+}
+
+.nav-menu li {
+  display: flex;
+  align-items: center;
 }
 
 .nav-menu li a {
@@ -57,7 +122,12 @@
   padding: 8px 15px;
   border-radius: 5px;
   transition: background-color 0.3s;
-  white-space: nowrap; /* Чтобы текст не переносился */
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px; /* Фиксированная высота как у кнопки темы */
+  box-sizing: border-box;
 }
 
 .nav-menu li a:hover {

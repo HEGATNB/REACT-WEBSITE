@@ -1,7 +1,6 @@
 /* TechnologyDetail.css - ИСПРАВЛЕННЫЙ */
 .technology-detail-page {
   min-height: calc(100vh - 80px); /* Высота минус навигация */
-  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
   padding: 20px;
   box-sizing: border-box;
   display: flex;
@@ -191,7 +190,6 @@
 .technology-detail-loading,
 .technology-detail-not-found {
   min-height: calc(100vh - 80px);
-  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
   display: flex;
   flex-direction: column;
   align-items: center;

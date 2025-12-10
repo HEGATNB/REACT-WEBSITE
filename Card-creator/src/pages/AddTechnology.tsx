@@ -17,7 +17,6 @@ interface AddTechnologyProps {
   setTechnologies: (tech: Technology[]) => void;
 }
 
-// Добавляем интерфейс для состояния новой технологии
 interface NewTechnology {
   title: string;
   description: string;
@@ -30,7 +29,6 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
   const navigate = useNavigate();
   const [isCardVisible, setIsCardVisible] = useState(false);
 
-  // Используем правильный тип для состояния
   const [newTechnology, setNewTechnology] = useState<NewTechnology>({
     title: '',
     description: '',
@@ -68,7 +66,6 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
       return;
     }
 
-    // Генерируем новый ID (максимальный существующий + 1)
     const maxId = technologies.length > 0
       ? Math.max(...technologies.map(t => t.id))
       : 0;
@@ -78,16 +75,11 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
       id: maxId + 1
     };
 
-    // Обновляем состояние глобальных технологий
     const updatedTechnologies = [...technologies, techWithId];
     setTechnologies(updatedTechnologies);
-
-    // Сохраняем в localStorage
     localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
     alert(`Технология "${techWithId.title}" успешно добавлена!`);
-
-    // Сбрасываем форму и закрываем карточку
     setNewTechnology({
       title: '',
       description: '',
@@ -96,18 +88,13 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
       category: ''
     });
     setIsCardVisible(false);
-
-    // Навигация на главную страницу
     navigate('/');
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Проверяем, был ли клик на кнопке закрытия
     if ((e.target as HTMLElement).closest('.card-close-button')) {
       return;
     }
-
-    // Проверяем, был ли клик на поле ввода
     if (
       (e.target as HTMLElement).tagName === 'INPUT' ||
       (e.target as HTMLElement).tagName === 'TEXTAREA' ||
