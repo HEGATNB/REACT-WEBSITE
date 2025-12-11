@@ -1,0 +1,21 @@
+# render.yaml
+services:
+  # Единый сервис (фронтенд + бэкенд)
+  - type: web
+    name: tech-tracker
+    env: node
+    region: frankfurt  # или singapore, oregon, ohio
+    plan: free
+    buildCommand: |
+      npm install
+      npm run build
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: VITE_API_URL
+        value: /api  # Используем относительный путь

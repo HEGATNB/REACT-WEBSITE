@@ -1,0 +1,258 @@
+/* ApiSettings.css */
+.api-settings {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.api-settings h2 {
+  margin-bottom: 32px;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.api-section {
+  margin-bottom: 32px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.api-section h3 {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.endpoint-control {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.endpoint-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.3s;
+}
+
+.endpoint-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.save-btn {
+  padding: 12px 24px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.save-btn:hover {
+  background: var(--primary-dark);
+}
+
+.api-examples {
+  margin-top: 16px;
+}
+
+.examples-title {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.example-btn {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 8px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.example-btn:hover {
+  background: var(--hover-color);
+  border-color: var(--primary-color);
+}
+
+.current-endpoint {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.current-endpoint code {
+  display: block;
+  margin-top: 4px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-family: monospace;
+  word-break: break-all;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.roadmap-control {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.roadmap-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.import-btn {
+  padding: 12px 24px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.import-btn:hover:not(:disabled) {
+  background: #3d8b40;
+}
+
+.import-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.roadmap-hint {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.example-roadmaps ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+
+.example-roadmaps li {
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--primary-color);
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.example-roadmaps li:hover {
+  background: var(--hover-color);
+}
+
+.sync-btn {
+  padding: 12px 24px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.sync-btn:hover:not(:disabled) {
+  background: #0b7dda;
+}
+
+.sync-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-message {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.sync-message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.sync-message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.sync-hint {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.api-error {
+  margin-top: 24px;
+  padding: 16px;
+  background: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  color: #c62828;
+}
+
+.api-error p {
+  margin: 0;
+}
+
+/* Темные темы */
+[data-theme="dark"] .api-settings {
+  background: var(--card-bg-dark);
+}
+
+[data-theme="dark"] .api-section {
+  background: var(--bg-secondary-dark);
+  border-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .current-endpoint code {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .example-btn {
+  background: var(--bg-primary-dark);
+  border-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .example-roadmaps li {
+  background: var(--bg-primary-dark);
+}

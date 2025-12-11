@@ -26,7 +26,6 @@ function TechnologyList() {
     }
   }, []);
 
-  // Получаем цвет по статусу (такой же как в карточках)
   const getColorByStatus = (status: Technology['status']): string => {
     switch (status) {
       case 'completed':
@@ -40,7 +39,6 @@ function TechnologyList() {
     }
   };
 
-  // Получаем текст статуса на русском
   const getStatusText = (status: Technology['status']): string => {
     switch (status) {
       case 'completed': return 'Завершено';

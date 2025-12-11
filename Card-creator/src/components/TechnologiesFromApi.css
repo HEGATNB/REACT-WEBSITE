@@ -1,0 +1,287 @@
+/* TechnologiesFromApi.css */
+.technologies-api {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.api-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.api-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.refresh-btn {
+  padding: 8px 16px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.refresh-btn:hover {
+  background: var(--primary-dark);
+}
+
+.filters {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-box {
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px 20px;
+  background: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  color: #c62828;
+}
+
+.error-container h3 {
+  margin-top: 0;
+}
+
+.retry-btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.retry-btn:hover {
+  background: #d32f2f;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.technologies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.tech-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.tech-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tech-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.tech-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #f44336;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.tech-description {
+  margin: 12px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.tech-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tech-category {
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tech-difficulty {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.tech-difficulty.beginner {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tech-difficulty.intermediate {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.tech-difficulty.advanced {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.tech-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.status-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+}
+
+.tech-resources {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Темная тема */
+[data-theme="dark"] .tech-card {
+  background: var(--card-bg-dark);
+}
+
+[data-theme="dark"] .filters {
+  background: var(--card-bg-dark);
+}
+
+[data-theme="dark"] .tech-category {
+  background: var(--bg-secondary-dark);
+}
+
+[data-theme="dark"] .tech-difficulty.beginner {
+  background: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+}
+
+[data-theme="dark"] .tech-difficulty.intermediate {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+}
+
+[data-theme="dark"] .tech-difficulty.advanced {
+  background: rgba(244, 67, 54, 0.2);
+  color: #e57373;
+}

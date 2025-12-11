@@ -9,6 +9,8 @@ import TechnologyList from './pages/technologyList';
 import AddTechnology from './pages/AddTechnology';
 import Stats from './pages/stats';
 import SettingsPage from './pages/settings';
+import ApiSettings from './components/ApiSettings';
+import TechnologiesFromApi from './components/TechnologiesFromApi';
 
 function App() {
   const {
@@ -21,6 +23,7 @@ function App() {
     setTechnologies // Добавлено
   } = useTechnologies();
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -81,8 +84,12 @@ function App() {
         return tech.status === 'completed';
       default:
         return true;
-    }
-  });
+      }
+    });
+    const [apiEndpoint, setApiEndpoint] = useState<string>(() => {
+      const saved = localStorage.getItem('apiEndpoint');
+      return saved || import.meta.env.VITE_API_URL || '';
+    });
 
   const total = technologies.length;
   const learned = technologies.filter(tech => tech.status === "completed").length;
@@ -147,6 +154,8 @@ function App() {
           <Route path="/stats" element={<Stats technologies={technologies} />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/technologies" element={<TechnologyList />} />
+          <Route path="/api-settings" element={<ApiSettings />} />
+          <Route path="/api-technologies" element={<TechnologiesFromApi />} />
           <Route path="/technology/:techId" element={<TechnologyDetail />} />
           <Route path="/add-technology" element={
             <AddTechnology

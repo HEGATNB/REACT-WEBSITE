@@ -81,6 +81,16 @@ function Navigation() {
             </Link>
           </li>
           <li>
+            <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
+               API Настройки
+            </Link>
+          </li>
+          <li>
+            <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
+               Технологии из API
+            </Link>
+          </li>
+          <li>
             <button
               className="theme-toggle-button"
               onClick={handleChangeTheme}
