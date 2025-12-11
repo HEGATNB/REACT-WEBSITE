@@ -13,7 +13,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Светлая тема - ПРИОРИТЕТНЫЕ СТИЛИ ФОНА */
 [data-theme="light"] {
   color: #213547 !important;
   background-color: #ffffff !important;
@@ -28,7 +27,6 @@
   background-color: #f5f5f5 !important;
 }
 
-/* Темная тема - ПРИОРИТЕТНЫЕ СТИЛИ ФОНА */
 [data-theme="dark"] {
   color: rgba(255, 255, 255, 0.87) !important;
   background-color: #242424 !important;
@@ -43,7 +41,6 @@
   background-color: #121212 !important;
 }
 
-/* ФОН ВСЕЙ СТРАНИЦЫ */
 body {
   margin: 0 !important;
   min-width: 320px !important;
@@ -51,7 +48,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease !important;
 }
 
-/* Основной контейнер приложения */
 #root {
   width: 100% !important;
   min-height: 100vh !important;
@@ -59,38 +55,30 @@ body {
   flex-direction: column !important;
 }
 
-/* ОСНОВНЫЕ КОМПОНЕНТЫ С ФОНОМ - СВЕТЛАЯ ТЕМА */
-
-/* App - главный контейнер */
 [data-theme="light"] .App {
   background: white !important;
 }
 
-/* Страница деталей технологии */
 [data-theme="light"] .technology-detail-page,
 [data-theme="light"] .technology-detail-loading,
 [data-theme="light"] .technology-detail-not-found {
   background: #f5f5f5 !important;
 }
 
-/* Страница списка технологий */
 [data-theme="light"] .technology-list-page,
 [data-theme="light"] .technologies-container {
   background: none !important;
 }
 
-/* Страница добавления технологии */
 [data-theme="light"] .add-technology-page {
   background: #f5f5f5 !important;
 }
 
-/* Карточки и контейнеры */
 [data-theme="light"] .cards-section,
 [data-theme="light"] .main-content {
   background: none !important;
 }
 
-/* ОСНОВНЫЕ КОМПОНЕНТЫ С ФОНОМ - ТЕМНАЯ ТЕМА */
 [data-theme="light"] .add-tech-link {
   background: #f5f5f8;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -113,38 +101,31 @@ body {
   color: black !important;
 }
 
-/* App - главный контейнер */
 [data-theme="dark"] .App {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
 
-/* Страница деталей технологии */
 [data-theme="dark"] .technology-detail-page,
 [data-theme="dark"] .technology-detail-loading,
 [data-theme="dark"] .technology-detail-not-found {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
 
-/* Страница списка технологий */
 [data-theme="dark"] .technology-list-page,
 [data-theme="dark"] .technologies-container {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
 
-/* Страница добавления технологии */
 [data-theme="dark"] .add-technology-page {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
 
-/* Карточки и контейнеры */
 [data-theme="dark"] .cards-section,
 [data-theme="dark"] .main-content {
   background: transparent !important;
 }
 
-/* НАВИГАЦИЯ */
 
-/* Стили для навигации в зависимости от темы */
 [data-theme="light"] .main-navigation {
   background-color: #f5f5f8 !important;
   color: #213547 !important;
@@ -160,7 +141,6 @@ body {
   color: white !important;
 }
 
-/* Стили для ссылок в навигации */
 [data-theme="light"] .nav-menu li a {
   color: #213547 !important;
 }
@@ -177,7 +157,6 @@ body {
   color: white !important;
 }
 
-/* Стили для кнопки темы */
 [data-theme="light"] .theme-toggle-button {
   color: #213547 !important;
 }
@@ -190,7 +169,6 @@ body {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Статусы на главной странице - белый текст как в темной теме */
 [data-theme="light"] .status-tag,
 [data-theme="light"] .status-not-started,
 [data-theme="light"] .status-in-progress,
@@ -198,7 +176,6 @@ body {
   color: #ffffff !important;
 }
 
-/* Вкладка "Все технологии" - черный текст */
 [data-theme="light"] .technology-list-page h1,
 [data-theme="light"] .technology-list-page h2,
 [data-theme="light"] .technology-list-page h3,
@@ -211,7 +188,6 @@ body {
   color: white !important;
 }
 
-/* Вкладка "Добавить технологию" - фон кнопки как в темной теме */
 [data-theme="light"] .add-technology-page button[type="submit"],
 [data-theme="light"] .add-technology-page .submit-button {
   background-color: #262332 !important;
@@ -232,7 +208,7 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Модальные окна */
+
 [data-theme="light"] .modal-content {
   background: #ffffff !important;
   color: #213547 !important;
@@ -326,7 +302,7 @@ button:focus-visible {
 [data-theme="light"] p,
 [data-theme="light"] span,
 [data-theme="light"] div {
-  color: white !important;
+  color: white;
 }
 
 [data-theme="dark"] h1,

@@ -12,10 +12,8 @@ function Navigation() {
   const [isWhiteTheme, setWhiteTheme] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Инициализируем тему из data-theme атрибута при загрузке
   useEffect(() => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
-    // Если тема не установлена, устанавливаем темную по умолчанию
     if (!currentTheme) {
       document.documentElement.setAttribute('data-theme', 'dark');
       setWhiteTheme(false);
@@ -31,13 +29,10 @@ function Navigation() {
 
     setIsAnimating(true);
 
-    // Определяем следующую тему
     const nextTheme = isWhiteTheme ? 'dark' : 'light';
 
-    // Устанавливаем data-theme на корневом элементе
     document.documentElement.setAttribute('data-theme', nextTheme);
 
-    // Сохраняем тему в localStorage для сохранения при перезагрузке
     localStorage.setItem('theme', nextTheme);
 
     setTimeout(() => {
@@ -46,7 +41,6 @@ function Navigation() {
     }, 300);
   }
 
-  // Получаем текст для кнопки (доступность)
   const getThemeButtonLabel = () => {
     return isWhiteTheme ? "Переключить на темную тему" : "Переключить на светлую тему";
   };

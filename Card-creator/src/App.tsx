@@ -7,6 +7,8 @@ import Navigation from './components/navigation';
 import TechnologyDetail from './pages/technologyDetail';
 import TechnologyList from './pages/technologyList';
 import AddTechnology from './pages/AddTechnology';
+import Stats from './pages/stats';
+import SettingsPage from './pages/settings';
 
 function App() {
   const {
@@ -142,6 +144,8 @@ function App() {
               </div>
             </>
           } />
+          <Route path="/stats" element={<Stats technologies={technologies} />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/technologies" element={<TechnologyList />} />
           <Route path="/technology/:techId" element={<TechnologyDetail />} />
           <Route path="/add-technology" element={

@@ -104,7 +104,6 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
       return;
     }
 
-    // Меняем статус при клике на карточку
     const statusOrder: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
     const currentIndex = statusOrder.indexOf(newTechnology.status);
     const nextIndex = (currentIndex + 1) % statusOrder.length;

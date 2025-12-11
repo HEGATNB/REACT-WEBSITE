@@ -1,11 +1,11 @@
 /* AddTechnology.css */
 .add-technology-page {
-  min-height: calc(100vh - 80px); /* Высота минус навигация */
+  min-height: calc(100vh - 80px);
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Изменено с center на flex-start */
+  justify-content: flex-start;
   padding: 20px;
   box-sizing: border-box;
   width: 100%;
@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Изменено с center на flex-start */
+  justify-content: flex-start;
   min-height: 100%;
   position: relative;
 }
@@ -28,7 +28,7 @@
   align-items: center;
   width: 100%;
   padding: 20px;
-  margin: 20px 0; /* Добавлен отступ */
+  margin: 20px 0;
   z-index: 2;
   position: relative;
 }
@@ -69,21 +69,19 @@
   transform: translateY(-2px);
 }
 
-/* Убираем темный фон модального окна */
 .modal-overlay-tech {
   display: none;
 }
 
-/* Карточка для редактирования - теперь часть потока */
 .tech-card-editor {
-  position: relative; /* Изменено с fixed на relative */
+  position: relative;
   top: 0;
   left: 0;
-  transform: none; /* Убираем transform */
+  transform: none;
   margin: 30px auto;
   width: 90%;
-  max-width: 500px; /* Уменьшена максимальная ширина */
-  min-height: 450px; /* Увеличена минимальная высота */
+  max-width: 500px;
+  min-height: 450px;
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -167,7 +165,6 @@
   background-color: rgba(38, 35, 50, 0.9);
 }
 
-/* Установка фона для всех полей ввода */
 .card-title-input,
 .card-description-input,
 .card-category-input,
@@ -187,7 +184,6 @@
   min-height: 80px;
 }
 
-/* Статус перенесен вверх */
 .card-status-info {
   display: flex;
   flex-direction: column;
@@ -197,7 +193,7 @@
   margin-top: 0;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-right: 40px; /* Отступ для кнопки закрытия */
+  padding-right: 40px;
 }
 
 .status-text {
@@ -219,7 +215,6 @@
   to { opacity: 1; }
 }
 
-/* Изменена анимация slideUp */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -231,7 +226,6 @@
   }
 }
 
-/* Адаптивность */
 @media (max-width: 1024px) {
   .tech-card-editor {
     width: 80%;
