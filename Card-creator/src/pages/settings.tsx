@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import './settings.css';
+import { FaRegMoon } from "react-icons/fa";
+import { FaSun } from "react-icons/fa";
 
 function SettingsPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -10,7 +12,7 @@ function SettingsPage() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme as 'light' | 'dark');
-    
+
     const savedNotifications = localStorage.getItem('notifications');
     if (savedNotifications !== null) {
       setNotifications(JSON.parse(savedNotifications));
@@ -129,13 +131,13 @@ function SettingsPage() {
                   className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
                   onClick={() => handleThemeChange('light')}
                 >
-                  ☀️ Светлая
+                  <FaSun /> Светлая
                 </button>
                 <button 
                   className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
                   onClick={() => handleThemeChange('dark')}
                 >
-                  🌙 Тёмная
+                  <FaRegMoon /> Тёмная
                 </button>
               </div>
             </div>
