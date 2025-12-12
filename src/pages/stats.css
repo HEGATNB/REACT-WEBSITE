@@ -57,22 +57,22 @@
 }
 
 .stat-item.completed {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(76, 175, 80, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(76, 175, 80, 0.7) 100%) !important;
   border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .stat-item.in-progress {
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(255, 152, 0, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(255, 152, 0, 0.7) 100%) !important;
   border: 1px solid rgba(255, 152, 0, 0.3);
 }
 
 .stat-item.not-started {
-  background: linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(244, 67, 54, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(244, 67, 54, 0.7) 100%) !important;
   border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 .stat-item.total {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(102, 126, 234, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(102, 126, 234, 0.7) 100%) !important;
   border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
@@ -355,4 +355,12 @@
 
 [data-theme="light"] .stats-footer {
   color: rgba(33, 53, 71, 0.6);
+}
+
+[data-theme="light"] .bar-label {
+  color: #213547;
+}
+
+[data-theme="light"] .stats-card h3{
+  border-bottom: 1px solid #213547;
 }

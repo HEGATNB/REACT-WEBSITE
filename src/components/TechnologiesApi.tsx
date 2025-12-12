@@ -47,16 +47,22 @@ function useTechnologiesApi() {
 
   // Получение текущего origin для относительных путей
   const getApiUrl = (endpoint: string): string => {
+    // Если endpoint пустой, используем относительный путь по умолчанию
+    if (!endpoint) {
+      return '/api/technologies';
+    }
+    
+    // Если endpoint начинается с http, используем как есть
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
     }
     
-    // Если endpoint начинается с /, добавляем текущий origin
+    // Если endpoint начинается с /, используем относительный путь
     if (endpoint.startsWith('/')) {
-      return window.location.origin + endpoint;
+      return endpoint;
     }
     
-    // По умолчанию используем относительный путь к API
+    // По умолчанию добавляем /api/technologies
     return '/api/technologies';
   };
 
@@ -81,13 +87,12 @@ function useTechnologiesApi() {
       setError(null);
 
       const url = getApiUrl(apiEndpoint);
+      console.log('Fetching from URL:', url);
       
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-        },
-        // Не используем credentials для упрощения CORS
-        // credentials: 'include'
+        }
       });
 
       if (!response.ok) {

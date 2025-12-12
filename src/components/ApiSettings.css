@@ -2,257 +2,355 @@
 .api-settings {
   max-width: 800px;
   margin: 0 auto;
-  padding: 24px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
 }
 
 .api-settings h2 {
   margin-bottom: 32px;
-  color: var(--text-primary);
+  color: #213547;
   text-align: center;
+  font-weight: 600;
+  font-size: 28px;
+}
+
+.api-section strong,
+.api-section li {
+  color: #213547;
 }
 
 .api-section {
   margin-bottom: 32px;
   padding: 24px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background: #f5f5f8;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.3s;
+}
+
+.api-section:hover {
+  transform: translateY(-2px);
 }
 
 .api-section h3 {
-  margin-bottom: 16px;
-  color: var(--text-primary);
+  margin-bottom: 20px;
+  color: #213547;
+  font-weight: 600;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.api-section h3::before {
+  content: "•";
+  color: #646cff;
+  font-size: 24px;
 }
 
 .endpoint-control {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .endpoint-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 6px;
+  padding: 14px 16px;
+  border: 2px solid #d1d1d1;
+  border-radius: 8px;
   font-size: 14px;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  transition: border-color 0.3s;
+  background: #ffffff;
+  color: #213547;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .endpoint-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: #646cff;
+  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
 }
 
 .save-btn {
-  padding: 12px 24px;
-  background: var(--primary-color);
+  padding: 14px 28px;
+  background: #262332;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .save-btn:hover {
-  background: var(--primary-dark);
+  background: #1e1a2b;
+  transform: translateY(-2px);
 }
 
 .api-examples {
-  margin-top: 16px;
+  margin-top: 20px;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 }
 
 .examples-title {
-  margin-bottom: 8px;
-  color: var(--text-secondary);
+  margin-bottom: 12px;
+  color: #666;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .example-btn {
   margin-right: 8px;
   margin-bottom: 8px;
-  padding: 8px 16px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-primary);
+  padding: 10px 20px;
+  background: #ffffff;
+  border: 2px solid #d1d1d1;
+  border-radius: 6px;
+  color: #213547;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 500;
   transition: all 0.3s;
 }
 
 .example-btn:hover {
-  background: var(--hover-color);
-  border-color: var(--primary-color);
+  background: #f5f5f8;
+  border-color: #646cff;
+  color: #646cff;
+  transform: translateY(-2px);
 }
 
 .current-endpoint {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--bg-primary);
-  border-radius: 4px;
-  border-left: 4px solid var(--primary-color);
+  margin-top: 20px;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid #646cff;
+}
+
+.current-endpoint p {
+  margin: 0 0 8px 0;
+  color: #213547;
+  font-weight: 500;
 }
 
 .current-endpoint code {
   display: block;
-  margin-top: 4px;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-family: monospace;
+  padding: 12px;
+  background: #f5f5f8;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Menlo', monospace;
   word-break: break-all;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #555;
+  line-height: 1.4;
 }
 
 .roadmap-control {
   display: flex;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .roadmap-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 6px;
+  padding: 14px 16px;
+  border: 2px solid #d1d1d1;
+  border-radius: 8px;
   font-size: 14px;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: #ffffff;
+  color: #213547;
+  transition: border-color 0.3s;
+}
+
+.roadmap-input:focus {
+  outline: none;
+  border-color: #646cff;
 }
 
 .import-btn {
-  padding: 12px 24px;
-  background: #4caf50;
+  padding: 14px 28px;
+  background: #262332;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .import-btn:hover:not(:disabled) {
-  background: #3d8b40;
+  background: #1e1a2b;
+  transform: translateY(-2px);
 }
 
 .import-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .roadmap-hint {
-  margin-top: 8px;
-  color: var(--text-secondary);
+  margin-top: 12px;
+  color: #666;
   font-size: 13px;
   font-style: italic;
+  line-height: 1.4;
 }
 
 .example-roadmaps ul {
   list-style: none;
   padding: 0;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .example-roadmaps li {
-  padding: 8px 12px;
-  margin-bottom: 4px;
-  background: var(--bg-primary);
-  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  border-radius: 8px;
   cursor: pointer;
-  color: var(--primary-color);
+  color: #646cff;
   font-size: 14px;
-  transition: background-color 0.3s;
+  font-weight: 500;
+  transition: all 0.3s;
+  border: 2px solid #e0e0e0;
 }
 
 .example-roadmaps li:hover {
-  background: var(--hover-color);
+  background: #f5f5f8;
+  border-color: #646cff;
+  transform: translateX(4px);
 }
 
 .sync-btn {
-  padding: 12px 24px;
-  background: #2196f3;
+  padding: 14px 28px;
+  background: #262332;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sync-btn:hover:not(:disabled) {
-  background: #0b7dda;
+  background: #1e1a2b;
+  transform: translateY(-2px);
 }
 
 .sync-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .sync-message {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 4px;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 8px;
   font-size: 14px;
+  font-weight: 500;
+  border: 2px solid transparent;
 }
 
 .sync-message.success {
   background: #e8f5e9;
   color: #2e7d32;
-  border: 1px solid #c8e6c9;
+  border-color: #c8e6c9;
 }
 
 .sync-message.error {
   background: #ffebee;
   color: #c62828;
-  border: 1px solid #ffcdd2;
+  border-color: #ffcdd2;
 }
 
 .sync-hint {
-  margin-top: 8px;
-  color: var(--text-secondary);
+  margin-top: 12px;
+  color: #666;
   font-size: 13px;
+  line-height: 1.4;
 }
 
 .api-error {
-  margin-top: 24px;
-  padding: 16px;
-  background-color: #f44336e6;
+  margin-top: 32px;
+  padding: 20px;
+  background: #ffebee;
   border-radius: 8px;
-  border: 1px solid #ffcdd2;
-  color: #c62828;
+  border: 2px solid #ffcdd2;
 }
 
 .api-error p {
   margin: 0;
+  color: #c62828;
+  font-weight: 500;
 }
 
 /* Темные темы */
 [data-theme="dark"] .api-settings {
-  background: var(--card-bg-dark);
+  background: #262332;
+  border-color: #383347;
+  color: white;
 }
 
 [data-theme="dark"] .api-section {
-  background: var(--bg-secondary-dark);
-  border-color: var(--border-color-dark);
+  background: #383347;
+  border-color: #464255;
 }
 
-[data-theme="dark"] .current-endpoint code {
-  background: rgba(255, 255, 255, 0.05);
+[data-theme="dark"] .api-section h3 {
+  color: white;
+}
+
+[data-theme="dark"] .endpoint-input,
+[data-theme="dark"] .roadmap-input {
+  background: #383347;
+  border-color: #464255;
+  color: white;
+}
+
+[data-theme="dark"] .api-examples,
+[data-theme="dark"] .example-roadmaps li,
+[data-theme="dark"] .current-endpoint {
+  background: #383347;
+  border-color: #464255;
+  color: #ccc;
 }
 
 [data-theme="dark"] .example-btn {
-  background: var(--bg-primary-dark);
-  border-color: var(--border-color-dark);
+  background: #383347;
+  border-color: #464255;
+  color: #ccc;
 }
 
-[data-theme="dark"] .example-roadmaps li {
-  background: var(--bg-primary-dark);
+[data-theme="dark"] .example-btn:hover {
+  background: #464255;
+  border-color: #646cff;
+  color: white;
+}
+
+[data-theme="dark"] .current-endpoint code {
+  background: #464255;
+  color: #ccc;
+}
+
+[data-theme="dark"] .roadmap-hint,
+[data-theme="dark"] .sync-hint {
+  color: #aaa;
+}
+
+[data-theme="light"] .examples-title{
+  color: #213547;
 }
