@@ -4,6 +4,7 @@ import './navigation.css';
 import { IoMdSettings } from "react-icons/io";
 import { FaRegMoon } from "react-icons/fa";
 import { FaSun } from "react-icons/fa";
+import { FiMenu, FiX } from "react-icons/fi";
 import logoDark from '/assets/WSLogo_dark.png';
 import logoLight from '/assets/WSLogo.png';
 
@@ -11,6 +12,7 @@ function Navigation() {
   const location = useLocation();
   const [isWhiteTheme, setWhiteTheme] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -23,6 +25,10 @@ function Navigation() {
       setWhiteTheme(false);
     }
   }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const handleChangeTheme = () => {
     if (isAnimating) return;
@@ -45,6 +51,10 @@ function Navigation() {
     return isWhiteTheme ? "Переключить на темную тему" : "Переключить на светлую тему";
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <nav className="main-navigation">
       <div className="nav-container">
@@ -54,7 +64,17 @@ function Navigation() {
             <h2 className="logo-text">Трекер технологий</h2>
           </Link>
         </div>
-        <ul className="nav-menu">
+
+        <button
+          className="nav-toggle"
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+          title={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+        >
+          {isMenuOpen ? <FiX /> : <FiMenu />}
+        </button>
+
+        <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
           <li>
             <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
               Главная
@@ -76,11 +96,6 @@ function Navigation() {
             </Link>
           </li>
           <li>
-            <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
-              <IoMdSettings />
-            </Link>
-          </li>
-          <li>
             <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
                API Настройки
             </Link>
@@ -88,6 +103,12 @@ function Navigation() {
           <li>
             <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
                Технологии из API
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
+              <IoMdSettings />
+              <span style={{ marginLeft: '8px' }}>Настройки</span>
             </Link>
           </li>
           <li>
