@@ -1,14 +1,11 @@
-# render.yaml
 services:
-  # Единый сервис (фронтенд + бэкенд)
   - type: web
     name: tech-tracker
     env: node
-    region: frankfurt  # или singapore, oregon, ohio
+    region: frankfurt
     plan: free
-    buildCommand: |
-      npm install
-      npm run build
+    nodeVersion: 18.17.0 # <-- Явно задаем версию Node.js (совместимую с ES-модулями)
+    buildCommand: npm run build # <-- Команда 'npm install' выполняется Render автоматически перед этим.
     startCommand: node server.js
     healthCheckPath: /health
     autoDeploy: true
@@ -18,4 +15,4 @@ services:
       - key: PORT
         value: 10000
       - key: VITE_API_URL
-        value: /api  # Используем относительный путь
+        value: /api
