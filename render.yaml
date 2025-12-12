@@ -4,8 +4,8 @@ services:
     env: node
     region: frankfurt
     plan: free
-    nodeVersion: 18.17.0 # <-- Явно задаем версию Node.js (совместимую с ES-модулями)
-    buildCommand: npm run build # <-- Команда 'npm install' выполняется Render автоматически перед этим.
+    nodeVersion: 18.17.0
+    buildCommand: npm run render-build
     startCommand: node server.js
     healthCheckPath: /health
     autoDeploy: true

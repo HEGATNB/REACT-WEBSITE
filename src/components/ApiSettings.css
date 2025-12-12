@@ -224,7 +224,7 @@
 .api-error {
   margin-top: 24px;
   padding: 16px;
-  background: #ffebee;
+  background-color: #f44336e6;
   border-radius: 8px;
   border: 1px solid #ffcdd2;
   color: #c62828;

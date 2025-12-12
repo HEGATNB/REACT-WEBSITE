@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -10,8 +9,30 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    const allowedOrigins = [
+      'https://react-website-igpb.onrender.com',
+      'http://localhost:3000',
+      'http://localhost:5173'
+    ];
+    
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Serve static files from dist directory
@@ -157,6 +178,9 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Обработка OPTIONS запросов для CORS
+app.options('*', cors(corsOptions));
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
@@ -165,4 +189,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
   console.log(`🌐 Фронтенд доступен по адресу: http://localhost:${PORT}`);
   console.log(`📚 API доступно по адресу: http://localhost:${PORT}/api/technologies`);
+  console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 });
