@@ -23,7 +23,6 @@ function App() {
     setTechnologies // Добавлено
   } = useTechnologies();
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -85,10 +84,6 @@ function App() {
       default:
         return true;
       }
-    });
-    const [apiEndpoint, setApiEndpoint] = useState<string>(() => {
-      const saved = localStorage.getItem('apiEndpoint');
-      return saved || import.meta.env.VITE_API_URL || '';
     });
 
   const total = technologies.length;
