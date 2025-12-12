@@ -1,0 +1,357 @@
+/* TechnologyCard.css */
+.Card {
+  background: green;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  width: 220px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.notes-section {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.note-text-area {
+  width: 100%;
+  min-height: 30px;
+  max-height: 30px;
+  transition:
+    min-height 0.3s ease 0.5s,
+    max-height 0.5s ease 0.5s;
+  border-radius: 10px;
+  padding: 8px;
+  border: none;
+  resize: none;
+  overflow: hidden;
+  background: #1f1d2b;
+  color: white;
+  font-family: inherit;
+  margin-top: 10px;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+.note-text-area:hover,
+.note-text-area:focus {
+  min-height: 60px;
+  max-height: 120px;
+  resize: vertical;
+  overflow: auto;
+  transition:
+    min-height 0.3s ease,
+    max-height 0.3s ease;
+}
+
+.note-text-area:not(:hover):not(:focus) {
+  transition:
+    min-height 0.3s ease,
+    max-height 0.3s ease;
+}
+
+.note-text-area::placeholder{
+  font-size:13px;
+}
+
+.notes-hint {
+  font-size: 12px;
+  color: #cccccc;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.Card:active {
+  transform: scale(0.98);
+}
+
+.Card:hover {
+  transform: translateY(-2px);
+}
+
+.note-text-area,
+.note-text-area:active,
+.note-text-area:focus,
+.note-text-area:hover {
+  cursor: text;
+}
+
+/* Стили для RoadMap */
+.RoadMap {
+  user-select: none;
+  background: #262332;
+  margin: 20px;
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 90%;
+  width: 90%;
+  position: relative;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 5%;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.stats-container p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  font-size: 20px;
+  text-align: center;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+/* Поле поиска */
+.filter-search-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.search-window {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  height: 35px;
+  background-color: #4d5156;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  padding: 0 15px;
+  position: relative;
+}
+
+.input-window {
+  flex: 1;
+  border: none;
+  height: 100%;
+  font-size: 16px;
+  padding: 0 10px;
+  background-color: transparent;
+  color: white;
+  outline: none;
+}
+
+.input-window::placeholder {
+  color: #cccccc;
+}
+
+.search-icon {
+  color: #cccccc;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.clear-search {
+  color: #cccccc;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.results-text {
+  font-size: 14px;
+  color: #ffffff;
+  margin-top: 5px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Прогресс бар */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 25px;
+  outline: 3px solid #1a1a1a;
+  background: white;
+  border-radius: 20px;
+  position: relative;
+  user-select: none;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  display: flex;
+  height: 100%;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+  background-size: 200% 200%;
+  border-radius: 20px;
+  position: relative;
+  transition: width 0.8s ease-in-out;
+  min-width: 0%;
+}
+
+.progress-bar-fill.animated {
+  animation: gradientShift 3s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.PercentText {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: bold;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+  z-index: 1;
+  transition: all 0.5s ease-in-out;
+}
+
+.PercentText.animated {
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Фильтры */
+.filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-button {
+  background-color: #1f1d2b;
+  border-radius: 25px;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-button:hover {
+  background-color: #2a2738;
+}
+
+.filters-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  margin-top: 10px;
+}
+
+.filters-list {
+  background: #262332;
+  border: 1px solid #1f1d2b;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  padding: 10px 0;
+}
+
+.filters-text {
+  margin: 0;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.filters-text:hover {
+  background-color: #1f1d2b;
+}
+
+.filters-text.active {
+  background-color: #1f1d2b;
+  color: #FFD700;
+}
+
+/* Кнопки быстрых действий*/
+.buttons-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.quick-actions-button {
+  background-color: #262332;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  min-height:45px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.quick-actions-button:hover {
+  background-color: #2a2738;
+}
