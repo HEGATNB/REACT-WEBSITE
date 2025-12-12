@@ -23,7 +23,7 @@ function App() {
     setTechnologies // Добавлено
   } = useTechnologies();
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://react-website-t0rs.onrender.com';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
