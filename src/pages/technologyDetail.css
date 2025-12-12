@@ -1,6 +1,6 @@
-/* TechnologyDetail.css - ИСПРАВЛЕННЫЙ */
+/* technologyDetail.css - ИСПРАВЛЕННЫЙ */
 .technology-detail-page {
-  min-height: calc(100vh - 80px); /* Высота минус навигация */
+  min-height: calc(100vh - 80px);
   padding: 20px;
   box-sizing: border-box;
   display: flex;
