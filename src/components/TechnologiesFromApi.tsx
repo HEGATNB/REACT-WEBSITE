@@ -1,5 +1,5 @@
 // TechnologiesFromApi.tsx
-import { useEffect } from 'react';
+import { useState } from 'react'; // Используем useState вместо useEffect
 import useTechnologiesApi from './TechnologiesApi';
 import './TechnologiesFromApi.css';
 
