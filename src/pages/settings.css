@@ -30,6 +30,7 @@
 
 .settings-title {
   margin: 0 0 40px 0;
+  user-select: none;
   font-size: 2.5rem;
   font-weight: 700;
   color: white;
@@ -56,6 +57,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: white;
+  user-select: none;
 }
 
 [data-theme="light"] .section-title {
@@ -81,6 +83,7 @@
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
   min-width: 200px;
+  user-select: none;
 }
 
 [data-theme="light"] .setting-label {
@@ -191,6 +194,7 @@
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
   min-width: 100px;
+  user-select: none;
 }
 
 [data-theme="light"] .toggle-text {
@@ -261,6 +265,7 @@
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.5;
+  user-select: none;
 }
 
 [data-theme="light"] .info-text {
