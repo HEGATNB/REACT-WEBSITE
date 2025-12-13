@@ -179,7 +179,7 @@
   border-color: #646cff;
 }
 
-.import-btn {
+.import-btn-api {
   padding: 14px 28px;
   background: #262332;
   color: white;
@@ -191,12 +191,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.import-btn:hover:not(:disabled) {
+.import-btn-api:hover:not(:disabled) {
   background: #1e1a2b;
   transform: translateY(-2px);
 }
 
-.import-btn:disabled {
+.import-btn-api:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;

@@ -112,7 +112,7 @@ function ApiSettings() {
           />
           <button
             onClick={handleImportRoadmap}
-            className="import-btn"
+            className="import-btn-api"
             disabled={loading}
           >
             {loading ? 'Импорт...' : 'Импортировать'}
