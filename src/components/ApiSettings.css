@@ -18,10 +18,12 @@
   user-select: none;
 }
 
-[data-theme="light"].api-section strong,
-[data-theme="light"] .api-section li {
+[data-theme="light"] .api-section strong,
+[data-theme="light"] .api-section,
+[data-theme="light"] .api-section p{
   color: #213547;
 }
+
 
 .api-section {
   margin-bottom: 32px;

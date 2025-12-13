@@ -17,23 +17,19 @@ function TechnologiesFromApi() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Получаем уникальные категории
+
   const categories = ['all', ...new Set(technologies.map(t => t.category).filter(Boolean) as string[])];
 
-  // Фильтрация технологий
   const filteredTechnologies = technologies.filter(tech => {
-    // Поиск по названию и описанию
     if (searchTerm && !tech.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !tech.description.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
 
-    // Фильтр по категории
     if (categoryFilter !== 'all' && tech.category !== categoryFilter) {
       return false;
     }
 
-    // Фильтр по статусу
     if (statusFilter !== 'all' && tech.status !== statusFilter) {
       return false;
     }

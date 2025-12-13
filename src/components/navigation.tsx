@@ -5,6 +5,8 @@ import { IoMdSettings } from "react-icons/io";
 import { FaRegMoon } from "react-icons/fa";
 import { FaSun } from "react-icons/fa";
 import { FiMenu, FiX } from "react-icons/fi";
+import { GiAutoRepair } from "react-icons/gi";
+import {FaHome, FaListAlt, FaPlusCircle, FaChartBar, FaCog, FaServer, FaDatabase} from "react-icons/fa";
 import logoDark from '/assets/WSLogo_dark.png';
 import logoLight from '/assets/WSLogo.png';
 
@@ -55,6 +57,10 @@ function Navigation() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="main-navigation">
       <div className="nav-container">
@@ -63,6 +69,70 @@ function Navigation() {
             <img src={isWhiteTheme ? logoDark : logoLight} alt="логотип" />
             <h2 className="logo-text">Трекер технологий</h2>
           </Link>
+        </div>
+
+        <div className="desktop-menu-container">
+          <ul className="nav-menu desktop-menu">
+            <li>
+              <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+                <FaHome className="nav-icon" />
+                <span>Главная</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/technologies" className={location.pathname === '/technologies' ? 'active' : ''}>
+                <FaListAlt className="nav-icon" />
+                <span>Все технологии</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''}>
+                <FaPlusCircle className="nav-icon" />
+                <span>Добавить</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
+                <FaChartBar className="nav-icon" />
+                <span>Статистика</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
+                <GiAutoRepair className="nav-icon" />
+                <span>API настройки</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
+                <FaServer className="nav-icon" />
+                <span>API технологии</span>
+              </Link>
+            </li>
+            <li className="theme-toggle-desktop">
+              <button
+                className="theme-toggle-button"
+                onClick={handleChangeTheme}
+                disabled={isAnimating}
+                aria-label={getThemeButtonLabel()}
+                title={getThemeButtonLabel()}
+              >
+                <div className="icon-container">
+                  <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
+                    <FaSun />
+                  </div>
+                  <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
+                    <FaRegMoon />
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
+                <IoMdSettings className="nav-icon settings-icon" />
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <button
@@ -74,62 +144,72 @@ function Navigation() {
           {isMenuOpen ? <FiX /> : <FiMenu />}
         </button>
 
-        <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-          <li>
-            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-              Главная
-            </Link>
-          </li>
-          <li>
-            <Link to="/technologies" className={location.pathname === '/technologies' ? 'active' : ''}>
-              Все технологии
-            </Link>
-          </li>
-          <li>
-            <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''}>
-              Добавить технологию
-            </Link>
-          </li>
-          <li>
-            <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''}>
-              Статистика
-            </Link>
-          </li>
-          <li>
-            <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
-               API Настройки
-            </Link>
-          </li>
-          <li>
-            <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
-               Технологии из API
-            </Link>
-          </li>
-          <li>
-            <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
-              <IoMdSettings />
-              <span style={{ marginLeft: '8px' }}>Настройки</span>
-            </Link>
-          </li>
-          <li>
-            <button
-              className="theme-toggle-button"
-              onClick={handleChangeTheme}
-              disabled={isAnimating}
-              aria-label={getThemeButtonLabel()}
-              title={getThemeButtonLabel()}
-            >
-              <div className="icon-container">
-                <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
-                  <FaSun />
+        <div className={`mobile-menu-container ${isMenuOpen ? 'active' : ''}`}>
+          <div className="nav-menu-overlay" onClick={closeMenu}></div>
+          <ul className={`nav-menu mobile-menu ${isMenuOpen ? 'active' : ''}`}>
+            <li>
+              <Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={closeMenu}>
+                <FaHome className="nav-icon" />
+                <span>Главная</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/technologies" className={location.pathname === '/technologies' ? 'active' : ''} onClick={closeMenu}>
+                <FaListAlt className="nav-icon" />
+                <span>Все технологии</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/add-technology" className={location.pathname === '/add-technology' ? 'active' : ''} onClick={closeMenu}>
+                <FaPlusCircle className="nav-icon" />
+                <span>Добавить технологию</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/stats" className={location.pathname === '/stats' ? 'active' : ''} onClick={closeMenu}>
+                <FaChartBar className="nav-icon" />
+                <span>Статистика</span>
+              </Link>
+            </li>
+              <li>
+              <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
+                <GiAutoRepair className="nav-icon" />
+                <span>API настройки</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
+                <FaServer className="nav-icon" />
+                <span>API технологии</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''} onClick={closeMenu}>
+                <FaCog className="nav-icon" />
+                <span>Настройки</span>
+              </Link>
+            </li>
+            <li className="theme-toggle-mobile">
+              <button
+                className="theme-toggle-button"
+                onClick={handleChangeTheme}
+                disabled={isAnimating}
+                aria-label={getThemeButtonLabel()}
+                title={getThemeButtonLabel()}
+              >
+                <div className="icon-container">
+                  <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
+                    <FaSun className="nav-icon" />
+                  </div>
+                  <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
+                    <FaRegMoon className="nav-icon" />
+                  </div>
                 </div>
-                <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
-                  <FaRegMoon />
-                </div>
-              </div>
-            </button>
-          </li>
-        </ul>
+                <span>Тема</span>
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );
