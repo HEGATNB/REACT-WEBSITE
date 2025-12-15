@@ -12,8 +12,10 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 25px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
   justify-items: center;
 }
 
@@ -193,20 +195,50 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
+/* Основной контейнер страницы */
+.technology-list-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+}
+
 @media (min-width: 1200px) {
   .technologies-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
 
-@media (max-width: 768px) {
-  .technology-list-page {
-    padding: 15px;
-  }
-
+@media (max-width: 1200px) {
   .technologies-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .technology-list-page {
+    padding: 0 15px;
+  }
+
+  .technologies-grid {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .technology-list-page {
+    padding: 0 15px;
+  }
+
+  .technologies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0 10px;
   }
 
   .technology-item {
@@ -221,13 +253,20 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 566px) {
+  .technology-list-page {
+    padding: 0 10px;
+  }
+
   .technologies-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 8px;
   }
 
   .technology-item {
     padding: 20px;
+    max-width: 100%;
   }
 
   .tech-title {
@@ -255,5 +294,19 @@
     min-width: 220px;
     padding: 14px 24px;
     font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .technology-list-page {
+    padding: 0 8px;
+  }
+
+  .technologies-grid {
+    padding: 0 5px;
+  }
+
+  .technology-item {
+    padding: 18px;
   }
 }

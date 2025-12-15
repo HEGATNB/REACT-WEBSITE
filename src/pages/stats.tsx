@@ -15,7 +15,6 @@ interface StatsProps {
 }
 
 function Stats({ technologies = [] }: StatsProps) {
-  // Если нет переданных технологий, попробуем загрузить из localStorage
   let techData = technologies;
   
   if (techData.length === 0) {

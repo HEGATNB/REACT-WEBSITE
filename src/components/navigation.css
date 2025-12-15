@@ -75,6 +75,7 @@
   align-items: center;
 }
 
+
 .nav-icon {
   font-size: 18px;
   margin-right: 6px;
@@ -269,6 +270,10 @@
 
 .mobile-menu li {
   width: 100%;
+}
+
+[data-theme="light"] .mobile-menu span {
+  color: #213547;
 }
 
 .mobile-menu li a {
