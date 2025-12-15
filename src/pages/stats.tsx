@@ -16,7 +16,7 @@ interface StatsProps {
 
 function Stats({ technologies = [] }: StatsProps) {
   let techData = technologies;
-  
+
   if (techData.length === 0) {
     try {
       const saved = localStorage.getItem('techTrackerData');
@@ -28,7 +28,6 @@ function Stats({ technologies = [] }: StatsProps) {
     }
   }
 
-  // Вычисляем статистику
   const total = techData.length;
   const completed = techData.filter(tech => tech.status === "completed").length;
   const inProgress = techData.filter(tech => tech.status === "in-progress").length;
@@ -76,10 +75,10 @@ function Stats({ technologies = [] }: StatsProps) {
           <h3>Общий прогресс</h3>
           <div className="progress-circle">
             <div className="circle-bg"></div>
-            <div 
-              className="circle-progress" 
-              style={{ 
-                background: `conic-gradient(#4caf50 ${progressPercentage * 3.6}deg, 
+            <div
+              className="circle-progress"
+              style={{
+                background: `conic-gradient(#4caf50 ${progressPercentage * 3.6}deg,
                            rgba(255, 255, 255, 0.1) 0deg)`
               }}
             ></div>
@@ -96,8 +95,8 @@ function Stats({ technologies = [] }: StatsProps) {
             <div className="bar-item">
               <span className="bar-label">Завершено</span>
               <div className="bar-container">
-                <div 
-                  className="bar-fill completed-bar" 
+                <div
+                  className="bar-fill completed-bar"
                   style={{ width: total > 0 ? `${(completed / total) * 100}%` : '0%' }}
                 ></div>
               </div>
@@ -106,8 +105,8 @@ function Stats({ technologies = [] }: StatsProps) {
             <div className="bar-item">
               <span className="bar-label">В процессе</span>
               <div className="bar-container">
-                <div 
-                  className="bar-fill inprogress-bar" 
+                <div
+                  className="bar-fill inprogress-bar"
                   style={{ width: total > 0 ? `${(inProgress / total) * 100}%` : '0%' }}
                 ></div>
               </div>
@@ -116,8 +115,8 @@ function Stats({ technologies = [] }: StatsProps) {
             <div className="bar-item">
               <span className="bar-label">Не начато</span>
               <div className="bar-container">
-                <div 
-                  className="bar-fill notstarted-bar" 
+                <div
+                  className="bar-fill notstarted-bar"
                   style={{ width: total > 0 ? `${(notStarted / total) * 100}%` : '0%' }}
                 ></div>
               </div>

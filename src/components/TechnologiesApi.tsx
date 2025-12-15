@@ -36,6 +36,9 @@ function useTechnologiesApi() {
     const savedEndpoint = localStorage.getItem('apiEndpoint');
     if (savedEndpoint) {
       setApiEndpoint(savedEndpoint);
+    } else {
+      // Устанавливаем правильный endpoint по умолчанию
+      setApiEndpoint('https://react-website-igpb.onrender.com/api-technologies');
     }
   }, []);
 
@@ -45,54 +48,48 @@ function useTechnologiesApi() {
     localStorage.setItem('apiEndpoint', normalizedEndpoint);
   };
 
-  // Получение текущего origin для относительных путей
+  // Получение правильного URL
   const getApiUrl = (endpoint: string): string => {
-    // Если endpoint пустой, используем относительный путь по умолчанию
+    // Если endpoint пустой, используем правильный по умолчанию
     if (!endpoint) {
-      return '/api/technologies';
+      return 'https://react-website-igpb.onrender.com/api-technologies';
     }
-    
+
     // Если endpoint начинается с http, используем как есть
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
     }
-    
-    // Если endpoint начинается с /, используем относительный путь
-    if (endpoint.startsWith('/')) {
-      return endpoint;
+
+    // Если endpoint начинается с /api-technologies, добавляем полный URL
+    if (endpoint.startsWith('/api-technologies')) {
+      return `https://react-website-igpb.onrender.com${endpoint}`;
     }
-    
-    // По умолчанию добавляем /api/technologies
-    return '/api/technologies';
+
+    // Если endpoint начинается с /, добавляем базовый URL
+    if (endpoint.startsWith('/')) {
+      return `https://react-website-igpb.onrender.com${endpoint}`;
+    }
+
+    // По умолчанию используем правильный endpoint
+    return 'https://react-website-igpb.onrender.com/api-technologies';
   };
 
   const fetchTechnologies = useCallback(async () => {
-    // Если endpoint не настроен, используем данные из localStorage
-    if (!apiEndpoint) {
-      const saved = localStorage.getItem('techTrackerData');
-      if (saved) {
-        try {
-          const parsedData = JSON.parse(saved);
-          setTechnologies(parsedData);
-        } catch (error) {
-          console.error('Ошибка при загрузке локальных данных:', error);
-        }
-      }
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
 
+      // Всегда используем API, даже если endpoint не настроен
       const url = getApiUrl(apiEndpoint);
       console.log('Fetching from URL:', url);
-      
+
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-        }
+          'Accept': 'application/json',
+        },
+        mode: 'cors', // Явно указываем режим CORS
+        credentials: 'omit' // Не отправляем куки, чтобы избежать CORS проблем
       });
 
       if (!response.ok) {
@@ -138,26 +135,13 @@ function useTechnologiesApi() {
 
   const addTechnology = async (techData: Omit<Technology, 'id'>): Promise<Technology> => {
     try {
-      // Если API не настроено, работаем локально
-      if (!apiEndpoint) {
-        const newTech: Technology = {
-          ...techData,
-          id: Date.now(),
-          createdAt: new Date().toISOString()
-        };
-
-        const updatedTechnologies = [...technologies, newTech];
-        setTechnologies(updatedTechnologies);
-        localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
-        return newTech;
-      }
-
       const url = getApiUrl(apiEndpoint);
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
         body: JSON.stringify(techData)
       });
 
@@ -185,24 +169,13 @@ function useTechnologiesApi() {
 
   const updateTechnology = async (id: number, updates: Partial<Technology>): Promise<Technology> => {
     try {
-      // Если API не настроено, работаем локально
-      if (!apiEndpoint) {
-        const updatedTechnologies = technologies.map(tech =>
-          tech.id === id ? { ...tech, ...updates, updatedAt: new Date().toISOString() } : tech
-        );
-        setTechnologies(updatedTechnologies);
-        localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
-        const updatedTech = updatedTechnologies.find(tech => tech.id === id);
-        if (!updatedTech) throw new Error('Технология не найдена');
-        return updatedTech;
-      }
-
       const url = `${getApiUrl(apiEndpoint)}/${id}`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
         body: JSON.stringify(updates)
       });
 
@@ -232,17 +205,10 @@ function useTechnologiesApi() {
 
   const deleteTechnology = async (id: number): Promise<boolean> => {
     try {
-      // Если API не настроено, работаем локально
-      if (!apiEndpoint) {
-        const updatedTechnologies = technologies.filter(tech => tech.id !== id);
-        setTechnologies(updatedTechnologies);
-        localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
-        return true;
-      }
-
       const url = `${getApiUrl(apiEndpoint)}/${id}`;
       const response = await fetch(url, {
-        method: 'DELETE'
+        method: 'DELETE',
+        mode: 'cors'
       });
 
       if (!response.ok) {
@@ -266,104 +232,6 @@ function useTechnologiesApi() {
     }
   };
 
-  const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(roadmapUrl);
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP при загрузке roadmap: ${response.status}`);
-      }
-
-      const roadmapData = await response.json();
-      let technologiesToImport: any[] = [];
-
-      // Разные форматы roadmaps
-      if (Array.isArray(roadmapData)) {
-        technologiesToImport = roadmapData;
-      } else if (roadmapData.technologies && Array.isArray(roadmapData.technologies)) {
-        technologiesToImport = roadmapData.technologies;
-      } else {
-        throw new Error('Неверный формат данных дорожной карты. Ожидается массив или объект с полем "technologies"');
-      }
-
-      const addedTechs: Technology[] = [];
-      for (const tech of technologiesToImport) {
-        try {
-          const newTech = await addTechnology({
-            title: tech.title || tech.name || 'Без названия',
-            description: tech.description || tech.desc || '',
-            status: 'not-started',
-            notes: '',
-            category: tech.category || 'uncategorized',
-            difficulty: tech.difficulty || 'beginner',
-            resources: tech.resources || tech.links || []
-          });
-          addedTechs.push(newTech);
-        } catch (error) {
-          console.error('Ошибка при добавлении технологии:', error);
-        }
-      }
-
-      return {
-        success: true,
-        importedCount: addedTechs.length,
-        totalCount: technologiesToImport.length
-      };
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const syncWithApi = async (): Promise<boolean> => {
-    if (!apiEndpoint) {
-      throw new Error('API эндпоинт не настроен');
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const url = `${getApiUrl(apiEndpoint)}/sync`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ technologies })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP при синхронизации: ${response.status}`);
-      }
-
-      const data: ApiResponse = await response.json();
-
-      if (data.success) {
-        if (Array.isArray(data.data)) {
-          setTechnologies(data.data);
-          localStorage.setItem('techTrackerData', JSON.stringify(data.data));
-        }
-        return true;
-      } else {
-        throw new Error(data.message || 'Ошибка синхронизации');
-      }
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Загрузка данных при монтировании
   useEffect(() => {
     fetchTechnologies();
@@ -378,8 +246,6 @@ function useTechnologiesApi() {
     addTechnology,
     updateTechnology,
     deleteTechnology,
-    importRoadmap,
-    syncWithApi,
     saveApiEndpoint,
     setTechnologies
   };

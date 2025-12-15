@@ -140,7 +140,7 @@ function TechnologiesFromApi() {
         <div className="empty-state">
           <p>Технологии не найдены</p>
           {searchTerm && <p>Попробуйте другой поисковый запрос</p>}
-        </div>
+        </div
       ) : (
         <div className="technologies-grid">
           {filteredTechnologies.map(tech => (
