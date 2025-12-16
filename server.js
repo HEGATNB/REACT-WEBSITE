@@ -11,13 +11,58 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://localhost:8080'],
+// Настройка CORS
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5000',
+    'http://localhost:8080',
+    'https://your-frontend-app.onrender.com', // добавьте ваш фронтенд
+    'https://*.onrender.com' // разрешаем все subdomain onrender
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
+  maxAge: 86400 // 24 часа
+};
+
+app.use(cors(corsOptions));
+
+// Middleware для добавления CSP заголовков
+app.use((req, res, next) => {
+  // Более мягкая политика CSP
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' https:; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; " +
+    "style-src 'self' 'unsafe-inline' https:; " +
+    "img-src 'self' data: blob: https:; " +
+    "font-src 'self' https: data:; " +
+    "connect-src 'self' https: ws: wss:; " +
+    "media-src 'self' https:; " +
+    "object-src 'none'; " +
+    "frame-ancestors 'none'; " +
+    "base-uri 'self';"
+  );
+
+  // Другие заголовки безопасности
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  next();
+});
 
 app.use(express.json());
 
@@ -415,11 +460,39 @@ function getSampleTechnologies(url = '') {
   return sampleTechs;
 }
 
+// ============ HEALTH CHECK ============
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     technologiesCount: technologies.length
+  });
+});
+
+// Favicon route
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // No Content
+});
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Tech Tracker API',
+    version: '1.0.0',
+    endpoints: {
+      technologies: '/api/technologies',
+      import: '/api/import-roadmap',
+      health: '/health'
+    }
+  });
+});
+
+// Обработка 404
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
   });
 });
 
