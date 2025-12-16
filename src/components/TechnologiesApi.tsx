@@ -78,26 +78,44 @@ function useTechnologiesApi() {
   };
 
   // Получение правильного URL
-  const getApiUrl = (endpoint: string): string => {
-    if (!endpoint) {
-      return 'http://localhost:5000/api/technologies';
+const getApiUrl = (endpoint: string): string => {
+  if (!endpoint || endpoint.trim() === '') {
+    // В production используем относительный путь
+    if (typeof window !== 'undefined' && window.location.origin.includes('onrender.com')) {
+      return '/api/technologies';
     }
+    // В development используем localhost
+    return 'http://localhost:5000/api/technologies';
+  }
 
-    if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+  // Если endpoint уже полный URL
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    return endpoint;
+  }
+
+  // Если endpoint начинается с /, это относительный путь
+  if (endpoint.startsWith('/')) {
+    // В production добавляем полный URL если нужно
+    if (typeof window !== 'undefined' && !endpoint.startsWith('http')) {
       return endpoint;
     }
+    return endpoint;
+  }
 
-    // Если endpoint начинается с /, добавляем localhost
-    if (endpoint.startsWith('/')) {
-      return `http://localhost:5000${endpoint}`;
-    }
+  // По умолчанию
+  if (typeof window !== 'undefined' && window.location.origin.includes('onrender.com')) {
+    return '/api/technologies';
+  }
 
-    return 'http://localhost:5000/api/technologies';
-  };
+  return 'http://localhost:5000/api/technologies';
+};
 
-  const getBaseApiUrl = (): string => {
-    return 'http://localhost:5000';
-  };
+const getBaseApiUrl = (): string => {
+  if (typeof window !== 'undefined' && window.location.origin.includes('onrender.com')) {
+    return window.location.origin;
+  }
+  return 'http://localhost:5000';
+};
 
   const fetchTechnologies = useCallback(async () => {
     try {

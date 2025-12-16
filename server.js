@@ -2,8 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import https from 'https';
-import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,8 +16,8 @@ const corsOptions = {
     'http://localhost:5173',
     'http://localhost:5000',
     'http://localhost:8080',
-    'https://your-frontend-app.onrender.com', // добавьте ваш фронтенд
-    'https://*.onrender.com' // разрешаем все subdomain onrender
+    'https://react-website-igpb.onrender.com',
+    'https://*.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -33,14 +31,13 @@ const corsOptions = {
     'Access-Control-Request-Headers'
   ],
   exposedHeaders: ['Content-Length', 'Content-Type'],
-  maxAge: 86400 // 24 часа
+  maxAge: 86400
 };
 
 app.use(cors(corsOptions));
 
 // Middleware для добавления CSP заголовков
 app.use((req, res, next) => {
-  // Более мягкая политика CSP
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self' https:; " +
@@ -55,7 +52,6 @@ app.use((req, res, next) => {
     "base-uri 'self';"
   );
 
-  // Другие заголовки безопасности
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -100,43 +96,10 @@ let technologies = [
 
 // ============ HELPER FUNCTIONS ============
 
-// Функция для безопасного получения данных через прокси
-const fetchWithProxy = (url) => {
-  return new Promise((resolve, reject) => {
-    const req = https.get(url, (res) => {
-      let data = '';
-
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      res.on('end', () => {
-        try {
-          const jsonData = JSON.parse(data);
-          resolve(jsonData);
-        } catch (error) {
-          reject(new Error(`Failed to parse JSON: ${error.message}`));
-        }
-      });
-    });
-
-    req.on('error', (error) => {
-      reject(error);
-    });
-
-    req.setTimeout(10000, () => {
-      req.destroy();
-      reject(new Error('Request timeout'));
-    });
-  });
-};
-
 // Функция для использования публичного CORS прокси
 const fetchWithCorsProxy = async (url) => {
   try {
-    // Используем публичный CORS прокси
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-
     const response = await fetch(proxyUrl);
 
     if (!response.ok) {
@@ -275,12 +238,10 @@ app.post('/api/import-roadmap', async (req, res) => {
     let roadmapData;
 
     try {
-      // Пробуем через CORS прокси
       roadmapData = await fetchWithCorsProxy(url);
     } catch (proxyError) {
       console.log('CORS proxy failed, trying direct fetch:', proxyError.message);
 
-      // Если прокси не сработал, пробуем напрямую
       try {
         const response = await fetch(url, {
           headers: {
@@ -299,7 +260,6 @@ app.post('/api/import-roadmap', async (req, res) => {
       } catch (fetchError) {
         console.error('Direct fetch failed:', fetchError);
 
-        // Если все варианты не сработали, возвращаем примерные данные
         return res.json({
           success: true,
           data: getSampleTechnologies(url),
@@ -311,7 +271,6 @@ app.post('/api/import-roadmap', async (req, res) => {
 
     console.log('Roadmap data received');
 
-    // Преобразуем данные roadmap в формат технологий
     const importedTechnologies = processRoadmapData(roadmapData);
 
     console.log('Successfully converted', importedTechnologies.length, 'technologies');
@@ -326,7 +285,6 @@ app.post('/api/import-roadmap', async (req, res) => {
   } catch (error) {
     console.error('Roadmap import error:', error);
 
-    // Всегда возвращаем успех с sample данными
     res.json({
       success: true,
       data: getSampleTechnologies(),
@@ -341,7 +299,6 @@ app.post('/api/import-roadmap', async (req, res) => {
 function processRoadmapData(roadmapData) {
   const importedTechnologies = [];
 
-  // Вариант 1: Если есть nodes
   if (roadmapData.nodes && Array.isArray(roadmapData.nodes)) {
     roadmapData.nodes.forEach((node, index) => {
       if (node.label && node.label.trim()) {
@@ -361,9 +318,7 @@ function processRoadmapData(roadmapData) {
     });
   }
 
-  // Вариант 2: Если nodes пустые, но есть другие данные
   if (importedTechnologies.length === 0) {
-    // Создаем технологии на основе других полей
     const techNames = [
       'HTML/CSS',
       'JavaScript',
@@ -472,11 +427,26 @@ app.get('/health', (req, res) => {
 
 // Favicon route
 app.get('/favicon.ico', (req, res) => {
-  res.status(204).end(); // No Content
+  res.status(204).end();
 });
 
-// Root route
+// Обслуживание статических файлов в production
+if (process.env.NODE_ENV === 'production') {
+  // Обслуживаем статические файлы из папки dist
+  app.use(express.static(path.join(__dirname, 'dist')));
+
+  // Обработка SPA маршрутов - ВАЖНО: этот маршрут должен быть ПОСЛЕ всех API маршрутов
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+}
+
+// Root API route
 app.get('/', (req, res) => {
+  if (process.env.NODE_ENV === 'production' && req.accepts('html')) {
+    return res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  }
+
   res.json({
     message: 'Tech Tracker API',
     version: '1.0.0',
@@ -484,27 +454,22 @@ app.get('/', (req, res) => {
       technologies: '/api/technologies',
       import: '/api/import-roadmap',
       health: '/health'
-    }
+    },
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// Обработка 404
-app.use((req, res) => {
+// Обработка 404 для API
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'API route not found'
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 API сервер запущен на порту ${PORT}`);
-  console.log(`🌐 Доступен по адресу: http://localhost:${PORT}`);
-  console.log(`📚 Основные endpoint:`);
-  console.log(`   GET  http://localhost:${PORT}/api/technologies`);
-  console.log(`   POST http://localhost:${PORT}/api/technologies`);
-  console.log(`   POST http://localhost:${PORT}/api/import-roadmap`);
-  console.log(`   GET  http://localhost:${PORT}/health`);
-  console.log(`🔧 Dev frontend: http://localhost:3000`);
-  console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔄 Импорт roadmap всегда работает (использует прокси/резервные данные)`);
+  console.log(`🚀 Сервер запущен на порту ${PORT}`);
+  console.log(`🌐 Frontend: http://localhost:${PORT}`);
+  console.log(`📚 API: http://localhost:${PORT}/api/technologies`);
+  console.log(`🔧 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 });

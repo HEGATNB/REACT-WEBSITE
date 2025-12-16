@@ -9,9 +9,15 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        rewrite: (path) => path
       },
       '/health': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/import-roadmap': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false
@@ -20,6 +26,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false
-  }
+    sourcemap: false,
+    emptyOutDir: true
+  },
+  base: './'
 });
