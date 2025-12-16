@@ -9,6 +9,23 @@ export interface Technology {
   category?: string;
 }
 
+interface RoadmapNode {
+  id: string;
+  label: string;
+  metadata?: {
+    description?: string;
+  };
+}
+
+interface RoadmapResponse {
+  nodes?: RoadmapNode[];
+  title?: {
+    card?: string;
+    page?: string;
+  };
+  description?: string;
+}
+
 const initialTechnologies: Technology[] = [
   {
     id: 1,
@@ -142,5 +159,64 @@ function useTechnologies() {
     setTechnologies
   };
 }
+
+const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
+  try {
+    setLoading(true);
+    setError(null);
+
+    // Используем proxy через наш бэкенд или специальный CORS proxy
+    const proxyUrl = apiEndpoint.replace('/api/technologies', '/api/import-roadmap');
+
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify({ url: roadmapUrl })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || 'Не удалось импортировать дорожную карту');
+    }
+
+    // Обработка импортированных технологий
+    if (data.data && Array.isArray(data.data)) {
+      const importedTechs = data.data.map((tech: Technology, index: number) => ({
+        ...tech,
+        id: Date.now() + index // Уникальные ID
+      }));
+
+      const updatedTechnologies = [...technologies, ...importedTechs];
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+      return {
+        success: true,
+        importedCount: importedTechs.length,
+        totalCount: importedTechs.length
+      };
+    }
+
+    return {
+      success: true,
+      importedCount: 0,
+      totalCount: 0
+    };
+
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+    throw new Error(`Ошибка при импорте дорожной карты: ${errorMessage}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
 export default useTechnologies;

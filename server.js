@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Простая CORS настройка для разработки
+// CORS настройка
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5000', 'http://localhost:8080'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -171,6 +171,77 @@ app.post('/api/technologies/sync', (req, res) => {
   });
 });
 
+// Новый endpoint для импорта roadmap через сервер (обходит CORS)
+app.post('/api/import-roadmap', async (req, res) => {
+  try {
+    const { url } = req.body;
+
+    if (!url) {
+      return res.status(400).json({
+        success: false,
+        message: 'URL не указан'
+      });
+    }
+
+    console.log('Importing roadmap from:', url);
+
+    // Делаем запрос к roadmap.sh через сервер (обходит CORS)
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'TechTracker/1.0',
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const roadmapData = await response.json();
+
+    console.log('Roadmap data received, nodes count:', roadmapData.nodes?.length || 0);
+
+    // Преобразуем данные roadmap в формат технологий
+    const importedTechnologies = [];
+
+    if (roadmapData.nodes && Array.isArray(roadmapData.nodes)) {
+      roadmapData.nodes.forEach((node, index) => {
+        if (node.label && node.label.trim()) {
+          importedTechnologies.push({
+            id: Date.now() + index,
+            title: node.label.trim(),
+            description: node.metadata?.description ||
+                       `Технология из дорожной карты: ${roadmapData.title?.card || roadmapData.title?.page || 'Unknown'}`,
+            status: 'not-started',
+            category: roadmapData.title?.card?.toLowerCase().replace(/\s+/g, '-') || 'imported',
+            difficulty: 'beginner',
+            notes: '',
+            resources: [],
+            createdAt: new Date().toISOString()
+          });
+        }
+      });
+    }
+
+    console.log('Successfully converted', importedTechnologies.length, 'technologies from roadmap');
+
+    res.json({
+      success: true,
+      data: importedTechnologies,
+      roadmapTitle: roadmapData.title?.card || roadmapData.title?.page || 'Roadmap',
+      totalCount: importedTechnologies.length
+    });
+
+  } catch (error) {
+    console.error('Roadmap import error:', error);
+    res.status(500).json({
+      success: false,
+      message: `Ошибка импорта: ${error.message}`,
+      data: []
+    });
+  }
+});
+
 app.get('/health', (req, res) => {
   console.log('GET /health - OK');
   res.json({
@@ -191,9 +262,8 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-// SPA fallback - должен быть ПОСЛЕДНИМ
+// SPA fallback
 app.get('*', (req, res) => {
-  // Если запрос к API, но маршрут не найден
   if (req.path.startsWith('/api/')) {
     console.log(`API route not found: ${req.path}`);
     return res.status(404).json({
@@ -201,8 +271,7 @@ app.get('*', (req, res) => {
       message: 'API endpoint not found'
     });
   }
-  
-  // Для React Router маршрутов - отдаем index.html
+
   console.log(`SPA route: ${req.path} -> index.html`);
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
@@ -211,6 +280,7 @@ app.listen(PORT, () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
   console.log(`🌐 Фронтенд доступен по адресу: http://localhost:${PORT}`);
   console.log(`📚 API доступно по адресу: http://localhost:${PORT}/api/technologies`);
+  console.log(`🔄 Импорт roadmap: http://localhost:${PORT}/api/import-roadmap`);
   console.log(`🔧 Dev frontend: http://localhost:3000`);
   console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📝 Logging enabled`);
