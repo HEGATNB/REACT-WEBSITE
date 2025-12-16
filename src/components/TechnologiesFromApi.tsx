@@ -17,7 +17,6 @@ function TechnologiesFromApi() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-
   const categories = ['all', ...new Set(technologies.map(t => t.category).filter(Boolean) as string[])];
 
   const filteredTechnologies = technologies.filter(tech => {
@@ -95,7 +94,7 @@ function TechnologiesFromApi() {
       <div className="api-header">
         <h2>Технологии из API ({technologies.length})</h2>
         <button onClick={() => fetchTechnologies()} className="refresh-btn">
-          Обновить
+          Обновить из API
         </button>
       </div>
 
@@ -140,6 +139,9 @@ function TechnologiesFromApi() {
         <div className="empty-state">
           <p>Технологии не найдены</p>
           {searchTerm && <p>Попробуйте другой поисковый запрос</p>}
+          <button onClick={() => fetchTechnologies()} className="refresh-btn" style={{ marginTop: '10px' }}>
+            Загрузить данные
+          </button>
         </div>
       ) : (
         <div className="technologies-grid">

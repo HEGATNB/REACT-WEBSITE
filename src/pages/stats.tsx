@@ -1,37 +1,23 @@
-
 import './stats.css';
+import useTechnologiesApi from '../components/TechnologiesApi';
 
-interface Technology {
-  id: number;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  notes: string;
-  category?: string;
-}
+function Stats() {
+  const { technologies, loading } = useTechnologiesApi();
 
-interface StatsProps {
-  technologies?: Technology[];
-}
-
-function Stats({ technologies = [] }: StatsProps) {
-  let techData = technologies;
-
-  if (techData.length === 0) {
-    try {
-      const saved = localStorage.getItem('techTrackerData');
-      if (saved) {
-        techData = JSON.parse(saved);
-      }
-    } catch (error) {
-      console.error('Ошибка при загрузке данных:', error);
-    }
+  if (loading && technologies.length === 0) {
+    return (
+      <div className="stats-page">
+        <div className="loading-state">
+          <p>Загрузка статистики...</p>
+        </div>
+      </div>
+    );
   }
 
-  const total = techData.length;
-  const completed = techData.filter(tech => tech.status === "completed").length;
-  const inProgress = techData.filter(tech => tech.status === "in-progress").length;
-  const notStarted = techData.filter(tech => tech.status === "not-started").length;
+  const total = technologies.length;
+  const completed = technologies.filter(tech => tech.status === "completed").length;
+  const inProgress = technologies.filter(tech => tech.status === "in-progress").length;
+  const notStarted = technologies.filter(tech => tech.status === "not-started").length;
   const progressPercentage = total > 0 ? (completed / total) * 100 : 0;
 
   return (

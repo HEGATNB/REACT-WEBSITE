@@ -38,6 +38,7 @@ function useTechnologiesApi() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiEndpoint, setApiEndpoint] = useState<string>('');
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   // Загрузка сохраненного endpoint из localStorage
   useEffect(() => {
@@ -47,7 +48,28 @@ function useTechnologiesApi() {
     } else {
       setApiEndpoint('https://react-website-igpb.onrender.com/api-technologies');
     }
+
+    // Загружаем данные из localStorage
+    const saved = localStorage.getItem('techTrackerData');
+    if (saved) {
+      try {
+        const parsedData = JSON.parse(saved);
+        console.log('📦 Загружено из localStorage:', parsedData.length, 'технологий');
+        setTechnologies(parsedData);
+      } catch (error) {
+        console.error('❌ Ошибка при загрузке локальных данных:', error);
+      }
+    }
+    setLoading(false);
   }, []);
+
+  // Обновляем localStorage при изменении technologies
+  useEffect(() => {
+    if (technologies.length > 0) {
+      console.log('💾 Сохранение в localStorage:', technologies.length, 'технологий');
+      localStorage.setItem('techTrackerData', JSON.stringify(technologies));
+    }
+  }, [technologies]);
 
   const saveApiEndpoint = (endpoint: string) => {
     const normalizedEndpoint = endpoint.trim();
@@ -58,31 +80,23 @@ function useTechnologiesApi() {
   // Получение правильного URL
   const getApiUrl = (endpoint: string): string => {
     if (!endpoint) {
-      return 'https://react-website-igpb.onrender.com/api-technologies';
+      return 'http://localhost:5000/api/technologies';
     }
 
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
     }
 
-    if (endpoint.startsWith('/api-technologies')) {
-      return `https://react-website-igpb.onrender.com${endpoint}`;
-    }
-
+    // Если endpoint начинается с /, добавляем localhost
     if (endpoint.startsWith('/')) {
-      return `https://react-website-igpb.onrender.com${endpoint}`;
+      return `http://localhost:5000${endpoint}`;
     }
 
-    return 'https://react-website-igpb.onrender.com/api-technologies';
+    return 'http://localhost:5000/api/technologies';
   };
 
-  // Функция для получения базового URL API (без конкретного endpoint)
   const getBaseApiUrl = (): string => {
-    if (apiEndpoint) {
-      const url = new URL(getApiUrl(apiEndpoint));
-      return `${url.protocol}//${url.hostname}:${url.port || (url.protocol === 'https:' ? '443' : '80')}`;
-    }
-    return 'https://react-website-igpb.onrender.com';
+    return 'http://localhost:5000';
   };
 
   const fetchTechnologies = useCallback(async () => {
@@ -91,7 +105,7 @@ function useTechnologiesApi() {
       setError(null);
 
       const url = getApiUrl(apiEndpoint);
-      console.log('Fetching from URL:', url);
+      console.log('🌐 Запрос к API:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -110,33 +124,20 @@ function useTechnologiesApi() {
 
       if (data.success) {
         if (Array.isArray(data.data)) {
+          console.log('✅ Получено от API:', data.data.length, 'технологий');
+
+          // Сохраняем все данные из API
           setTechnologies(data.data);
           localStorage.setItem('techTrackerData', JSON.stringify(data.data));
-        } else if (data.data) {
-          setTechnologies([data.data]);
-          localStorage.setItem('techTrackerData', JSON.stringify([data.data]));
-        } else {
-          setTechnologies([]);
-          localStorage.setItem('techTrackerData', JSON.stringify([]));
         }
       } else {
-        throw new Error(data.message || 'Не удалось загрузить данные');
+        console.warn('⚠️ Предупреждение от API:', data.message);
       }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
       setError(errorMessage);
-      console.error('Ошибка при загрузке технологий:', err);
-
-      const saved = localStorage.getItem('techTrackerData');
-      if (saved) {
-        try {
-          const parsedData = JSON.parse(saved);
-          setTechnologies(parsedData);
-        } catch (error) {
-          console.error('Ошибка при загрузке локальных данных:', error);
-        }
-      }
+      console.error('❌ Ошибка при загрузке технологий:', err);
     } finally {
       setLoading(false);
     }
@@ -147,12 +148,10 @@ function useTechnologiesApi() {
       setLoading(true);
       setError(null);
 
-      // Используем proxy через наш бэкенд для обхода CORS
       const baseUrl = getBaseApiUrl();
       const importUrl = `${baseUrl}/api/import-roadmap`;
 
-      console.log('Importing roadmap via proxy:', importUrl);
-      console.log('Source URL:', roadmapUrl);
+      console.log('🚀 Импорт roadmap из:', roadmapUrl);
 
       const response = await fetch(importUrl, {
         method: 'POST',
@@ -160,33 +159,46 @@ function useTechnologiesApi() {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        mode: 'cors',
-        credentials: 'omit',
         body: JSON.stringify({ url: roadmapUrl })
       });
 
       if (!response.ok) {
-        throw new Error(`Ошибка HTTP при импорте: ${response.status} ${response.statusText}`);
+        throw new Error(`Ошибка сервера: ${response.status}`);
       }
 
       const data: RoadmapImportResponse = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.message || 'Не удалось импортировать дорожную карту');
-      }
-
       // Обработка импортированных технологий
       if (data.data && Array.isArray(data.data)) {
+        console.log('📥 Получено от roadmap:', data.data.length, 'технологий');
+
+        // Генерируем уникальные ID
+        const maxId = technologies.length > 0
+          ? Math.max(...technologies.map(t => t.id))
+          : 0;
+
         const importedTechs = data.data.map((tech, index) => ({
           ...tech,
-          id: Date.now() + index // Уникальные ID
+          id: maxId + index + 1,
+          status: 'not-started' as const,
+          notes: tech.notes || '',
+          category: tech.category || 'imported'
         }));
 
+        console.log('🆕 Создано импортированных технологий:', importedTechs.length);
+
+        // Объединяем с существующими технологиями
         const updatedTechnologies = [...technologies, ...importedTechs];
+        console.log('📊 Всего технологий после импорта:', updatedTechnologies.length);
+
+        // Обновляем состояние
         setTechnologies(updatedTechnologies);
+
+        // Сохраняем в localStorage
         localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-        console.log(`Successfully imported ${importedTechs.length} technologies from roadmap: ${data.roadmapTitle}`);
+        // Триггерим обновление
+        setShouldRefresh(true);
 
         return {
           success: true,
@@ -203,10 +215,17 @@ function useTechnologiesApi() {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      console.error('Ошибка при импорте дорожной карты:', err);
-      throw new Error(`Ошибка при импорте дорожной карты: ${errorMessage}`);
+      console.error('❌ Ошибка импорта:', err);
+      setError(errorMessage);
+
+      return {
+        success: false,
+        importedCount: 0,
+        totalCount: 0
+      };
     } finally {
       setLoading(false);
+      setShouldRefresh(false);
     }
   };
 
@@ -240,7 +259,22 @@ function useTechnologiesApi() {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      throw new Error(`Ошибка при добавлении технологии: ${errorMessage}`);
+
+      // Если API не доступен, добавляем локально
+      const maxId = technologies.length > 0
+        ? Math.max(...technologies.map(t => t.id))
+        : 0;
+
+      const newTech: Technology = {
+        id: maxId + 1,
+        ...techData
+      };
+
+      const updatedTechnologies = [...technologies, newTech];
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+      return newTech;
     }
   };
 
@@ -276,7 +310,18 @@ function useTechnologiesApi() {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      throw new Error(`Ошибка при обновлении технологии: ${errorMessage}`);
+
+      // Если API не доступен, обновляем локально
+      const updatedTechnologies = technologies.map(tech =>
+        tech.id === id ? { ...tech, ...updates } : tech
+      );
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+      const updatedTech = updatedTechnologies.find(tech => tech.id === id);
+      if (!updatedTech) throw new Error('Технология не найдена');
+
+      return updatedTech;
     }
   };
 
@@ -305,7 +350,13 @@ function useTechnologiesApi() {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
-      throw new Error(`Ошибка при удалении технологии: ${errorMessage}`);
+
+      // Если API не доступен, удаляем локально
+      const updatedTechnologies = technologies.filter(tech => tech.id !== id);
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+      return true;
     }
   };
 
@@ -332,7 +383,8 @@ function useTechnologiesApi() {
       if (data.success && Array.isArray(data.data)) {
         setTechnologies(data.data);
         localStorage.setItem('techTrackerData', JSON.stringify(data.data));
-        console.log('Data synced with API:', data.data.length, 'technologies');
+        console.log('🔄 Данные синхронизированы с API:', data.data.length, 'технологий');
+        return true;
       } else {
         throw new Error(data.message || 'Не удалось синхронизировать данные');
       }
@@ -342,10 +394,72 @@ function useTechnologiesApi() {
     }
   };
 
-  // Загрузка данных при монтировании
-  useEffect(() => {
-    fetchTechnologies();
-  }, [fetchTechnologies]);
+  // Функции для работы с локальными данными
+  const markAllDone = async () => {
+    const updatedTechnologies = technologies.map(tech => ({
+      ...tech,
+      status: 'completed' as const
+    }));
+
+    setTechnologies(updatedTechnologies);
+    localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+    try {
+      await syncWithApi();
+    } catch (err) {
+      console.log('API sync failed, using local data');
+    }
+  };
+
+  const resetAllStatuses = async () => {
+    const updatedTechnologies = technologies.map(tech => ({
+      ...tech,
+      status: 'not-started' as const
+    }));
+
+    setTechnologies(updatedTechnologies);
+    localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+
+    try {
+      await syncWithApi();
+    } catch (err) {
+      console.log('API sync failed, using local data');
+    }
+  };
+
+  const exportData = (): string => {
+    const data = {
+      exportedAt: new Date().toISOString(),
+      technologies: technologies
+    };
+    const dataStr = JSON.stringify(data, null, 2);
+
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tech-tracker-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    return dataStr;
+  };
+
+  // Функция для принудительного обновления
+  const refreshData = () => {
+    const saved = localStorage.getItem('techTrackerData');
+    if (saved) {
+      try {
+        const parsedData = JSON.parse(saved);
+        console.log('🔄 Принудительное обновление данных:', parsedData.length, 'технологий');
+        setTechnologies(parsedData);
+      } catch (error) {
+        console.error('❌ Ошибка при обновлении данных:', error);
+      }
+    }
+  };
 
   return {
     technologies,
@@ -357,9 +471,13 @@ function useTechnologiesApi() {
     updateTechnology,
     deleteTechnology,
     saveApiEndpoint,
-    setTechnologies,
     importRoadmap,
-    syncWithApi
+    syncWithApi,
+    markAllDone,
+    resetAllStatuses,
+    exportData,
+    refreshData, // Добавляем функцию обновления
+    shouldRefresh
   };
 }
 

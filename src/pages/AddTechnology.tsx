@@ -2,37 +2,22 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoMdClose } from "react-icons/io";
 import './AddTechnology.css';
-
-interface Technology {
-  id: number;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  notes: string;
-  category?: string;
-}
+import useTechnologiesApi from '../components/TechnologiesApi';
 
 interface AddTechnologyProps {
-  technologies: Technology[];
-  setTechnologies: (tech: Technology[]) => void;
-}
-
-interface NewTechnology {
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  notes: string;
-  category: string;
+  technologies: any[];
+  setTechnologies: (tech: any[]) => void;
 }
 
 function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
   const navigate = useNavigate();
   const [isCardVisible, setIsCardVisible] = useState(false);
+  const { addTechnology } = useTechnologiesApi();
 
-  const [newTechnology, setNewTechnology] = useState<NewTechnology>({
+  const [newTechnology, setNewTechnology] = useState({
     title: '',
     description: '',
-    status: 'not-started',
+    status: 'not-started' as 'not-started' | 'in-progress' | 'completed',
     notes: '',
     category: ''
   });
@@ -55,7 +40,7 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
     }
   };
 
-  const handleSaveNewTechnology = () => {
+  const handleSaveNewTechnology = async () => {
     if (!newTechnology.title.trim()) {
       alert('Пожалуйста, введите название технологии');
       return;
@@ -66,29 +51,28 @@ function AddTechnology({ technologies, setTechnologies }: AddTechnologyProps) {
       return;
     }
 
-    const maxId = technologies.length > 0
-      ? Math.max(...technologies.map(t => t.id))
-      : 0;
+    try {
+      await addTechnology({
+        title: newTechnology.title.trim(),
+        description: newTechnology.description.trim(),
+        status: newTechnology.status,
+        notes: newTechnology.notes.trim(),
+        category: newTechnology.category.trim() || undefined
+      });
 
-    const techWithId: Technology = {
-      ...newTechnology,
-      id: maxId + 1
-    };
-
-    const updatedTechnologies = [...technologies, techWithId];
-    setTechnologies(updatedTechnologies);
-    localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
-
-    alert(`Технология "${techWithId.title}" успешно добавлена!`);
-    setNewTechnology({
-      title: '',
-      description: '',
-      status: 'not-started',
-      notes: '',
-      category: ''
-    });
-    setIsCardVisible(false);
-    navigate('/');
+      alert(`Технология "${newTechnology.title}" успешно добавлена!`);
+      setNewTechnology({
+        title: '',
+        description: '',
+        status: 'not-started',
+        notes: '',
+        category: ''
+      });
+      setIsCardVisible(false);
+      navigate('/');
+    } catch (err) {
+      alert(`Ошибка при добавлении: ${err instanceof Error ? err.message : 'Неизвестная ошибка'}`);
+    }
   };
 
   const handleCardClick = (e: React.MouseEvent) => {

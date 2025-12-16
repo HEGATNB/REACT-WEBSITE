@@ -1,32 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './TechnologyList.css';
-
-interface Technology {
-  id: number;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  notes: string;
-  category?: string;
-}
+import useTechnologiesApi from '../components/TechnologiesApi';
 
 function TechnologyList() {
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const { technologies, loading } = useTechnologiesApi();
 
-  useEffect(() => {
-    const saved = localStorage.getItem('techTrackerData');
-    if (saved) {
-      try {
-        const parsedData = JSON.parse(saved);
-        setTechnologies(parsedData);
-      } catch (error) {
-        console.error('Ошибка при загрузке данных:', error);
-      }
-    }
-  }, []);
-
-  const getColorByStatus = (status: Technology['status']): string => {
+  const getColorByStatus = (status: 'completed' | 'in-progress' | 'not-started'): string => {
     switch (status) {
       case 'completed':
         return '#4caf50';
@@ -39,7 +19,7 @@ function TechnologyList() {
     }
   };
 
-  const getStatusText = (status: Technology['status']): string => {
+  const getStatusText = (status: 'completed' | 'in-progress' | 'not-started'): string => {
     switch (status) {
       case 'completed': return 'Завершено';
       case 'in-progress': return 'В процессе';
@@ -47,6 +27,16 @@ function TechnologyList() {
       default: return 'Не начато';
     }
   };
+
+  if (loading && technologies.length === 0) {
+    return (
+      <div className="technology-list-page">
+        <div className="loading-state">
+          <p>Загрузка технологий...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="technology-list-page">

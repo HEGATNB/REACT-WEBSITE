@@ -17,17 +17,22 @@ function TechnologyDetail() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('techTrackerData');
-    if (saved) {
-      try {
-        const parsedData = JSON.parse(saved) as Technology[];
-        const foundTech = parsedData.find(t => t.id === Number(techId));
-        setTechnology(foundTech || null);
-      } catch (error) {
-        console.error('Ошибка при загрузке данных:', error);
+    // Загружаем данные из localStorage или используем общий стейт
+    const loadTechnology = () => {
+      const saved = localStorage.getItem('techTrackerData');
+      if (saved) {
+        try {
+          const parsedData = JSON.parse(saved) as Technology[];
+          const foundTech = parsedData.find(t => t.id === Number(techId));
+          setTechnology(foundTech || null);
+        } catch (error) {
+          console.error('Ошибка при загрузке данных:', error);
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    loadTechnology();
   }, [techId]);
 
   const getColorByStatus = (status: Technology['status']): string => {

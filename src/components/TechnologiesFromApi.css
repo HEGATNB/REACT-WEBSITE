@@ -230,6 +230,7 @@
   font-weight: 500;
   color: #555;
 }
+[data-theme="dark"] .tech-difficulty{}
 
 .tech-difficulty {
   padding: 6px 12px;

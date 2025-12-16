@@ -279,6 +279,11 @@
   color: #c62828;
   border-color: #ffcdd2;
 }
+[data-theme="dark"] .sync-message{
+  color: white;
+  background: #262332;
+  border: none;
+}
 
 .sync-hint {
   margin-top: 12px;
