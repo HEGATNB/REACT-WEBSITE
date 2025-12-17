@@ -1,364 +1,395 @@
-/* ApiSettings.css */
 .api-settings {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e0e0e0;
+  min-width: 55%;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+  color: white;
 }
 
 .api-settings h2 {
-  margin-bottom: 32px;
-  color: #213547;
   text-align: center;
-  font-weight: 600;
-  font-size: 28px;
-  user-select: none;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: white;
 }
-
-[data-theme="light"] .api-section strong,
-[data-theme="light"] .api-section,
-[data-theme="light"] .api-section p{
-  color: #213547;
-}
-
 
 .api-section {
-  margin-bottom: 32px;
-  padding: 24px;
-  background: #f5f5f8;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  transition: transform 0.3s;
-}
-
-.api-section:hover {
-  transform: translateY(-2px);
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .api-section h3 {
+  margin-top: 0;
   margin-bottom: 20px;
-  color: #213547;
-  font-weight: 600;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 1.3rem;
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
 }
 
-.api-section h3::before {
-  content: "•";
-  color: #646cff;
-  font-size: 24px;
-}
-
+/* Стили для эндпоинта */
 .endpoint-control {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .endpoint-input {
   flex: 1;
-  padding: 14px 16px;
-  border: 2px solid #d1d1d1;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   font-size: 14px;
-  background: #ffffff;
-  color: #213547;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s;
 }
 
 .endpoint-input:focus {
   outline: none;
   border-color: #646cff;
-  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
 }
 
 .save-btn {
-  padding: 14px 28px;
-  background: #262332;
+  padding: 12px 24px;
+  background: #646cff;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 14px;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+  white-space: nowrap;
 }
 
 .save-btn:hover {
-  background: #1e1a2b;
-  transform: translateY(-2px);
+  background: #535bf2;
 }
 
+/* Примеры API */
 .api-examples {
-  margin-top: 20px;
-  padding: 16px;
-  background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
 }
 
 .examples-title {
-  margin-bottom: 12px;
-  color: #666;
+  margin: 0;
   font-size: 14px;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .example-btn {
-  margin-right: 8px;
-  margin-bottom: 8px;
-  padding: 10px 20px;
-  background: #ffffff;
-  border: 2px solid #d1d1d1;
+  padding: 8px 16px;
+  background: rgba(100, 108, 255, 0.2);
+  color: #646cff;
+  border: 1px solid rgba(100, 108, 255, 0.3);
   border-radius: 6px;
-  color: #213547;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
   transition: all 0.3s;
 }
 
 .example-btn:hover {
-  background: #f5f5f8;
-  border-color: #646cff;
-  color: #646cff;
+  background: rgba(100, 108, 255, 0.3);
   transform: translateY(-2px);
 }
 
+/* Текущий эндпоинт */
 .current-endpoint {
-  margin-top: 20px;
-  padding: 16px;
-  background: #ffffff;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  border-left: 4px solid #646cff;
+  margin-top: 15px;
 }
 
 .current-endpoint p {
   margin: 0 0 8px 0;
-  color: #213547;
-  font-weight: 500;
+  font-size: 14px;
 }
 
 .current-endpoint code {
   display: block;
-  padding: 12px;
-  background: #f5f5f8;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  word-break: break-all;
+  font-family: monospace;
   font-size: 13px;
-  color: #555;
-  line-height: 1.4;
+  word-break: break-all;
+  color: #a5d6a7;
 }
 
+/* Импорт дорожной карты */
 .roadmap-control {
   display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .roadmap-input {
   flex: 1;
-  padding: 14px 16px;
-  border: 2px solid #d1d1d1;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   font-size: 14px;
-  background: #ffffff;
-  color: #213547;
-  transition: border-color 0.3s;
-}
-
-.roadmap-input:focus {
-  outline: none;
-  border-color: #646cff;
 }
 
 .import-btn-api {
-  padding: 14px 28px;
-  background: #262332;
+  padding: 12px 24px;
+  background: #4caf50;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 }
 
 .import-btn-api:hover:not(:disabled) {
-  background: #1e1a2b;
-  transform: translateY(-2px);
+  background: #43a047;
 }
 
 .import-btn-api:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .roadmap-hint {
-  margin-top: 12px;
-  color: #666;
+  margin: 10px 0 20px;
   font-size: 13px;
-  font-style: italic;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
 }
 
+/* Примеры дорожных карт */
 .example-roadmaps ul {
   list-style: none;
   padding: 0;
-  margin-top: 12px;
+  margin: 15px 0 0 0;
 }
 
 .example-roadmaps li {
-  padding: 12px 16px;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
   margin-bottom: 8px;
-  background: #ffffff;
-  border-radius: 8px;
   cursor: pointer;
-  color: #646cff;
+  transition: background-color 0.3s;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s;
-  border: 2px solid #e0e0e0;
+  word-break: break-all;
 }
 
 .example-roadmaps li:hover {
-  background: #f5f5f8;
-  border-color: #646cff;
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.2);
 }
 
+/* Синхронизация */
 .sync-btn {
   padding: 14px 28px;
-  background: #262332;
+  background: #ff9800;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 14px;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-bottom: 15px;
 }
 
 .sync-btn:hover:not(:disabled) {
-  background: #1e1a2b;
-  transform: translateY(-2px);
+  background: #f57c00;
 }
 
 .sync-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .sync-message {
-  margin-top: 16px;
-  padding: 14px;
+  padding: 12px;
   border-radius: 8px;
+  margin-bottom: 10px;
+  text-align: center;
   font-size: 14px;
-  font-weight: 500;
-  border: 2px solid transparent;
 }
 
 .sync-message.success {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-color: #c8e6c9;
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .sync-message.error {
-  background: #ffebee;
-  color: #c62828;
-  border-color: #ffcdd2;
-}
-[data-theme="dark"] .sync-message{
-  color: white;
-  background: #262332;
-  border: none;
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 .sync-hint {
-  margin-top: 12px;
-  color: #666;
   font-size: 13px;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
 }
 
+/* Ошибки */
 .api-error {
-  margin-top: 32px;
-  padding: 20px;
-  background: #ffebee;
+  padding: 15px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
   border-radius: 8px;
-  border: 2px solid #ffcdd2;
+  margin-top: 20px;
 }
 
 .api-error p {
   margin: 0;
-  color: #c62828;
-  font-weight: 500;
+  font-size: 14px;
 }
 
-/* Темные темы */
-[data-theme="dark"] .api-settings {
-  background: #262332;
-  border-color: #383347;
-  color: white;
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .api-settings {
+    padding: 15px;
+    min-width: 100%;
+  }
+
+  .api-settings h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .api-section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .endpoint-control,
+  .roadmap-control {
+    flex-direction: column;
+  }
+
+  .save-btn,
+  .import-btn-api {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .example-btn {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .api-examples {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .examples-title {
+    margin-bottom: 5px;
+  }
 }
 
-[data-theme="dark"] .api-section {
-  background: #383347;
-  border-color: #464255;
+@media (max-width: 480px) {
+  .api-settings {
+    padding: 10px;
+  }
+
+  .api-section {
+    padding: 15px;
+  }
+
+  .api-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .endpoint-input,
+  .roadmap-input {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .current-endpoint code {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .example-roadmaps li {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
 }
 
-[data-theme="dark"] .api-section h3 {
-  color: white;
-}
-
-[data-theme="dark"] .endpoint-input,
-[data-theme="dark"] .roadmap-input {
-  background: #383347;
-  border-color: #464255;
-  color: white;
-}
-
-[data-theme="dark"] .api-examples,
-[data-theme="dark"] .example-roadmaps li,
-[data-theme="dark"] .current-endpoint {
-  background: #383347;
-  border-color: #464255;
-  color: #ccc;
-}
-
-[data-theme="dark"] .example-btn {
-  background: #383347;
-  border-color: #464255;
-  color: #ccc;
-}
-
-[data-theme="dark"] .example-btn:hover {
-  background: #464255;
-  border-color: #646cff;
-  color: white;
-}
-
-[data-theme="dark"] .current-endpoint code {
-  background: #464255;
-  color: #ccc;
-}
-
-[data-theme="dark"] .roadmap-hint,
-[data-theme="dark"] .sync-hint {
-  color: #aaa;
-}
-
-[data-theme="light"] .examples-title{
+/* Светлая тема */
+[data-theme="light"] .api-settings {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
   color: #213547;
+}
+
+[data-theme="light"] .api-section {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(33, 53, 71, 0.1);
+}
+
+[data-theme="light"] .api-section h3 {
+  color: #213547;
+  border-bottom-color: rgba(33, 53, 71, 0.1);
+}
+
+[data-theme="light"] .endpoint-input {
+  background: rgba(33, 53, 71, 0.05);
+  border-color: rgba(33, 53, 71, 0.2);
+  color: #213547;
+}
+
+[data-theme="light"] .example-btn {
+  background: rgba(100, 108, 255, 0.1);
+  color: #646cff;
+  border-color: rgba(100, 108, 255, 0.2);
+}
+
+[data-theme="light"] .current-endpoint {
+  background: rgba(33, 53, 71, 0.05);
+}
+
+[data-theme="light"] .current-endpoint code {
+  background: rgba(33, 53, 71, 0.1);
+  color: #388e3c;
+}
+
+[data-theme="light"] .roadmap-input {
+  background: rgba(33, 53, 71, 0.05);
+  border-color: rgba(33, 53, 71, 0.2);
+  color: #213547;
+}
+
+[data-theme="light"] .roadmap-hint {
+  color: rgba(33, 53, 71, 0.7);
+}
+
+[data-theme="light"] .example-roadmaps li {
+  background: rgba(33, 53, 71, 0.05);
+  color: #213547;
+}
+
+[data-theme="light"] .example-roadmaps li:hover {
+  background: rgba(33, 53, 71, 0.1);
+}
+
+[data-theme="light"] .sync-hint {
+  color: rgba(33, 53, 71, 0.7);
+}
+
+[data-theme="light"] .api-error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
 }

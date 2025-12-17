@@ -59,15 +59,10 @@ function Stats() {
       <div className="stats-details">
         <div className="stats-card">
           <h3>Общий прогресс</h3>
-          <div className="progress-circle">
+          <div className="progress-circle" style={{ '--progress-percent': progressPercentage } as React.CSSProperties}>
             <div className="circle-bg"></div>
-            <div
-              className="circle-progress"
-              style={{
-                background: `conic-gradient(#4caf50 ${progressPercentage * 3.6}deg,
-                           rgba(255, 255, 255, 0.1) 0deg)`
-              }}
-            ></div>
+            <div className="circle-progress"></div>
+            <div className="circle-inner"></div>
             <div className="progress-text">
               <span className="progress-percent">{Math.round(progressPercentage)}%</span>
               <span className="progress-label">{completed} из {total}</span>

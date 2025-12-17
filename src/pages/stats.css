@@ -1,4 +1,3 @@
-
 .stats-page {
   min-height: calc(100vh - 80px);
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
@@ -137,7 +136,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Прогресс круг */
+/* Исправленная круговая диаграмма */
 .progress-circle {
   position: relative;
   width: 200px;
@@ -149,7 +148,11 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: conic-gradient(
+    rgba(255, 255, 255, 0.1) 0deg,
+    rgba(255, 255, 255, 0.1) 360deg
+  );
+  position: relative;
 }
 
 .circle-progress {
@@ -159,7 +162,24 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%);
+  background: conic-gradient(
+    #4caf50 0deg,
+    #4caf50 calc(var(--progress-percent) * 3.6deg),
+    rgba(255, 255, 255, 0) calc(var(--progress-percent) * 3.6deg),
+    rgba(255, 255, 255, 0) 360deg
+  );
+  clip-path: circle(50% at 50% 50%);
+}
+
+.circle-inner {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  z-index: 1;
 }
 
 .progress-text {
@@ -168,6 +188,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  z-index: 2;
 }
 
 .progress-percent {
@@ -273,6 +294,13 @@
     width: 180px;
     height: 180px;
   }
+  
+  .circle-inner {
+    top: 13px;
+    left: 13px;
+    right: 13px;
+    bottom: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -290,6 +318,29 @@
   
   .stat-item {
     padding: 20px;
+  }
+  
+  .progress-circle {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .progress-percent {
+    font-size: 2rem;
+  }
+  
+  .progress-label {
+    font-size: 0.9rem;
+  }
+  
+  .bar-label {
+    width: 80px;
+    font-size: 0.8rem;
+  }
+  
+  .bar-value {
+    width: 30px;
+    font-size: 0.9rem;
   }
 }
 
@@ -332,10 +383,27 @@
 
 [data-theme="light"] .stats-card h3 {
   color: #213547;
+  border-bottom-color: rgba(33, 53, 71, 0.1);
 }
 
 [data-theme="light"] .circle-bg {
-  background: rgba(33, 53, 71, 0.1);
+  background: conic-gradient(
+    rgba(33, 53, 71, 0.1) 0deg,
+    rgba(33, 53, 71, 0.1) 360deg
+  );
+}
+
+[data-theme="light"] .circle-progress {
+  background: conic-gradient(
+    #4caf50 0deg,
+    #4caf50 calc(var(--progress-percent) * 3.6deg),
+    rgba(33, 53, 71, 0) calc(var(--progress-percent) * 3.6deg),
+    rgba(33, 53, 71, 0) 360deg
+  );
+}
+
+[data-theme="light"] .circle-inner {
+  background: rgba(33, 53, 71, 0.05);
 }
 
 [data-theme="light"] .bar-container {
@@ -362,5 +430,5 @@
 }
 
 [data-theme="light"] .stats-card h3{
-  border-bottom: 1px solid #213547;
+  border-bottom: 1px solid rgba(33, 53, 71, 0.1);
 }
