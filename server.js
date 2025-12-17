@@ -435,35 +435,36 @@ if (process.env.NODE_ENV === 'production') {
   // Обслуживаем статические файлы из папки dist
   app.use(express.static(path.join(__dirname, 'dist')));
 
-  // Обработка SPA маршрутов - ВАЖНО: этот маршрут должен быть ПОСЛЕ всех API маршрутов
-  app.get(/^\/(?!api).*/, (req, res) => {
+  // Обработка SPA маршрутов - правильный синтаксис для Express 4
+  app.get('*', (req, res, next) => {
+    // Пропускаем API маршруты
+    if (req.path.startsWith('/api/') || req.path === '/health' || req.path === '/favicon.ico') {
+      return next();
+    }
+    // Для всех остальных маршрутов отдаем index.html
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+} else {
+  // В development показываем информацию об API
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Tech Tracker API',
+      version: '1.0.0',
+      endpoints: {
+        technologies: '/api/technologies',
+        import: '/api/import-roadmap',
+        health: '/health'
+      },
+      environment: 'development'
+    });
   });
 }
 
-// Root API route
-app.get('/', (req, res) => {
-  if (process.env.NODE_ENV === 'production' && req.accepts('html')) {
-    return res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  }
-
-  res.json({
-    message: 'Tech Tracker API',
-    version: '1.0.0',
-    endpoints: {
-      technologies: '/api/technologies',
-      import: '/api/import-roadmap',
-      health: '/health'
-    },
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-
-// Обработка 404 для API
-app.use('/api/*', (req, res) => {
+// Общая обработка 404
+app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'API route not found'
+    message: 'Route not found'
   });
 });
 

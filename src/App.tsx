@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Card, { RoadMap, QuickActions } from './components/TechnologyCard';
 import { useState, useEffect } from 'react';
 import useTechnologiesApi from './components/TechnologiesApi';
@@ -16,51 +16,44 @@ function App() {
   const {
     technologies,
     loading,
+    initialLoading,
     error,
     fetchTechnologies,
     updateTechnology,
     markAllDone,
     resetAllStatuses,
     exportData,
-    refreshData,
-    shouldRefresh
+    savePendingUpdates
   } = useTechnologiesApi();
 
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const location = useLocation();
 
+  // Загружаем данные при первом рендере
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'techTrackerData') {
-        console.log('📡 Обнаружено изменение в localStorage, обновляю данные...');
-        refreshData();
+    const loadData = async () => {
+      try {
+        await fetchTechnologies();
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        setIsInitialized(true); // Все равно помечаем как инициализированное
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    if (!isInitialized) {
+      loadData();
+    }
+  }, [fetchTechnologies, isInitialized]);
 
-    const interval = setInterval(() => {
-      refreshData();
-    }, 2000);
-
+  // Сохраняем изменения при уходе со страницы
+  useEffect(() => {
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
+      savePendingUpdates();
     };
-  }, [refreshData]);
-
-  useEffect(() => {
-    if (shouldRefresh) {
-      console.log('🔄 Обновление данных по триггеру');
-      refreshData();
-    }
-  }, [shouldRefresh, refreshData]);
-
-  useEffect(() => {
-    if (technologies.length === 0) {
-      fetchTechnologies();
-    }
-  }, []);
+  }, [savePendingUpdates, location.pathname]);
 
   const changeStatus = async (id: number) => {
     const statusOrder: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
@@ -86,30 +79,12 @@ function App() {
     }
   };
 
-  const handleMarkAllDone = async () => {
-    try {
-      const updatePromises = technologies.map(tech =>
-        updateTechnology(tech.id, { status: 'completed' })
-      );
-      await Promise.all(updatePromises);
-      alert('Все технологии отмечены как завершенные!');
-    } catch (err) {
-      console.error('Failed to mark all as done:', err);
-      alert('Ошибка при обновлении статусов');
-    }
+  const handleMarkAllDone = () => {
+    markAllDone();
   };
 
-  const handleResetAllStatuses = async () => {
-    try {
-      const updatePromises = technologies.map(tech =>
-        updateTechnology(tech.id, { status: 'not-started' })
-      );
-      await Promise.all(updatePromises);
-      alert('Статусы всех технологий сброшены!');
-    } catch (err) {
-      console.error('Failed to reset statuses:', err);
-      alert('Ошибка при сбросе статусов');
-    }
+  const handleResetAllStatuses = () => {
+    resetAllStatuses();
   };
 
   const randomNextTechnology = async () => {
@@ -170,94 +145,112 @@ function App() {
   const notStarted = technologies.filter(tech => tech.status === "not-started").length;
   const inProgress = technologies.filter(tech => tech.status === "in-progress").length;
 
-  if (loading && technologies.length === 0) {
+  if (initialLoading) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Загрузка данных...</p>
+        <p>Загрузка данных из API...</p>
+      </div>
+    );
+  }
+
+  if (error && technologies.length === 0) {
+    return (
+      <div className="error-container">
+        <h3>Ошибка загрузки данных</h3>
+        <p>{error}</p>
+        <button onClick={() => fetchTechnologies()} className="retry-btn">
+          Попробовать снова
+        </button>
       </div>
     );
   }
 
   return (
-    <BrowserRouter>
-      <div className="App">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={
-            <>
-              <div className="page-content">
-                <div className="progress-header">
-                  <RoadMap
-                    total={total}
-                    learned={learned}
-                    inProgress={inProgress}
-                    notStarted={notStarted}
-                    currentFilter={currentFilter}
-                    onFilterChange={handleFilterChange}
-                    onSearch={handleSearch}
-                    searchResultsCount={filteredTechnologies.length}
-                    searchQuery={searchQuery}
-                  />
-                </div>
-                <div className="main-content-wrapper">
-                  <div className="main-content-container">
-                    <div className="quick-actions-section">
-                      <QuickActions
-                        onMarkAllDone={handleMarkAllDone}
-                        onResetAll={handleResetAllStatuses}
-                        onRandomNext={randomNextTechnology}
-                        onExportData={handleExportData}
-                      />
-                    </div>
-                    <div className="cards-section">
-                      <div className="cards-container">
-                        {filteredTechnologies.length > 0 ? (
-                          filteredTechnologies.map(tech => (
-                            <div key={tech.id} className="technology-card-wrapper">
-                              <Card
-                                title={tech.title}
-                                description={tech.description}
-                                status={tech.status}
-                                notes={tech.notes}
-                                techId={tech.id}
-                                onStatusChange={() => changeStatus(tech.id)}
-                                onNotesChange={updateTechnologyNotes}
-                              />
-                            </div>
-                          ))
-                        ) : (
-                          <div className="no-results">
-                            <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
-                            {technologies.length === 0 && (
-                              <button
-                                onClick={() => fetchTechnologies()}
-                                className="refresh-btn"
-                                style={{ marginTop: '10px' }}
-                              >
-                                Загрузить данные
-                              </button>
-                            )}
+    <div className="App">
+      <Navigation />
+      <Routes>
+        <Route path="/" element={
+          <>
+            <div className="page-content">
+              <div className="progress-header">
+                <RoadMap
+                  total={total}
+                  learned={learned}
+                  inProgress={inProgress}
+                  notStarted={notStarted}
+                  currentFilter={currentFilter}
+                  onFilterChange={handleFilterChange}
+                  onSearch={handleSearch}
+                  searchResultsCount={filteredTechnologies.length}
+                  searchQuery={searchQuery}
+                />
+              </div>
+              <div className="main-content-wrapper">
+                <div className="main-content-container">
+                  <div className="quick-actions-section">
+                    <QuickActions
+                      onMarkAllDone={handleMarkAllDone}
+                      onResetAll={handleResetAllStatuses}
+                      onRandomNext={randomNextTechnology}
+                      onExportData={handleExportData}
+                    />
+                  </div>
+                  <div className="cards-section">
+                    <div className="cards-container">
+                      {filteredTechnologies.length > 0 ? (
+                        filteredTechnologies.map(tech => (
+                          <div key={tech.id} className="technology-card-wrapper">
+                            <Card
+                              title={tech.title}
+                              description={tech.description}
+                              status={tech.status}
+                              notes={tech.notes}
+                              techId={tech.id}
+                              onStatusChange={() => changeStatus(tech.id)}
+                              onNotesChange={updateTechnologyNotes}
+                            />
                           </div>
-                        )}
-                      </div>
+                        ))
+                      ) : (
+                        <div className="no-results">
+                          <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
+                          {technologies.length === 0 && (
+                            <button
+                              onClick={() => fetchTechnologies()}
+                              className="refresh-btn"
+                              style={{ marginTop: '10px' }}
+                            >
+                              Загрузить данные
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-            </>
-          } />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/technologies" element={<TechnologyList />} />
-          <Route path="/api-settings" element={<ApiSettings />} />
-          <Route path="/api-technologies" element={<TechnologiesFromApi />} />
-          <Route path="/technology/:techId" element={<TechnologyDetail />} />
-          <Route path="/add-technology" element={<AddTechnology />} />
-        </Routes>
-      </div>
+            </div>
+          </>
+        } />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/technologies" element={<TechnologyList />} />
+        <Route path="/api-settings" element={<ApiSettings />} />
+        <Route path="/api-technologies" element={<TechnologiesFromApi />} />
+        <Route path="/technology/:techId" element={<TechnologyDetail />} />
+        <Route path="/add-technology" element={<AddTechnology />} />
+      </Routes>
+    </div>
+  );
+}
+
+function AppWrapper() {
+  return (
+    <BrowserRouter>
+      <App />
     </BrowserRouter>
   );
 }
 
-export default App;
+export default AppWrapper;

@@ -17,7 +17,6 @@ interface CardProps {
   isEditable?: boolean;
 }
 
-
 interface RoadMapProps {
   total: number;
   learned: number;
@@ -56,8 +55,17 @@ const getColorByStatus = (status: Status): string => {
       return '#f44336';
   }
 };
+
 function Card({ title, description, status, notes, techId, onStatusChange, onNotesChange, isEditable = false }: CardProps) {
+  const [localNotes, setLocalNotes] = useState(notes);
+  const notesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cardColor = getColorByStatus(status);
+
+  // Синхронизируем локальные заметки с переданными
+  useEffect(() => {
+    setLocalNotes(notes);
+  }, [notes]);
+
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === 'TEXTAREA' || target.closest('textarea')) {
@@ -71,8 +79,30 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onNotesChange(techId, e.target.value);
+    const newNotes = e.target.value;
+    setLocalNotes(newNotes);
+
+    // Очищаем предыдущий таймер
+    if (notesTimeoutRef.current) {
+      clearTimeout(notesTimeoutRef.current);
+    }
+
+    // Устанавливаем новый таймер для сохранения через 1.5 секунды
+    notesTimeoutRef.current = setTimeout(() => {
+      if (newNotes !== notes) {
+        onNotesChange(techId, newNotes);
+      }
+    }, 1500);
   };
+
+  // Очищаем таймер при размонтировании
+  useEffect(() => {
+    return () => {
+      if (notesTimeoutRef.current) {
+        clearTimeout(notesTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -80,19 +110,19 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
       onClick={handleCardClick}
       style={{ backgroundColor: cardColor }}
     >
-      <h2 >{title}</h2>
+      <h2>{title}</h2>
       <p>{description}</p>
       <p>Статус: {status}</p>
       <textarea
         className="note-text-area"
-        value={notes}
+        value={localNotes}
         onClick={handleTextareaClick}
         onChange={handleTextareaChange}
         placeholder="Впишите сюда свою заметку..."
         rows={3}
       />
       <div className="notes-hint">
-        {notes.length > 0 ? `Заметка сохранена (${notes.length} символов)` :
+        {localNotes.length > 0 ? `Заметка сохранена (${localNotes.length} символов)` :
           'Добавьте заметку'}
       </div>
     </div>
