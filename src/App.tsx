@@ -31,15 +31,17 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const location = useLocation();
 
-  // Загружаем данные при первом рендере
+  // Загружаем данные при первом рендере и при изменении location
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('Загрузка технологий из API...');
         await fetchTechnologies();
         setIsInitialized(true);
+        console.log(`Загружено ${technologies.length} технологий`);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
-        setIsInitialized(true); // Все равно помечаем как инициализированное
+        setIsInitialized(true);
       }
     };
 
@@ -125,7 +127,7 @@ function App() {
       const query = searchQuery.toLowerCase();
       return tech.title.toLowerCase().includes(query) ||
         tech.description.toLowerCase().includes(query) ||
-        tech.notes.toLowerCase().includes(query);
+        (tech.notes && tech.notes.toLowerCase().includes(query));
     }
 
     switch (currentFilter) {
@@ -144,6 +146,15 @@ function App() {
   const learned = technologies.filter(tech => tech.status === "completed").length;
   const notStarted = technologies.filter(tech => tech.status === "not-started").length;
   const inProgress = technologies.filter(tech => tech.status === "in-progress").length;
+
+  console.log('Технологии в App.tsx:', {
+    total,
+    learned,
+    notStarted,
+    inProgress,
+    filteredCount: filteredTechnologies.length,
+    technologiesCount: technologies.length
+  });
 
   if (initialLoading) {
     return (
@@ -205,7 +216,7 @@ function App() {
                               title={tech.title}
                               description={tech.description}
                               status={tech.status}
-                              notes={tech.notes}
+                              notes={tech.notes || ''}
                               techId={tech.id}
                               onStatusChange={() => changeStatus(tech.id)}
                               onNotesChange={updateTechnologyNotes}
@@ -215,14 +226,18 @@ function App() {
                       ) : (
                         <div className="no-results">
                           <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
-                          {technologies.length === 0 && (
+                          {technologies.length === 0 ? (
                             <button
                               onClick={() => fetchTechnologies()}
                               className="refresh-btn"
                               style={{ marginTop: '10px' }}
                             >
-                              Загрузить данные
+                              Загрузить данные из API
                             </button>
+                          ) : searchQuery ? (
+                            <p>Попробуйте другой поисковый запрос.</p>
+                          ) : (
+                            <p>Нет технологий, соответствующих текущему фильтру "{currentFilter}".</p>
                           )}
                         </div>
                       )}
