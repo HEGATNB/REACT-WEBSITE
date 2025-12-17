@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import './TechnologyList.css';
 import useTechnologiesApi from '../components/TechnologiesApi';
 

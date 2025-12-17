@@ -32,6 +32,7 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   user-select: none;
   cursor: default;
+  box-sizing: border-box;
 }
 
 .technology-item:hover {
@@ -171,7 +172,7 @@
   display: flex;
   justify-content: center;
   padding: 25px 0;
-  margin-top: auto; /* Прижимаем к низу */
+  margin-top: auto;
 }
 
 .add-tech-link {
@@ -195,7 +196,6 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* Основной контейнер страницы */
 .technology-list-page {
   width: 100%;
   max-width: 1400px;
@@ -244,6 +244,7 @@
   .technology-item {
     max-width: 100%;
     padding: 22px;
+    margin: 0 5px;
   }
 
   .add-tech-link {
@@ -267,6 +268,7 @@
   .technology-item {
     padding: 20px;
     max-width: 100%;
+    margin: 0;
   }
 
   .tech-title {
@@ -308,5 +310,6 @@
 
   .technology-item {
     padding: 18px;
+    margin: 0;
   }
 }
