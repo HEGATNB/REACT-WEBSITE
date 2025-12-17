@@ -162,15 +162,6 @@ function App() {
   const notStarted = technologies.filter(tech => tech.status === "not-started").length;
   const inProgress = technologies.filter(tech => tech.status === "in-progress").length;
 
-  console.log('Технологии в App.tsx:', {
-    total,
-    learned,
-    notStarted,
-    inProgress,
-    filteredCount: filteredTechnologies.length,
-    technologiesCount: technologies.length
-  });
-
   if (initialLoading) {
     return (
       <div className="loading-container">
