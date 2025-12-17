@@ -190,6 +190,13 @@
   text-align: center;
 }
 
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: white;
+  font-size: 18px;
+}
+
 .add-tech-link:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-3px);

@@ -23,7 +23,8 @@ function App() {
     markAllDone,
     resetAllStatuses,
     exportData,
-    savePendingUpdates
+    savePendingUpdates,
+    deleteTechnology // Добавляем deleteTechnology если нужно
   } = useTechnologiesApi();
 
   const [currentFilter, setCurrentFilter] = useState<string>('all');
@@ -81,12 +82,24 @@ function App() {
     }
   };
 
-  const handleMarkAllDone = () => {
-    markAllDone();
+  const handleMarkAllDone = async () => {
+    try {
+      await markAllDone();
+      // После успешного обновления перезагружаем данные
+      await fetchTechnologies();
+    } catch (err) {
+      console.error('Failed to mark all as done:', err);
+    }
   };
 
-  const handleResetAllStatuses = () => {
-    resetAllStatuses();
+  const handleResetAllStatuses = async () => {
+    try {
+      await resetAllStatuses();
+      // После успешного обновления перезагружаем данные
+      await fetchTechnologies();
+    } catch (err) {
+      console.error('Failed to reset all statuses:', err);
+    }
   };
 
   const randomNextTechnology = async () => {
@@ -101,6 +114,8 @@ function App() {
 
     try {
       await updateTechnology(randomTech.id, { status: 'in-progress' });
+      // После обновления перезагружаем данные
+      await fetchTechnologies();
       alert(`Выбранная технология "${randomTech.title}" теперь в процессе изучения!`);
     } catch (err) {
       console.error('Failed to update random tech:', err);

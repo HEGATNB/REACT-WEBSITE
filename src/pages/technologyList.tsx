@@ -3,7 +3,7 @@ import './TechnologyList.css';
 import useTechnologiesApi from '../components/TechnologiesApi';
 
 function TechnologyList() {
-  const { technologies, loading } = useTechnologiesApi();
+  const { technologies, loading, initialLoading } = useTechnologiesApi(); // Используем тот же хук
 
   const getColorByStatus = (status: 'completed' | 'in-progress' | 'not-started'): string => {
     switch (status) {
@@ -27,7 +27,8 @@ function TechnologyList() {
     }
   };
 
-  if (loading && technologies.length === 0) {
+  // Используем initialLoading вместо loading для первоначальной загрузки
+  if (initialLoading && technologies.length === 0) {
     return (
       <div className="technology-list-page">
         <div className="loading-state">
