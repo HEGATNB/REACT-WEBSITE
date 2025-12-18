@@ -32,7 +32,6 @@
   box-sizing: border-box;
 }
 
-/* Левая часть: Quick Actions */
 .quick-actions-section {
   width: 280px;
   flex-shrink: 0;
@@ -81,7 +80,6 @@
   opacity: 0.8;
 }
 
-/* Центральная часть: Карточки - СТАРАЯ ВЕРСИЯ КОНТЕЙНЕРА */
 .cards-section {
   flex: 1;
   min-width: 0;
@@ -94,14 +92,14 @@
   flex-wrap: wrap;
   gap: 20px;
   width: 100%;
-  padding: 10px 0 10px 50px; /* Добавлен отступ слева для компьютерной версии */
+  padding: 10px 0 10px 50px;
   box-sizing: border-box;
 }
 
 .technology-card-wrapper {
-  flex: 1 1 240px; /* Базовая ширина карточки */
-  max-width: 300px; /* Максимальная ширина карточки */
-  min-width: 200px; /* Минимальная ширина карточки */
+  flex: 1 1 240px;
+  max-width: 300px;
+  min-width: 200px;
 }
 
 .no-results {
@@ -113,10 +111,9 @@
   background-color: #262332;
   border-radius: 12px;
   margin: 20px 0;
-  margin-left: 50px; /* Добавлен отступ слева */
+  margin-left: 50px;
 }
 
-/* Правая часть: Массовые действия */
 .mass-edit-section {
   width: 280px;
   flex-shrink: 0;
@@ -168,7 +165,6 @@
   opacity: 0.8;
 }
 
-/* Активное состояние кнопки массового редактирования */
 .mass-edit-toggle-button.active {
   background-color: #646cff;
   color: white;
@@ -182,7 +178,6 @@
   opacity: 1;
 }
 
-/* Панель управления массовым редактированием */
 .mass-edit-controls-panel {
   background-color: #262332;
   padding: 20px;
@@ -297,7 +292,6 @@
   padding: 0;
 }
 
-/* АДАПТИВНОСТЬ КАК В НОВОЙ ВЕРСИИ */
 @media (max-width: 1200px) {
   .main-content-container {
     gap: 20px;
@@ -305,15 +299,15 @@
 
   .cards-container {
     gap: 15px;
-    padding-left: 40px; /* Уменьшенный отступ на средних экранах */
+    padding-left: 40px;
   }
 
   .no-results {
-    margin-left: 40px; /* Уменьшенный отступ на средних экранах */
+    margin-left: 40px;
   }
 
   .technology-card-wrapper {
-    flex: 1 1 220px; /* Уменьшаем базовую ширину */
+    flex: 1 1 220px;
     max-width: 280px;
   }
 
@@ -344,7 +338,7 @@
   .mass-edit-panel {
     max-width: 600px;
     margin: 0 auto;
-    width: calc(100% - 40px); /* Учитываем padding контейнера */
+    width: calc(100% - 40px);
   }
 
   .buttons-container {
@@ -362,20 +356,20 @@
 
   .cards-container {
     justify-content: center;
-    padding-left: 0; /* Убираем левый отступ на планшетах */
+    padding-left: 0;
   }
 
   .no-results {
-    margin-left: 0; /* Убираем левый отступ на планшетах */
+    margin-left: 0;
   }
 
   .technology-card-wrapper {
     flex: 1 1 200px;
-    max-width: calc(50% - 10px); /* Карточки занимают половину ширины с учетом gap */
+    max-width: calc(50% - 10px);
   }
 
   .selected-count-badge {
-    white-space: normal; /* Разрешаем переносы на планшетах */
+    white-space: normal;
   }
 }
 
@@ -386,12 +380,12 @@
 
   .main-content-wrapper {
     padding: 0 15px;
-    width: calc(100% - 30px); /* Учитываем padding */
+    width: calc(100% - 30px);
   }
 
   .progress-header {
     margin: 15px auto 20px;
-    width: calc(100% - 30px); /* Учитываем padding */
+    width: calc(100% - 30px);
   }
 
   .cards-container {
@@ -401,7 +395,7 @@
 
   .technology-card-wrapper {
     flex: 1 1 180px;
-    max-width: calc(50% - 6px); /* 50% ширины минус половина gap */
+    max-width: calc(50% - 6px);
   }
 
   .quick-actions-button {
@@ -418,7 +412,7 @@
 
   .mass-edit-panel {
     padding: 15px;
-    width: calc(100% - 30px); /* Учитываем padding контейнера */
+    width: calc(100% - 30px);
   }
 
   .mass-edit-controls-panel {
@@ -431,8 +425,8 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 8px 12px; /* Уменьшаем padding на мобильных */
-    white-space: normal; /* Разрешаем переносы на мобильных */
+    padding: 8px 12px;
+    white-space: normal;
     line-height: 1.4;
   }
 }
@@ -444,17 +438,17 @@
 
   .main-content-wrapper {
     padding: 0 10px;
-    width: calc(100% - 20px); /* Учитываем padding */
+    width: calc(100% - 20px);
   }
 
   .cards-container {
     gap: 10px;
-    justify-content: space-between; /* Равномерное распределение */
+    justify-content: space-between;
   }
 
   .technology-card-wrapper {
     flex: 1 1 150px;
-    max-width: calc(50% - 5px); /* 50% минус половина gap */
+    max-width: calc(50% - 5px);
     min-width: 140px;
     box-sizing: border-box;
   }
@@ -475,7 +469,7 @@
   .mass-edit-panel {
     padding: 12px;
     max-width: 100%;
-    width: calc(100% - 20px); /* Учитываем padding контейнера */
+    width: calc(100% - 20px);
   }
 
   .mass-edit-toggle-button {
@@ -494,11 +488,10 @@
     text-align: center;
   }
 
-  /* Исправление для карточек на очень маленьких экранах */
   @media (max-width: 400px) {
     .technology-card-wrapper {
       flex: 1 1 100%;
-      max-width: 100%; /* На очень узких экранах - одна карточка в ряд */
+      max-width: 100%;
       min-width: auto;
     }
 
@@ -508,11 +501,10 @@
   }
 }
 
-/* Стили для хедера прогресса (если там есть текст со статусом) */
 .progress-header h2,
 .progress-header h3,
 .progress-header .status-text {
-  white-space: nowrap; /* Запрещаем перенос текста на компьютерной версии */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -521,7 +513,7 @@
   .progress-header h2,
   .progress-header h3,
   .progress-header .status-text {
-    white-space: normal; /* Разрешаем переносы на мобильных */
+    white-space: normal;
   }
 }
 
@@ -602,7 +594,6 @@
   color: #666;
 }
 
-/* Убираем старые стили, которые больше не нужны */
 .mass-edit-header-section {
   display: none;
 }
@@ -611,7 +602,6 @@
   display: none;
 }
 
-/* Стили для карточек в режиме массового редактирования */
 .technology-card-wrapper {
   position: relative;
   transition: transform 0.2s;
@@ -669,6 +659,10 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.CompletedStat{
+ white-space: nowrap;
 }
 
 .retry-btn:hover {

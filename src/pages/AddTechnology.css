@@ -1,4 +1,3 @@
-/* AddTechnology.css */
 .add-technology-page {
   min-height: calc(100vh - 80px);
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
@@ -129,12 +128,12 @@
 .card-description-input,
 .card-category-input,
 .card-notes-input {
-  width: 100%; /* Изменено с 90% на 100% */
+  width: 100%;
   padding: 18px;
   border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   background-color: rgba(255, 255, 255, 0.95);
-  color: white; /* Исправлено: font-color на color */
+  color: white;
   font-family: inherit;
   font-size: 14px;
   transition: border-color 0.3s, box-shadow 0.3s;

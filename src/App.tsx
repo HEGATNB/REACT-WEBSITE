@@ -13,7 +13,6 @@ import ApiSettings from './components/ApiSettings';
 import TechnologiesFromApi from './components/TechnologiesFromApi';
 import MassEditPanel from './components/MassEditPanel';
 
-// Локальные типы
 type Status = 'completed' | 'in-progress' | 'not-started';
 
 interface Technology {
@@ -53,7 +52,6 @@ function App() {
   const [showMassEditPanel, setShowMassEditPanel] = useState(false);
   const location = useLocation();
 
-  // Синхронизируем данные из API с локальным состоянием
   useEffect(() => {
     const enhancedTechnologies = apiTechnologies.map(tech => ({
       ...tech,
@@ -65,7 +63,6 @@ function App() {
     setTechnologies(enhancedTechnologies);
   }, [apiTechnologies]);
 
-  // Загружаем данные при первом рендере
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -127,7 +124,6 @@ function App() {
         notes: newNotes,
         updatedAt: new Date().toISOString()
       });
-      // Обновляем локальное состояние
       const updatedTechs = technologies.map(t =>
         t.id === techId ? { ...t, notes: newNotes, updatedAt: new Date().toISOString() } : t
       );
@@ -220,7 +216,6 @@ function App() {
 
   const handleDeleteSelected = async (ids: number[]) => {
     try {
-      // Удаляем каждую выбранную технологию
       const deletePromises = ids.map(id => deleteTechnology(id));
       await Promise.all(deletePromises);
       const updatedTechs = technologies.filter(tech => !ids.includes(tech.id));
