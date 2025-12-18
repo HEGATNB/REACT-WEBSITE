@@ -4,8 +4,10 @@ import { GiSettingsKnobs } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
 import Modal from './Modal';
 
+// Типы для статуса
 type Status = 'completed' | 'in-progress' | 'not-started';
 
+// Props для Card компонента
 interface CardProps {
   title: string;
   description: string;
@@ -15,6 +17,11 @@ interface CardProps {
   onStatusChange: (id: number) => void;
   onNotesChange: (techId: number, notes: string) => void;
   isEditable?: boolean;
+  studyStartDate: string;
+  studyEndDate?: string;
+  isMassEditing?: boolean;
+  isSelected?: boolean;
+  onSelect?: (id: number, selected: boolean) => void;
 }
 
 interface RoadMapProps {
@@ -43,31 +50,46 @@ interface FiltersProps {
   onClose: () => void;
 }
 
+// Функция для получения цвета по статусу
 const getColorByStatus = (status: Status): string => {
   switch (status) {
-    case 'completed':
-      return '#4caf50';
-    case 'in-progress':
-      return '#ff9800';
-    case 'not-started':
-      return '#f44336';
-    default:
-      return '#f44336';
+    case 'completed': return '#4caf50';
+    case 'in-progress': return '#ff9800';
+    case 'not-started': return '#f44336';
+    default: return '#f44336';
   }
 };
 
-function Card({ title, description, status, notes, techId, onStatusChange, onNotesChange, isEditable = false }: CardProps) {
+function Card({
+  title,
+  description,
+  status,
+  notes,
+  techId,
+  onStatusChange,
+  onNotesChange,
+  isEditable = false,
+  studyStartDate,
+  studyEndDate,
+  isMassEditing = false,
+  isSelected = false,
+  onSelect
+}: CardProps) {
   const [localNotes, setLocalNotes] = useState(notes);
   const notesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cardColor = getColorByStatus(status);
 
-  // Синхронизируем локальные заметки с переданными
   useEffect(() => {
     setLocalNotes(notes);
   }, [notes]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
+    if (isMassEditing && onSelect) {
+      e.stopPropagation();
+      onSelect(techId, !isSelected);
+      return;
+    }
     if (target.tagName === 'TEXTAREA' || target.closest('textarea')) {
       return;
     }
@@ -82,20 +104,16 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
     const newNotes = e.target.value;
     setLocalNotes(newNotes);
 
-    // Очищаем предыдущий таймер
     if (notesTimeoutRef.current) {
       clearTimeout(notesTimeoutRef.current);
     }
 
-    // Устанавливаем новый таймер для сохранения через 1.5 секунды
     notesTimeoutRef.current = setTimeout(() => {
       if (newNotes !== notes) {
         onNotesChange(techId, newNotes);
       }
     }, 1500);
   };
-
-  // Очищаем таймер при размонтировании
   useEffect(() => {
     return () => {
       if (notesTimeoutRef.current) {
@@ -104,31 +122,106 @@ function Card({ title, description, status, notes, techId, onStatusChange, onNot
     };
   }, []);
 
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'не указана';
+    }
+  };
+
   return (
     <div
-      className={`Card ${isEditable ? 'editable-card' : ''}`}
+      className={`Card ${isEditable ? 'editable-card' : ''} ${isMassEditing ? 'mass-edit-mode' : ''} ${isSelected ? 'selected-card' : ''}`}
       onClick={handleCardClick}
       style={{ backgroundColor: cardColor }}
+      role={isMassEditing ? "checkbox" : "article"}
+      aria-checked={isMassEditing ? isSelected : undefined}
+      aria-label={`Карточка технологии: ${title}. Статус: ${status}. ${studyEndDate ? `Планируемое окончание: ${formatDate(studyEndDate)}` : ''}`}
+      tabIndex={isMassEditing ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (isMassEditing && onSelect && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onSelect(techId, !isSelected);
+        }
+      }}
     >
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <p>Статус: {status}</p>
-      <textarea
-        className="note-text-area"
-        value={localNotes}
-        onClick={handleTextareaClick}
-        onChange={handleTextareaChange}
-        placeholder="Впишите сюда свою заметку..."
-        rows={3}
-      />
-      <div className="notes-hint">
-        {localNotes.length > 0 ? `Заметка сохранена (${localNotes.length} символов)` :
-          'Добавьте заметку'}
+      {isMassEditing && (
+        <div
+          className="mass-edit-checkbox"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect?.(techId, !isSelected);
+          }}
+        >
+          <input
+            type="checkbox"
+            id={`select-${techId}`}
+            checked={isSelected}
+            onChange={(e) => onSelect?.(techId, e.target.checked)}
+            aria-label={`Выбрать технологию: ${title}`}
+          />
+          <label htmlFor={`select-${techId}`} className="checkbox-label">
+            ✓
+          </label>
+        </div>
+      )}
+
+      <h2 className="card-title">{title}</h2>
+      <p className="card-description">{description}</p>
+      <div className="status-container">
+        <span className="status-label">Статус:</span>
+        <span className="status-value">{status}</span>
+      </div>
+
+      {/* Блок сроков изучения */}
+      <div className="study-timeline" aria-label="Сроки изучения технологии">
+        <div className="timeline-item">
+          <span className="timeline-label"></span>
+          <time className="timeline-date" dateTime={studyStartDate}>
+            {formatDate(studyStartDate)}
+          </time>
+        </div>
+        {studyEndDate && (
+          <div className="timeline-item">
+            <span className="timeline-label">Планируемое окончание:</span>
+            <time className="timeline-date" dateTime={studyEndDate}>
+              {formatDate(studyEndDate)}
+            </time>
+          </div>
+        )}
+      </div>
+
+      <div className="notes-container">
+        <label htmlFor={`notes-${techId}`} className="notes-label">
+          Заметки:
+        </label>
+        <textarea
+          id={`notes-${techId}`}
+          className="note-text-area"
+          value={localNotes}
+          onClick={handleTextareaClick}
+          onChange={handleTextareaChange}
+          placeholder="Впишите сюда свою заметку..."
+          rows={3}
+          disabled={isMassEditing}
+          aria-label="Поле для заметок о технологии"
+          aria-describedby={`notes-hint-${techId}`}
+        />
+        <div id={`notes-hint-${techId}`} className="notes-hint">
+          {localNotes.length > 0
+            ? `Заметка сохранена (${localNotes.length} символов)`
+            : ''
+          }
+        </div>
       </div>
     </div>
   );
 }
-
 function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }: QuickActionsProps) {
   const [showExportModal, setShowExportModal] = useState(false);
 
@@ -142,16 +235,36 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }:
   return (
     <>
       <div className="buttons-container">
-        <button className="quick-actions-button" type="button" onClick={onMarkAllDone}>
+        <button
+          className="quick-actions-button"
+          type="button"
+          onClick={onMarkAllDone}
+          aria-label="Отметить все технологии как изученные"
+        >
           Отметить все как выполненные
         </button>
-        <button className="quick-actions-button" type="button" onClick={onResetAll}>
+        <button
+          className="quick-actions-button"
+          type="button"
+          onClick={onResetAll}
+          aria-label="Сбросить статусы всех технологий"
+        >
           Сбросить все статусы
         </button>
-        <button className="quick-actions-button" type="button" onClick={onRandomNext}>
+        <button
+          className="quick-actions-button"
+          type="button"
+          onClick={onRandomNext}
+          aria-label="Выбрать случайную технологию для изучения"
+        >
           Случайный выбор следующей технологии
         </button>
-        <button className="quick-actions-button" type="button" onClick={handleExport}>
+        <button
+          className="quick-actions-button"
+          type="button"
+          onClick={handleExport}
+          aria-label="Экспортировать данные о технологиях"
+        >
           Экспорт данных
         </button>
       </div>
@@ -172,6 +285,7 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }:
   );
 }
 
+// Filters компонент (остается без изменений)
 function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersProps) {
   const closeTimerRef = useRef<number | null>(null);
 
@@ -206,32 +320,42 @@ function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersP
       className="filters-overlay"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      role="menu"
+      aria-label="Фильтры для технологий"
     >
       <div className="filters-list">
-        <p
+        <button
           className={`filters-text ${currentFilter === 'all' ? 'active' : ''}`}
           onClick={() => handleFilterClick('all')}
+          aria-label="Показать все технологии"
+          role="menuitem"
         >
           Все карточки
-        </p>
-        <p
+        </button>
+        <button
           className={`filters-text ${currentFilter === 'not-started' ? 'active' : ''}`}
           onClick={() => handleFilterClick('not-started')}
+          aria-label="Показать только не начатые технологии"
+          role="menuitem"
         >
           Только не начатые
-        </p>
-        <p
+        </button>
+        <button
           className={`filters-text ${currentFilter === 'in-progress' ? 'active' : ''}`}
           onClick={() => handleFilterClick('in-progress')}
+          aria-label="Показать только технологии в процессе изучения"
+          role="menuitem"
         >
           Только в процессе
-        </p>
-        <p
+        </button>
+        <button
           className={`filters-text ${currentFilter === 'completed' ? 'active' : ''}`}
           onClick={() => handleFilterClick('completed')}
+          aria-label="Показать только изученные технологии"
+          role="menuitem"
         >
           Только завершенные
-        </p>
+        </button>
       </div>
     </div>
   );
@@ -309,27 +433,34 @@ function RoadMap({
   };
 
   return (
-    <div className="RoadMap">
+    <div className="RoadMap" role="region" aria-label="Статистика и управление технологиями">
       <div className="stats-container">
-        <p className="CompletedStat">
-          Технологий в статусе completed<br/>{learned}
-        </p>
-        <p className="InProgressStat">
-          Технологий в статусе in-progress<br/>{inProgress}
-        </p>
-        <p className="NotStartStat">
-          Технологий в статусе not-started<br/>{notStarted}
-        </p>
+        <div className="stat-item" aria-label={`Изучено технологий: ${learned}`}>
+          <p className="CompletedStat">
+            Технологий в статусе <span className="completed-word">completed</span><br/>{learned}
+          </p>
+        </div>
+        <div className="stat-item" aria-label={`Технологий в процессе изучения: ${inProgress}`}>
+          <p className="InProgressStat">
+            Технологий в статусе <span className="in-progress-word">in-progress</span><br/>{inProgress}
+          </p>
+        </div>
+        <div className="stat-item" aria-label={`Не начатых технологий: ${notStarted}`}>
+          <p className="NotStartStat">
+            Технологий в статусе <span className="not-started-word">not-started</span><br/>{notStarted}
+          </p>
+        </div>
       </div>
       <div className="progress-container">
-        <div className="progress-bar-container">
+        <div className="progress-bar-container" role="progressbar" aria-valuenow={Math.round(displayedProgress)} aria-valuemin="0" aria-valuemax="100">
           <div
             className={`progress-bar-fill ${isAnimating ? 'animated' : ''}`}
             style={{ width: `${displayedProgress}%` }}
+            aria-hidden="true"
           >
           </div>
         </div>
-        <span className={`PercentText ${isAnimating ? 'animated' : ''}`}>
+        <span className={`PercentText ${isAnimating ? 'animated' : ''}`} aria-live="polite">
           {Math.round(displayedProgress)}%
         </span>
       </div>
@@ -340,8 +471,11 @@ function RoadMap({
               className="filter-button"
               type="button"
               onClick={() => setShowFilters(!showFilters)}
+              aria-expanded={showFilters}
+              aria-controls="filters-menu"
+              aria-label={showFilters ? "Скрыть фильтры" : "Показать фильтры"}
             >
-              <GiSettingsKnobs /> Фильтры
+              <GiSettingsKnobs aria-hidden="true" /> Фильтры
             </button>
             <Filters
               currentFilter={currentFilter}
@@ -360,22 +494,28 @@ function RoadMap({
               value={localSearchQuery}
               onChange={handleSearchChange}
               onKeyPress={handleSearchKeyPress}
+              aria-label="Поиск технологий"
             />
             <FaSearch
               onClick={handleSearchIconClick}
               className="search-icon"
+              role="button"
+              tabIndex={0}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearchIconClick()}
+              aria-label="Выполнить поиск"
             />
             {localSearchQuery && (
-              <span
+              <button
                 onClick={handleClearSearch}
                 className="clear-search"
+                aria-label="Очистить поисковый запрос"
               >
                 ×
-              </span>
+              </button>
             )}
           </div>
           {searchQuery && searchQuery.trim() !== '' && (
-            <div className="results-text">
+            <div className="results-text" aria-live="polite">
               Найдено результатов: {searchResultsCount}
             </div>
           )}

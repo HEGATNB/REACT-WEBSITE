@@ -35,7 +35,7 @@
 
 .add-tech-button {
   padding: 18px 36px;
-  background: #42424;
+  background: #424242;
   backdrop-filter: blur(10px);
   color: white;
   text-decoration: none;
@@ -52,17 +52,13 @@
 }
 
 .add-tech-button.save-mode {
-  background: ;
-  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+  background: rgb(76, 175, 80);
+  box-shadow: 0 8px 25px rgba(5,5,5,255);
+  outline: none !important;
 }
 
 .add-tech-button:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
-}
-
-.add-tech-button.save-mode:hover {
-  box-shadow: 0 12px 30px rgba(76, 175, 80, 0.5);
 }
 
 .add-tech-button:active {

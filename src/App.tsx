@@ -11,10 +11,27 @@ import Stats from './pages/stats';
 import SettingsPage from './pages/settings';
 import ApiSettings from './components/ApiSettings';
 import TechnologiesFromApi from './components/TechnologiesFromApi';
+import MassEditPanel from './components/MassEditPanel';
+
+// Локальные типы
+type Status = 'completed' | 'in-progress' | 'not-started';
+
+interface Technology {
+  id: number;
+  title: string;
+  description: string;
+  status: Status;
+  notes: string;
+  category?: string;
+  studyStartDate: string;
+  studyEndDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 function App() {
   const {
-    technologies,
+    technologies: apiTechnologies,
     loading,
     initialLoading,
     error,
@@ -24,15 +41,31 @@ function App() {
     resetAllStatuses,
     exportData,
     savePendingUpdates,
-    deleteTechnology // Добавляем deleteTechnology если нужно
+    deleteTechnology
   } = useTechnologiesApi();
 
+  const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isMassEditing, setIsMassEditing] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [showMassEditPanel, setShowMassEditPanel] = useState(false);
   const location = useLocation();
 
-  // Загружаем данные при первом рендере и при изменении location
+  // Синхронизируем данные из API с локальным состоянием
+  useEffect(() => {
+    const enhancedTechnologies = apiTechnologies.map(tech => ({
+      ...tech,
+      studyStartDate: (tech as any).studyStartDate || tech.createdAt || new Date().toISOString(),
+      studyEndDate: (tech as any).studyEndDate,
+      createdAt: tech.createdAt || new Date().toISOString(),
+      updatedAt: tech.updatedAt || new Date().toISOString()
+    }));
+    setTechnologies(enhancedTechnologies);
+  }, [apiTechnologies]);
+
+  // Загружаем данные при первом рендере
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -50,24 +83,38 @@ function App() {
       loadData();
     }
   }, [fetchTechnologies, isInitialized]);
-
-  // Сохраняем изменения при уходе со страницы
   useEffect(() => {
     return () => {
       savePendingUpdates();
     };
   }, [savePendingUpdates, location.pathname]);
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setIsMassEditing(false);
+      setSelectedIds([]);
+      setShowMassEditPanel(false);
+    }
+  }, [location.pathname]);
 
   const changeStatus = async (id: number) => {
-    const statusOrder: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
+    if (isMassEditing) return;
 
+    const statusOrder: Status[] = ['not-started', 'in-progress', 'completed'];
     const tech = technologies.find(t => t.id === id);
+
     if (tech) {
       const currentIndex = statusOrder.indexOf(tech.status);
       const nextIndex = (currentIndex + 1) % statusOrder.length;
 
       try {
-        await updateTechnology(id, { status: statusOrder[nextIndex] });
+        await updateTechnology(id, {
+          status: statusOrder[nextIndex],
+          updatedAt: new Date().toISOString()
+        });
+        const updatedTechs = technologies.map(t =>
+          t.id === id ? { ...t, status: statusOrder[nextIndex], updatedAt: new Date().toISOString() } : t
+        );
+        setTechnologies(updatedTechs);
       } catch (err) {
         console.error('Failed to update status:', err);
       }
@@ -76,7 +123,15 @@ function App() {
 
   const updateTechnologyNotes = async (techId: number, newNotes: string) => {
     try {
-      await updateTechnology(techId, { notes: newNotes });
+      await updateTechnology(techId, {
+        notes: newNotes,
+        updatedAt: new Date().toISOString()
+      });
+      // Обновляем локальное состояние
+      const updatedTechs = technologies.map(t =>
+        t.id === techId ? { ...t, notes: newNotes, updatedAt: new Date().toISOString() } : t
+      );
+      setTechnologies(updatedTechs);
     } catch (err) {
       console.error('Failed to update notes:', err);
     }
@@ -85,7 +140,6 @@ function App() {
   const handleMarkAllDone = async () => {
     try {
       await markAllDone();
-      // После успешного обновления перезагружаем данные
       await fetchTechnologies();
     } catch (err) {
       console.error('Failed to mark all as done:', err);
@@ -95,7 +149,6 @@ function App() {
   const handleResetAllStatuses = async () => {
     try {
       await resetAllStatuses();
-      // После успешного обновления перезагружаем данные
       await fetchTechnologies();
     } catch (err) {
       console.error('Failed to reset all statuses:', err);
@@ -113,10 +166,14 @@ function App() {
     const randomTech = notStartedTech[Math.floor(Math.random() * notStartedTech.length)];
 
     try {
-      await updateTechnology(randomTech.id, { status: 'in-progress' });
-      // После обновления перезагружаем данные
-      await fetchTechnologies();
-      alert(`Выбранная технология "${randomTech.title}" теперь в процессе изучения!`);
+      await updateTechnology(randomTech.id, {
+        status: 'in-progress',
+        updatedAt: new Date().toISOString()
+      });
+      const updatedTechs = technologies.map(t =>
+        t.id === randomTech.id ? { ...t, status: 'in-progress', updatedAt: new Date().toISOString() } : t
+      );
+      setTechnologies(updatedTechs);
     } catch (err) {
       console.error('Failed to update random tech:', err);
       alert('Ошибка при обновлении статуса');
@@ -135,6 +192,64 @@ function App() {
   const handleExportData = (): string => {
     const dataStr = exportData();
     return dataStr;
+  };
+  const handleSelectCard = (id: number, selected: boolean) => {
+    setSelectedIds(prev => {
+      if (selected) {
+        if (prev.includes(id)) {
+          return prev;
+        }
+        return [...prev, id];
+      } else {
+        return prev.filter(selectedId => selectedId !== id);
+      }
+    });
+  };
+
+  const handleMassEditClick = () => {
+    setIsMassEditing(true);
+    setSelectedIds([]);
+    setShowMassEditPanel(false);
+  };
+
+  const handleCancelMassEdit = () => {
+    setIsMassEditing(false);
+    setSelectedIds([]);
+    setShowMassEditPanel(false);
+  };
+
+  const handleDeleteSelected = async (ids: number[]) => {
+    try {
+      // Удаляем каждую выбранную технологию
+      const deletePromises = ids.map(id => deleteTechnology(id));
+      await Promise.all(deletePromises);
+      const updatedTechs = technologies.filter(tech => !ids.includes(tech.id));
+      setTechnologies(updatedTechs);
+      setSelectedIds([]);
+    } catch (err) {
+      console.error('Ошибка при массовом удалении:', err);
+      alert('Произошла ошибка при удалении технологий');
+    }
+  };
+
+  const handleStatusChangeSelected = async (ids: number[], status: Status) => {
+    try {
+      const updatePromises = ids.map(id =>
+        updateTechnology(id, {
+          status: status,
+          updatedAt: new Date().toISOString()
+        })
+      );
+      await Promise.all(updatePromises);
+      const updatedTechs = technologies.map(t =>
+        ids.includes(t.id) ? { ...t, status: status, updatedAt: new Date().toISOString() } : t
+      );
+      setTechnologies(updatedTechs);
+      setSelectedIds([]);
+    } catch (err) {
+      console.error('Ошибка при массовом обновлении статуса:', err);
+      alert('Произошла ошибка при обновлении статусов');
+    }
   };
 
   const filteredTechnologies = technologies.filter(tech => {
@@ -203,16 +318,22 @@ function App() {
                   searchQuery={searchQuery}
                 />
               </div>
+
               <div className="main-content-wrapper">
                 <div className="main-content-container">
+                  {/* Левая часть: Quick Actions */}
                   <div className="quick-actions-section">
-                    <QuickActions
-                      onMarkAllDone={handleMarkAllDone}
-                      onResetAll={handleResetAllStatuses}
-                      onRandomNext={randomNextTechnology}
-                      onExportData={handleExportData}
-                    />
+                    <div className="buttons-container">
+                      <QuickActions
+                        onMarkAllDone={handleMarkAllDone}
+                        onResetAll={handleResetAllStatuses}
+                        onRandomNext={randomNextTechnology}
+                        onExportData={handleExportData}
+                      />
+                    </div>
                   </div>
+
+                  {/* Центральная часть: Карточки */}
                   <div className="cards-section">
                     <div className="cards-container">
                       {filteredTechnologies.length > 0 ? (
@@ -226,6 +347,11 @@ function App() {
                               techId={tech.id}
                               onStatusChange={() => changeStatus(tech.id)}
                               onNotesChange={updateTechnologyNotes}
+                              studyStartDate={tech.studyStartDate}
+                              studyEndDate={tech.studyEndDate}
+                              isMassEditing={isMassEditing}
+                              isSelected={selectedIds.includes(tech.id)}
+                              onSelect={handleSelectCard}
                             />
                           </div>
                         ))
@@ -249,9 +375,60 @@ function App() {
                       )}
                     </div>
                   </div>
+                  <div className="mass-edit-section">
+                    <div className="mass-edit-panel">
+                      {!isMassEditing ? (
+                        <button
+                          onClick={handleMassEditClick}
+                          className="mass-edit-toggle-button"
+                          aria-label="Включить режим массового редактирования"
+                        >
+                          <span className="mass-edit-icon">📋</span>
+                          Массовое редактирование
+                        </button>
+                      ) : (
+                        <div className="mass-edit-controls-panel">
+                          <div className="mass-edit-info-panel">
+                            <div className="selected-info">
+                              <span className="selected-count-badge">
+                                Выбрано: <strong>{selectedIds.length}</strong>
+                              </span>
+                              <button
+                                onClick={() => setShowMassEditPanel(true)}
+                                disabled={selectedIds.length === 0}
+                                className="apply-mass-edit-action"
+                                aria-label="Применить действие к выбранным карточкам"
+                              >
+                                Применить действие
+                              </button>
+                              <button
+                                onClick={handleCancelMassEdit}
+                                className="cancel-mass-edit-action"
+                                aria-label="Отменить режим массового редактирования"
+                              >
+                                Отмена
+                              </button>
+                            </div>
+                            <p className="mass-edit-instruction">
+                              ⓘ Выберите карточки для массового редактирования. Клик по карточке выделяет её.
+                              Для выбора с клавиатуры используйте Tab и пробел.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <MassEditPanel
+              selectedIds={selectedIds}
+              technologies={technologies.map(t => ({ id: t.id, title: t.title, status: t.status }))}
+              onDelete={handleDeleteSelected}
+              onStatusChange={handleStatusChangeSelected}
+              onCancel={handleCancelMassEdit}
+              isOpen={showMassEditPanel}
+            />
           </>
         } />
         <Route path="/stats" element={<Stats />} />

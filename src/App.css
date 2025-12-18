@@ -32,12 +32,16 @@
   box-sizing: border-box;
 }
 
+/* Левая часть: Quick Actions */
 .quick-actions-section {
   width: 280px;
   flex-shrink: 0;
   position: sticky;
   top: 100px;
   height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .buttons-container {
@@ -49,7 +53,7 @@
 }
 
 .quick-actions-button {
-  background-color: var(--card-bg, #262332);
+  background-color: #262332;
   border: none;
   border-radius: 12px;
   color: white;
@@ -61,12 +65,228 @@
   min-height: 50px;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .quick-actions-button:hover {
-  background-color: var(--card-hover, #2a2738);
+  background-color: #2a2738;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.quick-actions-button .button-icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* Центральная часть: Карточки - СТАРАЯ ВЕРСИЯ КОНТЕЙНЕРА */
+.cards-section {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  padding: 10px 0 10px 50px; /* Добавлен отступ слева для компьютерной версии */
+  box-sizing: border-box;
+}
+
+.technology-card-wrapper {
+  flex: 1 1 240px; /* Базовая ширина карточки */
+  max-width: 300px; /* Максимальная ширина карточки */
+  min-width: 200px; /* Минимальная ширина карточки */
+}
+
+.no-results {
+  width: 100%;
+  text-align: center;
+  padding: 40px 20px;
+  color: #cccccc;
+  font-size: 16px;
+  background-color: #262332;
+  border-radius: 12px;
+  margin: 20px 0;
+  margin-left: 50px; /* Добавлен отступ слева */
+}
+
+/* Правая часть: Массовые действия */
+.mass-edit-section {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mass-edit-panel {
+  background-color: #262332;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #3a3649;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mass-edit-toggle-button {
+  background-color: #262332;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-align: left;
+  min-height: 50px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.mass-edit-toggle-button:hover {
+  background-color: #2a2738;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mass-edit-toggle-button .mass-edit-icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* Активное состояние кнопки массового редактирования */
+.mass-edit-toggle-button.active {
+  background-color: #646cff;
+  color: white;
+}
+
+.mass-edit-toggle-button.active:hover {
+  background-color: #535bf2;
+}
+
+.mass-edit-toggle-button.active .mass-edit-icon {
+  opacity: 1;
+}
+
+/* Панель управления массовым редактированием */
+.mass-edit-controls-panel {
+  background-color: #262332;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #3a3649;
+  margin-top: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mass-edit-info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.selected-info {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+.selected-count-badge {
+  font-weight: 600;
+  color: #ffffff;
+  background-color: rgba(100, 108, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(100, 108, 255, 0.3);
+  font-size: 14px;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+
+.selected-count-badge strong {
+  color: #646cff;
+  font-size: 16px;
+  margin-left: 4px;
+  display: inline;
+}
+
+.apply-mass-edit-action {
+  padding: 12px 20px;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.apply-mass-edit-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.apply-mass-edit-action:not(:disabled):hover {
+  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
+}
+
+.cancel-mass-edit-action {
+  padding: 12px 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid #3a3649;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.cancel-mass-edit-action:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #cccccc;
+}
+
+.mass-edit-instruction {
+  font-size: 13px;
+  color: #cccccc;
+  margin: 10px 0 0 0;
+  line-height: 1.5;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 3px solid #646cff;
 }
 
 .progress-header {
@@ -77,53 +297,36 @@
   padding: 0;
 }
 
-.cards-section {
-  flex: 1;
-  min-width: 0;
-}
-
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 25px;
-  width: 100%;
-  padding: 10px 0;
-  box-sizing: border-box;
-  justify-items: center;
-}
-
-.technology-card-wrapper {
-  width: 100%;
-  max-width: 240px;
-}
-
-.no-results {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary, #cccccc);
-  font-size: 16px;
-  background-color: var(--card-bg, #262332);
-  border-radius: 12px;
-  margin: 20px 0;
-  width: 100%;
-}
-
+/* АДАПТИВНОСТЬ КАК В НОВОЙ ВЕРСИИ */
 @media (max-width: 1200px) {
   .main-content-container {
-    gap: 25px;
+    gap: 20px;
   }
 
   .cards-container {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 15px;
+    padding-left: 40px; /* Уменьшенный отступ на средних экранах */
+  }
+
+  .no-results {
+    margin-left: 40px; /* Уменьшенный отступ на средних экранах */
+  }
+
+  .technology-card-wrapper {
+    flex: 1 1 220px; /* Уменьшаем базовую ширину */
+    max-width: 280px;
+  }
+
+  .quick-actions-section,
+  .mass-edit-section {
+    width: 240px;
   }
 }
 
 @media (max-width: 992px) {
   .main-content-container {
     flex-direction: column;
-    gap: 30px;
+    gap: 25px;
   }
 
   .quick-actions-section {
@@ -131,21 +334,48 @@
     position: static;
   }
 
+  .mass-edit-section {
+    width: 100%;
+    position: static;
+    order: 3;
+    margin-top: 20px;
+  }
+
+  .mass-edit-panel {
+    max-width: 600px;
+    margin: 0 auto;
+    width: calc(100% - 40px); /* Учитываем padding контейнера */
+  }
+
   .buttons-container {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 12px;
   }
 
   .quick-actions-button {
-    min-width: 200px;
-    max-width: 250px;
+    min-width: 180px;
+    max-width: 220px;
     flex: 1;
   }
 
   .cards-container {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 18px;
+    justify-content: center;
+    padding-left: 0; /* Убираем левый отступ на планшетах */
+  }
+
+  .no-results {
+    margin-left: 0; /* Убираем левый отступ на планшетах */
+  }
+
+  .technology-card-wrapper {
+    flex: 1 1 200px;
+    max-width: calc(50% - 10px); /* Карточки занимают половину ширины с учетом gap */
+  }
+
+  .selected-count-badge {
+    white-space: normal; /* Разрешаем переносы на планшетах */
   }
 }
 
@@ -156,21 +386,54 @@
 
   .main-content-wrapper {
     padding: 0 15px;
+    width: calc(100% - 30px); /* Учитываем padding */
   }
 
   .progress-header {
     margin: 15px auto 20px;
+    width: calc(100% - 30px); /* Учитываем padding */
   }
 
   .cards-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .technology-card-wrapper {
+    flex: 1 1 180px;
+    max-width: calc(50% - 6px); /* 50% ширины минус половина gap */
   }
 
   .quick-actions-button {
-    min-width: 180px;
+    min-width: 160px;
     padding: 10px 16px;
     font-size: 13px;
+  }
+
+  .mass-edit-toggle-button {
+    padding: 12px 16px;
+    font-size: 13px;
+    min-width: 160px;
+  }
+
+  .mass-edit-panel {
+    padding: 15px;
+    width: calc(100% - 30px); /* Учитываем padding контейнера */
+  }
+
+  .mass-edit-controls-panel {
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .selected-count-badge {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px; /* Уменьшаем padding на мобильных */
+    white-space: normal; /* Разрешаем переносы на мобильных */
+    line-height: 1.4;
   }
 }
 
@@ -181,21 +444,91 @@
 
   .main-content-wrapper {
     padding: 0 10px;
+    width: calc(100% - 20px); /* Учитываем padding */
   }
 
   .cards-container {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    gap: 10px;
+    justify-content: space-between; /* Равномерное распределение */
+  }
+
+  .technology-card-wrapper {
+    flex: 1 1 150px;
+    max-width: calc(50% - 5px); /* 50% минус половина gap */
+    min-width: 140px;
+    box-sizing: border-box;
   }
 
   .buttons-container {
     flex-direction: column;
+    gap: 10px;
+    width: 100%;
   }
 
   .quick-actions-button {
     max-width: 100%;
     min-width: auto;
+    width: 100%;
+    box-sizing: border-box;
   }
+
+  .mass-edit-panel {
+    padding: 12px;
+    max-width: 100%;
+    width: calc(100% - 20px); /* Учитываем padding контейнера */
+  }
+
+  .mass-edit-toggle-button {
+    max-width: 100%;
+    min-width: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .selected-count-badge,
+  .apply-mass-edit-action,
+  .cancel-mass-edit-action {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* Исправление для карточек на очень маленьких экранах */
+  @media (max-width: 400px) {
+    .technology-card-wrapper {
+      flex: 1 1 100%;
+      max-width: 100%; /* На очень узких экранах - одна карточка в ряд */
+      min-width: auto;
+    }
+
+    .cards-container {
+      gap: 15px;
+    }
+  }
+}
+
+/* Стили для хедера прогресса (если там есть текст со статусом) */
+.progress-header h2,
+.progress-header h3,
+.progress-header .status-text {
+  white-space: nowrap; /* Запрещаем перенос текста на компьютерной версии */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .progress-header h2,
+  .progress-header h3,
+  .progress-header .status-text {
+    white-space: normal; /* Разрешаем переносы на мобильных */
+  }
+}
+
+/* Светлая тема */
+[data-theme="light"] .App {
+  background-color: #ffffff;
+  color: #213547;
 }
 
 [data-theme="light"] .quick-actions-button {
@@ -210,4 +543,134 @@
 [data-theme="light"] .no-results {
   background-color: #f0f0f5;
   color: #666;
+}
+
+[data-theme="light"] .mass-edit-panel {
+  background-color: #f5f5fa;
+  border-color: #dddde3;
+}
+
+[data-theme="light"] .mass-edit-toggle-button {
+  background-color: #f0f0f5;
+  color: #213547;
+}
+
+[data-theme="light"] .mass-edit-toggle-button:hover {
+  background-color: #e0e0e8;
+}
+
+[data-theme="light"] .mass-edit-toggle-button.active {
+  background-color: #646cff;
+  color: white;
+}
+
+[data-theme="light"] .mass-edit-toggle-button.active:hover {
+  background-color: #535bf2;
+}
+
+[data-theme="light"] .mass-edit-controls-panel {
+  background-color: #ffffff;
+  border-color: #dddde3;
+}
+
+[data-theme="light"] .selected-count-badge {
+  background-color: rgba(100, 108, 255, 0.1);
+  color: #213547;
+  border-color: rgba(100, 108, 255, 0.3);
+}
+
+[data-theme="light"] .selected-count-badge strong {
+  color: #646cff;
+}
+
+[data-theme="light"] .apply-mass-edit-action {
+  background-color: #646cff;
+}
+
+[data-theme="light"] .cancel-mass-edit-action {
+  background-color: #f5f5fa;
+  color: #213547;
+  border-color: #dddde3;
+}
+
+[data-theme="light"] .cancel-mass-edit-action:hover {
+  background-color: #e8e8f0;
+}
+
+[data-theme="light"] .mass-edit-instruction {
+  background-color: #f9f9fc;
+  color: #666;
+}
+
+/* Убираем старые стили, которые больше не нужны */
+.mass-edit-header-section {
+  display: none;
+}
+
+.quick-actions-section .mass-edit-panel {
+  display: none;
+}
+
+/* Стили для карточек в режиме массового редактирования */
+.technology-card-wrapper {
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.technology-card-wrapper:hover {
+  transform: translateY(-2px);
+}
+
+/* Загрузка и ошибки */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1.5rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #3a3649;
+  border-top-color: #646cff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-container h3 {
+  color: #ff6b6b;
+  font-size: 1.5rem;
+}
+
+.retry-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover {
+  background-color: #535bf2;
 }

@@ -1,0 +1,90 @@
+.date-input {
+  margin-bottom: 1.5rem;
+}
+
+.date-input__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.required-asterisk {
+  color: var(--error-color);
+  margin-left: 0.25rem;
+}
+
+.date-input__wrapper {
+  position: relative;
+}
+
+.date-input__field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.date-input__field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.date-input__field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--bg-disabled);
+}
+
+.date-input.invalid .date-input__field {
+  border-color: var(--error-color);
+}
+
+.date-input__info {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.date-input__info-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-input__help-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.date-input__error-message {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--error-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-input__error-message::before {
+  content: '⚠';
+}
+
+/* Доступность: скрыть элемент визуально, но оставить доступным для скринридеров */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

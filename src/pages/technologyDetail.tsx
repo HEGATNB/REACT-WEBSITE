@@ -9,6 +9,10 @@ interface Technology {
   status: 'completed' | 'in-progress' | 'not-started';
   notes: string;
   category?: string;
+  studyStartDate: string;
+  studyEndDate?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function TechnologyDetail() {
@@ -82,7 +86,25 @@ function TechnologyDetail() {
             {getStatusText(technology.status)}
           </div>
         </div>
-
+        <div className="detail-study-timeline">
+          <h3>Сроки изучения:</h3>
+          <div className="timeline-dates">
+            <div className="date-item">
+              <span className="date-label">Начало изучения:</span>
+              <span className="date-value">
+                {new Date(technology.studyStartDate).toLocaleDateString('ru-RU')}
+              </span>
+            </div>
+            {technology.studyEndDate && (
+              <div className="date-item">
+                <span className="date-label">Планируемое окончание:</span>
+                <span className="date-value">
+                  {new Date(technology.studyEndDate).toLocaleDateString('ru-RU')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
         {technology.category && (
           <div className="detail-category">
             Категория: <span>{technology.category}</span>

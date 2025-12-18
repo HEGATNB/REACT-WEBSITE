@@ -165,9 +165,7 @@ const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
     setLoading(true);
     setError(null);
 
-    // Используем proxy через наш бэкенд или специальный CORS proxy
     const proxyUrl = apiEndpoint.replace('/api/technologies', '/api/import-roadmap');
-
     const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: {
@@ -187,11 +185,10 @@ const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
       throw new Error(data.message || 'Не удалось импортировать дорожную карту');
     }
 
-    // Обработка импортированных технологий
     if (data.data && Array.isArray(data.data)) {
       const importedTechs = data.data.map((tech: Technology, index: number) => ({
         ...tech,
-        id: Date.now() + index // Уникальные ID
+        id: Date.now() + index
       }));
 
       const updatedTechnologies = [...technologies, ...importedTechs];
