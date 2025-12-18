@@ -111,11 +111,6 @@ body {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
 
-[data-theme="dark"] .technology-list-page,
-[data-theme="dark"] .technologies-container {
-  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
-}
-
 [data-theme="dark"] .add-technology-page {
   background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%) !important;
 }
