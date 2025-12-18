@@ -1,4 +1,4 @@
-/* technologyDetail.css - ИСПРАВЛЕННЫЙ */
+/* technologyDetail.css - Стили как в старой версии с формами */
 .technology-detail-page {
   min-height: calc(100vh - 80px);
   padding: 20px;
@@ -6,8 +6,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
+  background-color: #121212;
 }
 
 .detail-back-button {
@@ -16,47 +17,8 @@
   margin-bottom: 20px;
 }
 
-.detail-study-timeline {
-  margin: 1.5rem 0;
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.75rem;
-}
-
-.detail-study-timeline h3 {
-  margin: 0 0 1rem 0;
-  color: white;
-  font-size: 1.25rem;
-}
-
-.timeline-dates {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.date-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 0.5rem;
-}
-
-.date-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.date-value {
-  color: white;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
 .detail-back-button a {
-  color: white;
+  color: #ffffff;
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
@@ -64,168 +26,219 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #262332;
   border-radius: 8px;
   transition: all 0.3s ease;
+  border: 1px solid #3a3649;
 }
 
 .detail-back-button a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #2a2738;
   transform: translateX(-5px);
+  border-color: #646cff;
 }
 
 .technology-detail-card {
   width: 100%;
   max-width: 800px;
-  padding: 40px;
-  border-radius: 20px;
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #262332;
   color: white;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3649;
 }
 
 .detail-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
   gap: 20px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 25px;
+  margin-bottom: 30px;
 }
 
-.detail-title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Стили форм как в старой версии */
+.form-group {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.form-label .required-star {
+  color: #ff6b6b;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #3a3649;
+  border-radius: 8px;
+  background-color: #1e1b2e;
+  color: #ffffff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #646cff;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.form-row .form-group {
   flex: 1;
-  min-width: 300px;
+  min-width: 0;
 }
 
-.detail-status-badge {
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  background-color: rgba(0, 0, 0, 0.3);
+.input-error {
+  border-color: #f44336 !important;
+}
+
+.input-error:focus {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+}
+
+.error-message {
+  display: block;
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+/* Секции */
+.detail-study-timeline {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid #3a3649;
+}
+
+.section-title {
+  margin: 0 0 1rem 0;
   color: white;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
-}
-
-.detail-category {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 15px 20px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  align-self: flex-start;
-}
-
-.detail-category span {
+  font-size: 1.25rem;
   font-weight: 600;
-  color: white;
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 5px 15px;
-  border-radius: 20px;
 }
 
-.detail-description {
-  background-color: rgba(255, 255, 255, 0.08);
-  padding: 25px;
-  border-radius: 15px;
-  border-left: 4px solid rgba(255, 255, 255, 0.3);
+.timeline-fields {
+  width: 100%;
 }
 
-.detail-description h3 {
-  margin: 0 0 15px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.detail-description p {
-  margin: 0;
-  font-size: 17px;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.detail-notes {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 25px;
-  border-radius: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.detail-notes h3 {
-  margin: 0 0 15px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.notes-content {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.notes-content em {
-  color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
-}
-
+/* Футер */
 .detail-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 25px;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
-  margin-top: 10px;
+  border-top: 1px solid #3a3649;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .detail-id {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
   background-color: rgba(0, 0, 0, 0.2);
-  padding: 8px 15px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-family: monospace;
 }
 
-.edit-link {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 600;
+/* Кнопки действий */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.save-button {
   padding: 12px 30px;
-  background: #262332;
-  border-radius: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  background-color: #646cff;
+  color: white;
+  min-width: 180px;
 }
 
-.edit-link:hover {
-  transform: translateY(-3px);
-  background: #262332;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+.save-button:hover:not(:disabled) {
+  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
 }
 
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
 
+.cancel-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid #3a3649;
+  display: inline-block;
+  text-align: center;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  border-color: #cccccc;
+}
+
+/* Состояния загрузки и ошибок */
 .technology-detail-loading,
 .technology-detail-not-found {
   min-height: calc(100vh - 80px);
@@ -237,6 +250,7 @@
   padding: 20px;
   text-align: center;
   width: 100%;
+  background-color: #121212;
 }
 
 .technology-detail-loading {
@@ -255,78 +269,125 @@
   text-decoration: none;
   font-size: 16px;
   padding: 12px 25px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #262332;
   border-radius: 10px;
+  border: 1px solid #3a3649;
   transition: all 0.3s ease;
 }
 
 .technology-detail-not-found a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #2a2738;
+  border-color: #646cff;
 }
 
+/* Светлая тема */
+[data-theme="light"] .technology-detail-page {
+  background-color: #ffffff;
+}
+
+[data-theme="light"] .technology-detail-card {
+  background-color: #f0f0f5;
+  border-color: #dddde3;
+  color: #213547;
+}
+
+[data-theme="light"] .detail-back-button a {
+  background-color: #f0f0f5;
+  border-color: #dddde3;
+  color: #213547;
+}
+
+[data-theme="light"] .detail-back-button a:hover {
+  background-color: #e0e0e8;
+  border-color: #646cff;
+}
+
+[data-theme="light"] .form-label {
+  color: #213547;
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-textarea,
+[data-theme="light"] .form-select {
+  background-color: #ffffff;
+  border-color: #dddde3;
+  color: #213547;
+}
+
+[data-theme="light"] .detail-study-timeline {
+  background-color: #f5f5fa;
+  border-color: #dddde3;
+}
+
+[data-theme="light"] .section-title {
+  color: #213547;
+}
+
+[data-theme="light"] .detail-id {
+  color: #666666;
+  background-color: #e8e8f0;
+}
+
+[data-theme="light"] .cancel-button {
+  background-color: #f5f5fa;
+  border-color: #dddde3;
+  color: #213547;
+}
+
+[data-theme="light"] .cancel-button:hover {
+  background-color: #e8e8f0;
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
   .technology-detail-page {
     padding: 15px;
   }
 
   .technology-detail-card {
-    padding: 30px;
-    gap: 25px;
+    padding: 20px;
   }
 
   .detail-header {
     flex-direction: column;
-    align-items: flex-start;
     gap: 15px;
   }
 
-  .detail-title {
-    font-size: 26px;
-    min-width: unset;
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .detail-description,
-  .detail-notes {
-    padding: 20px;
+  .detail-footer {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .detail-description p {
-    font-size: 16px;
+  .form-actions {
+    flex-direction: column;
+    width: 100%;
   }
 
-  .notes-content {
-    font-size: 15px;
+  .save-button,
+  .cancel-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .save-button {
+    min-width: auto;
   }
 }
 
 @media (max-width: 480px) {
   .technology-detail-card {
-    padding: 25px;
-    gap: 20px;
+    padding: 15px;
   }
 
-  .detail-title {
-    font-size: 22px;
-  }
-
-  .detail-status-badge {
-    padding: 10px 20px;
+  .form-input,
+  .form-textarea,
+  .form-select {
+    padding: 10px 12px;
     font-size: 14px;
-  }
-
-  .detail-category {
-    font-size: 16px;
-    padding: 12px 16px;
-  }
-
-  .detail-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .edit-link {
-    width: 100%;
-    text-align: center;
   }
 }

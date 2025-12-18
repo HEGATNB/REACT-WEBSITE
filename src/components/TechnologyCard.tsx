@@ -174,7 +174,7 @@ function Card({
       <h2 className="card-title">{title}</h2>
       <p className="card-description">{description}</p>
       <div className="status-container">
-        <span className="status-label">Статус:</span>
+        <span className="status-label">Статус: </span>
         <span className="status-value">{status}</span>
       </div>
 
