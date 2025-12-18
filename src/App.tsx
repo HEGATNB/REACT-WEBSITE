@@ -40,8 +40,10 @@ function App() {
     resetAllStatuses,
     exportData,
     savePendingUpdates,
-    deleteTechnology
-  } = useTechnologiesApi();
+    deleteTechnology,
+    syncLocalToApi,  // ✅ Теперь это внутри компонента
+    hasPendingChanges  // ✅ Теперь это внутри компонента
+  } = useTechnologiesApi();  // ✅ Все хуки вызываются внутри компонента
 
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [currentFilter, setCurrentFilter] = useState<string>('all');
@@ -80,11 +82,13 @@ function App() {
       loadData();
     }
   }, [fetchTechnologies, isInitialized]);
+
   useEffect(() => {
     return () => {
       savePendingUpdates();
     };
   }, [savePendingUpdates, location.pathname]);
+
   useEffect(() => {
     if (location.pathname !== '/') {
       setIsMassEditing(false);
@@ -189,6 +193,7 @@ function App() {
     const dataStr = exportData();
     return dataStr;
   };
+
   const handleSelectCard = (id: number, selected: boolean) => {
     setSelectedIds(prev => {
       if (selected) {
@@ -426,6 +431,7 @@ function App() {
             />
           </>
         } />
+
         <Route path="/stats" element={<Stats />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/technologies" element={<TechnologyList />} />

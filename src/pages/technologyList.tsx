@@ -30,6 +30,7 @@ function TechnologyList() {
   // Используем initialLoading вместо loading для первоначальной загрузки
   if (initialLoading && technologies.length === 0) {
     return (
+
       <div className="technology-list-page">
         <div className="loading-state">
           <p>Загрузка технологий...</p>

@@ -8,6 +8,7 @@ function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [animations, setAnimations] = useState(true);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -17,12 +18,12 @@ function SettingsPage() {
     if (savedNotifications !== null) {
       setNotifications(JSON.parse(savedNotifications));
     }
-    
+
     const savedAutoSave = localStorage.getItem('autoSave');
     if (savedAutoSave !== null) {
       setAutoSave(JSON.parse(savedAutoSave));
     }
-    
+
     const savedAnimations = localStorage.getItem('animations');
     if (savedAnimations !== null) {
       setAnimations(JSON.parse(savedAnimations));
@@ -30,11 +31,11 @@ function SettingsPage() {
   }, []);
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
-  setTheme(newTheme);
-  localStorage.setItem('theme', newTheme);
-  document.documentElement.setAttribute('data-theme', newTheme);
-  window.dispatchEvent(new CustomEvent('themeChanged'));
-};
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    window.dispatchEvent(new CustomEvent('themeChanged'));
+  };
 
   const handleNotificationsChange = (value: boolean) => {
     setNotifications(value);
@@ -49,11 +50,42 @@ function SettingsPage() {
   const handleAnimationsChange = (value: boolean) => {
     setAnimations(value);
     localStorage.setItem('animations', JSON.stringify(value));
-    
+
     if (!value) {
       document.documentElement.style.setProperty('--animation-speed', '0s');
     } else {
       document.documentElement.style.removeProperty('--animation-speed');
+    }
+  };
+
+  const handleSync = async () => {
+    if (syncStatus === 'syncing') return; // Предотвращаем двойное нажатие
+
+    setSyncStatus('syncing');
+
+    try {
+      // Здесь будет ваша логика синхронизации
+      // Например, синхронизация с облачным хранилищем, API и т.д.
+
+      // Имитация процесса синхронизации
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Пример успешной синхронизации
+      setSyncStatus('success');
+
+      // Сбрасываем статус через 3 секунды
+      setTimeout(() => {
+        setSyncStatus('idle');
+      }, 3000);
+
+    } catch (error) {
+      console.error('Ошибка синхронизации:', error);
+      setSyncStatus('error');
+
+      // Сбрасываем статус ошибки через 5 секунд
+      setTimeout(() => {
+        setSyncStatus('idle');
+      }, 5000);
     }
   };
 
@@ -79,7 +111,7 @@ function SettingsPage() {
       alert('Нет данных для экспорта');
       return;
     }
-    
+
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -95,11 +127,11 @@ function SettingsPage() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
@@ -113,28 +145,41 @@ function SettingsPage() {
       };
       reader.readAsText(file);
     };
-    
+
     input.click();
+  };
+
+  const getSyncButtonText = () => {
+    switch (syncStatus) {
+      case 'syncing':
+        return '🔄 Синхронизация...';
+      case 'success':
+        return '✅ Синхронизировано!';
+      case 'error':
+        return '❌ Ошибка синхронизации';
+      default:
+        return '☁️ Синхронизировать с облаком';
+    }
   };
 
   return (
     <div className="settings-page">
       <div className="settings-container">
         <h1 className="settings-title">Настройки</h1>
-        
+
         <div className="settings-section">
           <h2 className="section-title">Внешний вид</h2>
           <div className="settings-group">
             <div className="setting-item">
               <label className="setting-label">Тема</label>
               <div className="theme-switcher">
-                <button 
+                <button
                   className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
                   onClick={() => handleThemeChange('light')}
                 >
                   <FaSun /> Светлая
                 </button>
-                <button 
+                <button
                   className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
                   onClick={() => handleThemeChange('dark')}
                 >
@@ -142,12 +187,12 @@ function SettingsPage() {
                 </button>
               </div>
             </div>
-            
+
             <div className="setting-item">
               <label className="setting-label">Анимации</label>
               <label className="toggle-switch">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={animations}
                   onChange={(e) => handleAnimationsChange(e.target.checked)}
                 />
@@ -166,8 +211,8 @@ function SettingsPage() {
             <div className="setting-item">
               <label className="setting-label">Уведомления</label>
               <label className="toggle-switch">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={notifications}
                   onChange={(e) => handleNotificationsChange(e.target.checked)}
                 />
@@ -177,12 +222,12 @@ function SettingsPage() {
                 </span>
               </label>
             </div>
-            
+
             <div className="setting-item">
               <label className="setting-label">Автосохранение</label>
               <label className="toggle-switch">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={autoSave}
                   onChange={(e) => handleAutoSaveChange(e.target.checked)}
                 />
@@ -199,26 +244,41 @@ function SettingsPage() {
           <h2 className="section-title">Управление данными</h2>
           <div className="settings-group">
             <div className="setting-item">
+              <label className="setting-label">Синхронизация</label>
+              <button
+                className={`data-btn sync-btn ${
+                  syncStatus === 'syncing' ? 'syncing' :
+                  syncStatus === 'success' ? 'success' :
+                  syncStatus === 'error' ? 'error' : ''
+                }`}
+                onClick={handleSync}
+                disabled={syncStatus === 'syncing'}
+              >
+                {getSyncButtonText()}
+              </button>
+            </div>
+
+            <div className="setting-item">
               <label className="setting-label">Экспорт данных</label>
               <button className="data-btn export-btn" onClick={exportData}>
                 📤 Экспортировать в JSON
               </button>
             </div>
-            
+
             <div className="setting-item">
               <label className="setting-label">Импорт данных</label>
               <button className="data-btn import-btn" onClick={importData}>
                 📥 Импортировать из JSON
               </button>
             </div>
-            
+
             <div className="setting-item">
               <label className="setting-label">Сброс статистики</label>
               <button className="data-btn reset-btn" onClick={resetStatistics}>
                 🔄 Сбросить статистику
               </button>
             </div>
-            
+
             <div className="setting-item">
               <label className="setting-label">Очистка всех данных</label>
               <button className="data-btn clear-btn" onClick={clearAllData}>
@@ -232,6 +292,10 @@ function SettingsPage() {
           <p className="info-text">
             Приложение сохраняет все данные локально в вашем браузере.
             Экспортируйте данные для резервного копирования.
+          </p>
+          <p className="info-text">
+            Синхронизация позволяет сохранять ваши данные в облаке и
+            получать к ним доступ с других устройств.
           </p>
         </div>
       </div>

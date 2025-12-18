@@ -15,6 +15,72 @@ interface Technology {
   updatedAt: string;
 }
 
+const getStatusColors = (status: Technology['status']) => {
+  switch (status) {
+    case 'completed':
+      return {
+        cardBg: '#2e7d32', // Средний зеленый
+        cardBorder: '#00c853', // Неоново-зеленый (остался)
+        inputBg: '#ffffff', // Чистый белый
+        inputText: '#1b5e20', // Темно-зеленый текст
+        inputBorder: '#4caf50', // Приглушенный зеленый вместо неонового
+
+        buttonBg: '#1b5e20', // Темно-зеленый (был cardBg)
+        buttonHover: '#2e7d32', // Средний зеленый
+        buttonText: '#ffffff',
+
+        labelColor: '#e8f5e9', // Светло-зеленый вместо белого
+        sectionBg: '#388e3c', // Темнее чем фон, светлее чем кнопки
+
+        accent: '#69f0ae',
+        cancelBg: '#4caf50', // Средний зеленый
+        cancelHover: '#2e7d32',
+        cancelText: '#ffffff'
+      };
+    case 'in-progress':
+      return {
+        cardBg: '#ff8f00', // Средний оранжевый
+        cardBorder: '#ff9100', // Ярко-оранжевый
+        inputBg: '#ffffff', // Чистый белый
+        inputText: '#e65100', // Темно-оранжевый текст
+        inputBorder: '#ff9800', // Приглушенный оранжевый
+
+        buttonBg: '#e65100', // Темно-оранжевый
+        buttonHover: '#ff6f00', // Средний оранжевый
+        buttonText: '#ffffff', // Белый текст вместо черного
+
+        labelColor: '#fff3cd', // Светло-желтый вместо белого
+        sectionBg: '#f57c00', // Темнее чем фон, светлее чем кнопки
+
+        accent: '#ffd180',
+        cancelBg: '#ff9800', // Основной оранжевый
+        cancelHover: '#ff8f00',
+        cancelText: '#212121' // Темный текст для контраста
+      };
+    case 'not-started':
+    default:
+      return {
+        cardBg: '#d32f2f', // Средний красный
+        cardBorder: '#ff5252', // Неоново-красный
+        inputBg: '#ffffff', // Чистый белый
+        inputText: '#b71c1c', // Темно-красный текст
+        inputBorder: '#f44336', // Приглушенный красный
+
+        buttonBg: '#b71c1c', // Темно-красный
+        buttonHover: '#c62828', // Средний красный
+        buttonText: '#ffffff',
+
+        labelColor: '#ffebee', // Светло-красный вместо белого
+        sectionBg: '#d32f2f', // Средний красный
+
+        accent: '#ff8a80',
+        cancelBg: '#f44336', // Основной красный
+        cancelHover: '#d32f2f',
+        cancelText: '#ffffff'
+      };
+  }
+};
+
 function TechnologyDetail() {
   const { techId } = useParams<{ techId: string }>();
   const navigate = useNavigate();
@@ -41,8 +107,8 @@ function TechnologyDetail() {
             title: foundTech.title,
             description: foundTech.description,
             status: foundTech.status,
-            notes: foundTech.notes,
-            category: foundTech.category,
+            notes: foundTech.notes || '',
+            category: foundTech.category || '',
             studyStartDate: foundTech.studyStartDate,
             studyEndDate: foundTech.studyEndDate,
           };
@@ -144,8 +210,6 @@ function TechnologyDetail() {
     };
 
     setFormData(newFormData);
-
-    // Динамическая валидация при изменении
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors(prev => ({
@@ -161,8 +225,6 @@ function TechnologyDetail() {
       ...prev,
       [name]: true
     }));
-
-    // Валидация при потере фокуса
     const error = validateField(name, formData[name as keyof typeof formData]);
     setErrors(prev => ({
       ...prev,
@@ -171,7 +233,6 @@ function TechnologyDetail() {
   };
 
   const handleSave = () => {
-    // Помечаем все поля как touched перед валидацией
     const allTouched = ['title', 'description', 'status', 'studyStartDate', 'studyEndDate', 'category']
       .reduce((acc, field) => ({ ...acc, [field]: true }), {});
     setTouched(allTouched);
@@ -189,7 +250,8 @@ function TechnologyDetail() {
             const updatedTech = {
               ...tech,
               ...formData,
-              studyEndDate: formData.studyEndDate || tech.studyEndDate, // Гарантируем наличие даты окончания
+              notes: formData.notes || '',
+              category: formData.category || undefined,
               updatedAt: new Date().toISOString()
             } as Technology;
             return updatedTech;
@@ -198,14 +260,9 @@ function TechnologyDetail() {
         });
 
         localStorage.setItem('techTrackerData', JSON.stringify(updatedData));
-
-        // Обновляем локальное состояние и возвращаемся к списку
-        const updatedTech = updatedData.find(t => t.id === technology.id);
-        setTechnology(updatedTech || null);
-
         setTimeout(() => {
           navigate('/technologies');
-        }, 500);
+        }, 300);
       }
     } catch (error) {
       console.error('Ошибка при сохранении:', error);
@@ -214,23 +271,8 @@ function TechnologyDetail() {
     }
   };
 
-  const getColorByStatus = (status: Technology['status']): string => {
-    switch (status) {
-      case 'completed': return '#4caf50';
-      case 'in-progress': return '#ff9800';
-      case 'not-started': return '#f44336';
-      default: return '#f44336';
-    }
-  };
-
-  const getStatusText = (status: Technology['status']): string => {
-    switch (status) {
-      case 'completed': return 'Завершено';
-      case 'in-progress': return 'В процессе';
-      case 'not-started': return 'Не начато';
-      default: return 'Не начато';
-    }
-  };
+  const currentStatus = formData.status || technology?.status || 'not-started';
+  const colors = getStatusColors(currentStatus);
 
   if (isLoading) {
     return <div className="technology-detail-loading">Загрузка...</div>;
@@ -245,8 +287,6 @@ function TechnologyDetail() {
     );
   }
 
-  const currentStatus = formData.status || technology.status;
-
   return (
     <div className="technology-detail-page">
       <div className="detail-back-button">
@@ -255,12 +295,17 @@ function TechnologyDetail() {
 
       <div
         className="technology-detail-card"
-        style={{ backgroundColor: getColorByStatus(currentStatus) }}
+        style={{
+          backgroundColor: colors.cardBg,
+          borderColor: colors.cardBorder,
+          borderWidth: '2px',
+          borderStyle: 'solid'
+        }}
       >
         <div className="detail-header">
           <div className="edit-section">
             <div className="form-group">
-              <label htmlFor="title" className="form-label">
+              <label htmlFor="title" className="form-label" style={{ color: colors.labelColor }}>
                 Название технологии <span className="required-star">*</span>
               </label>
               <input
@@ -272,12 +317,17 @@ function TechnologyDetail() {
                 onBlur={handleBlur}
                 className={`form-input ${errors.title ? 'input-error' : ''}`}
                 placeholder="Введите название"
+                style={{
+                  backgroundColor: colors.inputBg,
+                  borderColor: colors.inputBorder,
+                  color: colors.inputText
+                }}
               />
               {errors.title && <div className="error-message">{errors.title}</div>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="status" className="form-label">
+              <label htmlFor="status" className="form-label" style={{ color: colors.labelColor }}>
                 Статус <span className="required-star">*</span>
               </label>
               <select
@@ -287,6 +337,11 @@ function TechnologyDetail() {
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={`form-select ${errors.status ? 'input-error' : ''}`}
+                style={{
+                  backgroundColor: colors.inputBg,
+                  borderColor: colors.inputBorder,
+                  color: colors.inputText
+                }}
               >
                 <option value="not-started">Не начато</option>
                 <option value="in-progress">В процессе</option>
@@ -297,12 +352,18 @@ function TechnologyDetail() {
           </div>
         </div>
 
-        <div className="detail-study-timeline">
-          <h3 className="section-title">Сроки изучения</h3>
+        <div
+          className="detail-study-timeline"
+          style={{
+            backgroundColor: colors.sectionBg,
+            borderColor: colors.inputBorder
+          }}
+        >
+          <h3 className="section-title" style={{ color: colors.labelColor }}>Сроки изучения</h3>
           <div className="timeline-fields">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="studyStartDate" className="form-label">
+                <label htmlFor="studyStartDate" className="form-label" style={{ color: colors.labelColor }}>
                   Начало изучения <span className="required-star">*</span>
                 </label>
                 <input
@@ -313,12 +374,17 @@ function TechnologyDetail() {
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   className={`form-input ${errors.studyStartDate ? 'input-error' : ''}`}
+                  style={{
+                    backgroundColor: colors.inputBg,
+                    borderColor: colors.inputBorder,
+                    color: colors.inputText
+                  }}
                 />
                 {errors.studyStartDate && <div className="error-message">{errors.studyStartDate}</div>}
               </div>
 
               <div className="form-group">
-                <label htmlFor="studyEndDate" className="form-label">
+                <label htmlFor="studyEndDate" className="form-label" style={{ color: colors.labelColor }}>
                   Планируемое окончание <span className="required-star">*</span>
                 </label>
                 <input
@@ -329,6 +395,11 @@ function TechnologyDetail() {
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   className={`form-input ${errors.studyEndDate ? 'input-error' : ''}`}
+                  style={{
+                    backgroundColor: colors.inputBg,
+                    borderColor: colors.inputBorder,
+                    color: colors.inputText
+                  }}
                 />
                 {errors.studyEndDate && <div className="error-message">{errors.studyEndDate}</div>}
               </div>
@@ -337,7 +408,7 @@ function TechnologyDetail() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="category" className="form-label">Категория</label>
+          <label htmlFor="category" className="form-label" style={{ color: colors.labelColor }}>Категория</label>
           <input
             id="category"
             name="category"
@@ -347,12 +418,17 @@ function TechnologyDetail() {
             onBlur={handleBlur}
             className={`form-input ${errors.category ? 'input-error' : ''}`}
             placeholder="Например: Frontend, Backend и т.д."
+            style={{
+              backgroundColor: colors.inputBg,
+              borderColor: colors.inputBorder,
+              color: colors.inputText
+            }}
           />
           {errors.category && <div className="error-message">{errors.category}</div>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="description" className="form-label">
+          <label htmlFor="description" className="form-label" style={{ color: colors.labelColor }}>
             Описание <span className="required-star">*</span>
           </label>
           <textarea
@@ -364,12 +440,17 @@ function TechnologyDetail() {
             className={`form-textarea ${errors.description ? 'input-error' : ''}`}
             placeholder="Подробное описание технологии..."
             rows={4}
+            style={{
+              backgroundColor: colors.inputBg,
+              borderColor: colors.inputBorder,
+              color: colors.inputText
+            }}
           />
           {errors.description && <div className="error-message">{errors.description}</div>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="notes" className="form-label">Заметки</label>
+          <label htmlFor="notes" className="form-label" style={{ color: colors.labelColor }}>Заметки</label>
           <textarea
             id="notes"
             name="notes"
@@ -379,11 +460,19 @@ function TechnologyDetail() {
             className="form-textarea"
             placeholder="Ваши заметки по изучению..."
             rows={3}
+            style={{
+              backgroundColor: colors.inputBg,
+              borderColor: colors.inputBorder,
+              color: colors.inputText
+            }}
           />
         </div>
 
         <div className="detail-footer">
-          <div className="detail-id">
+          <div className="detail-id" style={{
+            color: colors.labelColor,
+            backgroundColor: colors.sectionBg
+          }}>
             ID: {technology.id}
           </div>
 
@@ -392,10 +481,41 @@ function TechnologyDetail() {
               onClick={handleSave}
               className="save-button"
               disabled={isSaving}
+              style={{
+                backgroundColor: colors.buttonBg,
+                color: colors.buttonText,
+                borderColor: colors.buttonBg
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.buttonHover;
+                e.currentTarget.style.borderColor = colors.buttonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = colors.buttonBg;
+                e.currentTarget.style.borderColor = colors.buttonBg;
+              }}
             >
               {isSaving ? 'Сохранение...' : 'Сохранить изменения'}
             </button>
-            <Link to="/technologies" className="cancel-button">
+            <Link
+              to="/technologies"
+              className="cancel-button"
+              style={{
+                backgroundColor: colors.cancelBg,
+                borderColor: colors.inputBorder,
+                color: colors.labelColor
+              }}
+              onMouseEnter={(e) => {
+                const target = e.currentTarget;
+                target.style.backgroundColor = colors.cancelHover;
+                target.style.borderColor = colors.accent;
+              }}
+              onMouseLeave={(e) => {
+                const target = e.currentTarget;
+                target.style.backgroundColor = colors.cancelBg;
+                target.style.borderColor = colors.inputBorder;
+              }}
+            >
               Отмена
             </Link>
           </div>
