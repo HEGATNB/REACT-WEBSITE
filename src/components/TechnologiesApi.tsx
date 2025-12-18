@@ -40,7 +40,19 @@ function useTechnologiesApi() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:5000/api/technologies');
+ const [apiEndpoint, setApiEndpoint] = useState<string>(() => {
+  const savedEndpoint = localStorage.getItem('apiEndpoint');
+  if (savedEndpoint && savedEndpoint.trim() &&
+      (savedEndpoint.startsWith('http://') || savedEndpoint.startsWith('https://'))) {
+    return savedEndpoint.trim();
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return '/api/technologies';
+  }
+
+  // Для разработки можно оставить localhost
+  return 'http://localhost:5000/api/technologies';
+});
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Technology[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -171,8 +183,12 @@ function useTechnologiesApi() {
   };
 
   const getApiUrl = (): string => {
-    return apiEndpoint;
-  };
+  const savedEndpoint = localStorage.getItem('apiEndpoint');
+  if (savedEndpoint && savedEndpoint.trim()) {
+    return savedEndpoint.trim();
+  }
+  return '/api/technologies'; // Относительный путь по умолчанию
+};
 
   const fetchTechnologies = useCallback(async () => {
     try {
@@ -266,12 +282,20 @@ function useTechnologiesApi() {
   }, [searchTechnologies]);
 
   const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const baseUrl = apiEndpoint.replace('/api/technologies', '');
-      const importUrl = `${baseUrl}/api/import-roadmap`;
+    // Исправление: правильно получаем base URL
+    let importUrl;
+    if (apiEndpoint.startsWith('http')) {
+      // Если полный URL (http/https), заменяем путь
+      importUrl = apiEndpoint.replace('/api/technologies', '/api/import-roadmap');
+    } else {
+      // Если относительный путь, строим правильный URL
+      const basePath = apiEndpoint.replace('/api/technologies', '');
+      importUrl = `${basePath}/api/import-roadmap`;
+    }
 
       console.log('🚀 Импорт roadmap из:', roadmapUrl);
 
