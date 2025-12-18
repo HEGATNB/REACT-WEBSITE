@@ -30,10 +30,11 @@ function SettingsPage() {
   }, []);
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  };
+  setTheme(newTheme);
+  localStorage.setItem('theme', newTheme);
+  document.documentElement.setAttribute('data-theme', newTheme);
+  window.dispatchEvent(new CustomEvent('themeChanged'));
+};
 
   const handleNotificationsChange = (value: boolean) => {
     setNotifications(value);

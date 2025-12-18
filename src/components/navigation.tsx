@@ -6,26 +6,45 @@ import { FaRegMoon } from "react-icons/fa";
 import { FaSun } from "react-icons/fa";
 import { FiMenu, FiX } from "react-icons/fi";
 import { GiAutoRepair } from "react-icons/gi";
-import {FaHome, FaListAlt, FaPlusCircle, FaChartBar, FaCog, FaServer, FaDatabase} from "react-icons/fa";
+import {FaHome, FaListAlt, FaPlusCircle, FaChartBar, FaCog, FaServer} from "react-icons/fa";
 import logoDark from '/assets/WSLogo_dark.png';
 import logoLight from '/assets/WSLogo.png';
 
 function Navigation() {
   const location = useLocation();
-  const [isWhiteTheme, setWhiteTheme] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Слушаем изменения темы
   useEffect(() => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (!currentTheme) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      setWhiteTheme(false);
-    } else if (currentTheme === 'light') {
-      setWhiteTheme(true);
-    } else {
-      setWhiteTheme(false);
-    }
+    const updateTheme = () => {
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'dark';
+      setTheme(savedTheme);
+    };
+
+    // Первоначальная установка
+    updateTheme();
+
+    // Слушаем изменения localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        updateTheme();
+      }
+    };
+
+    // Слушаем кастомное событие для синхронизации между компонентами
+    const handleThemeChange = () => {
+      updateTheme();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('themeChanged', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -37,20 +56,23 @@ function Navigation() {
 
     setIsAnimating(true);
 
-    const nextTheme = isWhiteTheme ? 'dark' : 'light';
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
 
+    // Обновляем localStorage и атрибут
+    localStorage.setItem('theme', nextTheme);
     document.documentElement.setAttribute('data-theme', nextTheme);
 
-    localStorage.setItem('theme', nextTheme);
+    // Отправляем кастомное событие для синхронизации
+    window.dispatchEvent(new CustomEvent('themeChanged'));
 
     setTimeout(() => {
-      setWhiteTheme(!isWhiteTheme);
+      setTheme(nextTheme);
       setIsAnimating(false);
     }, 300);
   }
 
   const getThemeButtonLabel = () => {
-    return isWhiteTheme ? "Переключить на темную тему" : "Переключить на светлую тему";
+    return theme === 'light' ? "Переключить на темную тему" : "Переключить на светлую тему";
   };
 
   const toggleMenu = () => {
@@ -66,7 +88,7 @@ function Navigation() {
       <div className="nav-container">
         <div className="nav-brand">
           <Link to="/">
-            <img src={isWhiteTheme ? logoDark : logoLight} alt="логотип" />
+            <img src={theme === 'light' ? logoDark : logoLight} alt="логотип" />
             <h2 className="logo-text">Трекер технологий</h2>
           </Link>
         </div>
@@ -118,10 +140,10 @@ function Navigation() {
                 title={getThemeButtonLabel()}
               >
                 <div className="icon-container">
-                  <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
+                  <div className={`theme-icon icon-sun ${theme === 'light' ? 'hiding' : ''}`}>
                     <FaSun />
                   </div>
-                  <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
+                  <div className={`theme-icon icon-moon ${theme === 'light' ? 'showing' : ''}`}>
                     <FaRegMoon />
                   </div>
                 </div>
@@ -171,14 +193,14 @@ function Navigation() {
                 <span>Статистика</span>
               </Link>
             </li>
-              <li>
-              <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''}>
+            <li>
+              <Link to="/api-settings" className={location.pathname === '/api-settings' ? 'active' : ''} onClick={closeMenu}>
                 <GiAutoRepair className="nav-icon" />
                 <span>API настройки</span>
               </Link>
             </li>
             <li>
-              <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''}>
+              <Link to="/api-technologies" className={location.pathname === '/api-technologies' ? 'active' : ''} onClick={closeMenu}>
                 <FaServer className="nav-icon" />
                 <span>API технологии</span>
               </Link>
@@ -198,10 +220,10 @@ function Navigation() {
                 title={getThemeButtonLabel()}
               >
                 <div className="icon-container">
-                  <div className={`theme-icon icon-sun ${isWhiteTheme ? 'hiding' : ''}`}>
+                  <div className={`theme-icon icon-sun ${theme === 'light' ? 'hiding' : ''}`}>
                     <FaSun className="nav-icon" />
                   </div>
-                  <div className={`theme-icon icon-moon ${isWhiteTheme ? 'showing' : ''}`}>
+                  <div className={`theme-icon icon-moon ${theme === 'light' ? 'showing' : ''}`}>
                     <FaRegMoon className="nav-icon" />
                   </div>
                 </div>

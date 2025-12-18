@@ -3,7 +3,7 @@
   margin: 0 auto;
   min-width: 55%;
   padding: 20px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #262332 100%);
+  background: none;
   min-height: calc(100vh - 80px);
   box-sizing: border-box;
   color: white;
