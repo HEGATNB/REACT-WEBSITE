@@ -12,6 +12,7 @@ import SettingsPage from './pages/settings';
 import ApiSettings from './components/ApiSettings';
 import TechnologiesFromApi from './components/TechnologiesFromApi';
 import MassEditPanel from './components/MassEditPanel';
+import { NotificationProvider } from './components/NotificationContext';
 
 type Status = 'completed' | 'in-progress' | 'not-started';
 
@@ -41,11 +42,18 @@ function App() {
     exportData,
     savePendingUpdates,
     deleteTechnology,
-    syncLocalToApi,  // ✅ Теперь это внутри компонента
-    hasPendingChanges  // ✅ Теперь это внутри компонента
-  } = useTechnologiesApi();  // ✅ Все хуки вызываются внутри компонента
+    syncLocalToApi,
+    hasPendingChanges
+  } = useTechnologiesApi();
 
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const technologies = apiTechnologies.map(tech => ({
+    ...tech,
+    studyStartDate: (tech as any).studyStartDate || tech.createdAt || new Date().toISOString(),
+    studyEndDate: (tech as any).studyEndDate,
+    createdAt: tech.createdAt || new Date().toISOString(),
+    updatedAt: tech.updatedAt || new Date().toISOString()
+  }));
+
   const [currentFilter, setCurrentFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -53,17 +61,6 @@ function App() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [showMassEditPanel, setShowMassEditPanel] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const enhancedTechnologies = apiTechnologies.map(tech => ({
-      ...tech,
-      studyStartDate: (tech as any).studyStartDate || tech.createdAt || new Date().toISOString(),
-      studyEndDate: (tech as any).studyEndDate,
-      createdAt: tech.createdAt || new Date().toISOString(),
-      updatedAt: tech.updatedAt || new Date().toISOString()
-    }));
-    setTechnologies(enhancedTechnologies);
-  }, [apiTechnologies]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -82,12 +79,6 @@ function App() {
       loadData();
     }
   }, [fetchTechnologies, isInitialized]);
-
-  useEffect(() => {
-    return () => {
-      savePendingUpdates();
-    };
-  }, [savePendingUpdates, location.pathname]);
 
   useEffect(() => {
     if (location.pathname !== '/') {
@@ -112,10 +103,6 @@ function App() {
           status: statusOrder[nextIndex],
           updatedAt: new Date().toISOString()
         });
-        const updatedTechs = technologies.map(t =>
-          t.id === id ? { ...t, status: statusOrder[nextIndex], updatedAt: new Date().toISOString() } : t
-        );
-        setTechnologies(updatedTechs);
       } catch (err) {
         console.error('Failed to update status:', err);
       }
@@ -128,10 +115,6 @@ function App() {
         notes: newNotes,
         updatedAt: new Date().toISOString()
       });
-      const updatedTechs = technologies.map(t =>
-        t.id === techId ? { ...t, notes: newNotes, updatedAt: new Date().toISOString() } : t
-      );
-      setTechnologies(updatedTechs);
     } catch (err) {
       console.error('Failed to update notes:', err);
     }
@@ -170,10 +153,6 @@ function App() {
         status: 'in-progress',
         updatedAt: new Date().toISOString()
       });
-      const updatedTechs = technologies.map(t =>
-        t.id === randomTech.id ? { ...t, status: 'in-progress', updatedAt: new Date().toISOString() } : t
-      );
-      setTechnologies(updatedTechs);
     } catch (err) {
       console.error('Failed to update random tech:', err);
       alert('Ошибка при обновлении статуса');
@@ -223,8 +202,6 @@ function App() {
     try {
       const deletePromises = ids.map(id => deleteTechnology(id));
       await Promise.all(deletePromises);
-      const updatedTechs = technologies.filter(tech => !ids.includes(tech.id));
-      setTechnologies(updatedTechs);
       setSelectedIds([]);
     } catch (err) {
       console.error('Ошибка при массовом удалении:', err);
@@ -241,10 +218,6 @@ function App() {
         })
       );
       await Promise.all(updatePromises);
-      const updatedTechs = technologies.map(t =>
-        ids.includes(t.id) ? { ...t, status: status, updatedAt: new Date().toISOString() } : t
-      );
-      setTechnologies(updatedTechs);
       setSelectedIds([]);
     } catch (err) {
       console.error('Ошибка при массовом обновлении статуса:', err);
@@ -446,9 +419,11 @@ function App() {
 
 function AppWrapper() {
   return (
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }
 

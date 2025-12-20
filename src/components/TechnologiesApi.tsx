@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import debounce from 'lodash/debounce';
+import { useNotification } from './NotificationContext';
 
 export interface Technology {
   id: number;
@@ -37,7 +38,11 @@ interface RoadmapImportResponse {
   message?: string;
 }
 
+const TECHNOLOGY_UPDATED_EVENT = 'technologyUpdated';
+
 function useTechnologiesApi() {
+  const { showSuccess, showError, showInfo } = useNotification();
+
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -57,109 +62,22 @@ function useTechnologiesApi() {
   const [searchResults, setSearchResults] = useState<Technology[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
-  const [shouldFetchFromApi, setShouldFetchFromApi] = useState(false);
   const [hasPendingChanges, setHasPendingChanges] = useState(false);
 
   const pendingUpdates = useRef<Map<number, Partial<Technology>>>(new Map());
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
+  const isSavingToApi = useRef(false);
+  const needsInitialFetch = useRef(true);
+  const lastSyncTimeRef = useRef<number>(Date.now());
 
-  // Инициализация - загрузка данных из localStorage
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        setInitialLoading(true);
-
-        // Загружаем endpoint
-        const savedEndpoint = localStorage.getItem('apiEndpoint');
-        if (savedEndpoint) {
-          setApiEndpoint(savedEndpoint);
-        }
-
-        // Загружаем локальные данные
-        const saved = localStorage.getItem('techTrackerData');
-        if (saved) {
-          try {
-            const parsedData = JSON.parse(saved);
-            console.log('📦 Загружено из localStorage:', parsedData.length, 'технологий');
-            setTechnologies(parsedData);
-          } catch (e) {
-            console.error('Ошибка при загрузке локальных данных:', e);
-          }
-        }
-
-        // Не загружаем автоматически из API при старте
-        console.log('🚫 Автоматическая синхронизация с API отключена');
-
-      } catch (error) {
-        console.error('Ошибка инициализации:', error);
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-
-    initData();
+  const notifyTechnologyUpdate = useCallback(() => {
+    window.dispatchEvent(new CustomEvent(TECHNOLOGY_UPDATED_EVENT));
   }, []);
-
-  // Автосохранение при уходе со страницы
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      if (pendingUpdates.current.size > 0) {
-        await savePendingUpdates();
-      }
-    };
-
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'hidden' && pendingUpdates.current.size > 0) {
-        await savePendingUpdates();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-
-      // Сохраняем при размонтировании компонента
-      if (pendingUpdates.current.size > 0) {
-        savePendingUpdates();
-      }
-
-      if (syncTimeoutRef.current) {
-        clearTimeout(syncTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Функция сохранения накопившихся изменений в API
-  const savePendingUpdates = async () => {
-    if (pendingUpdates.current.size === 0) return;
-
-    try {
-      console.log('💾 Сохранение накопившихся изменений в API:', pendingUpdates.current.size);
-
-      const updatesArray = Array.from(pendingUpdates.current.entries());
-      const updatePromises = updatesArray.map(([id, updates]) =>
-        updateTechnologyToApi(id, updates)
-      );
-
-      await Promise.all(updatePromises);
-      pendingUpdates.current.clear();
-      setHasPendingChanges(false);
-      console.log('✅ Все изменения сохранены в API');
-
-    } catch (error) {
-      console.error('❌ Ошибка при сохранении изменений в API:', error);
-      setHasPendingChanges(true);
-    }
-  };
-
-  // Функция для обновления в API
   const updateTechnologyToApi = async (id: number, updates: Partial<Technology>) => {
     try {
+      console.log(`📤 Отправка обновления в API для id ${id}:`, updates);
       const response = await fetch(`${apiEndpoint}/${id}`, {
         method: 'PUT',
         headers: {
@@ -178,6 +96,7 @@ function useTechnologiesApi() {
         throw new Error(data.message || 'Ошибка обновления');
       }
 
+      console.log(`✅ Обновление id ${id} сохранено в API`);
       return data.data;
     } catch (error) {
       console.error('Ошибка при обновлении технологии в API:', error);
@@ -185,26 +104,18 @@ function useTechnologiesApi() {
     }
   };
 
-  const saveApiEndpoint = (endpoint: string) => {
-    const normalizedEndpoint = endpoint.trim();
-    setApiEndpoint(normalizedEndpoint);
-    localStorage.setItem('apiEndpoint', normalizedEndpoint);
-  };
-
   const fetchTechnologies = useCallback(async (force = false) => {
+    if (!force && technologies.length > 0 && !needsInitialFetch.current) {
+      const timeSinceLastFetch = Date.now() - lastFetchTime;
+      if (timeSinceLastFetch < 5 * 60 * 1000) { // 5 минут
+        console.log('📦 Используем локальные данные');
+        return technologies;
+      }
+    }
+
     try {
       setLoading(true);
       setError(null);
-
-      // Проверяем, нужно ли делать запрос
-      const now = Date.now();
-      const timeSinceLastFetch = now - lastFetchTime;
-
-      if (!force && timeSinceLastFetch < 60000 && technologies.length > 0) { // 60 секунд кеш
-        console.log('📦 Используем кешированные данные, последний запрос был', timeSinceLastFetch / 1000, 'сек назад');
-        setLoading(false);
-        return technologies;
-      }
 
       console.log('🌐 Загрузка технологий из API:', apiEndpoint);
 
@@ -215,7 +126,7 @@ function useTechnologiesApi() {
         },
         mode: 'cors',
         credentials: 'omit',
-        signal: AbortSignal.timeout(10000) // Таймаут 10 секунд
+        signal: AbortSignal.timeout(10000)
       });
 
       if (!response.ok) {
@@ -227,22 +138,24 @@ function useTechnologiesApi() {
       if (data.success && Array.isArray(data.data)) {
         console.log('✅ Получено от API:', data.data.length, 'технологий');
 
-        // Проверяем, изменились ли данные
-        const newData = data.data;
-        const currentData = technologies;
+        const newData = data.data.map(tech => ({
+          ...tech,
+          studyStartDate: tech.studyStartDate || new Date().toISOString().split('T')[0],
+          studyEndDate: tech.studyEndDate || '',
+          notes: tech.notes || '',
+          category: tech.category || ''
+        }));
 
-        // Простая проверка на изменения
-        const hasChanges = JSON.stringify(newData) !== JSON.stringify(currentData);
+        setTechnologies(newData);
+        localStorage.setItem('techTrackerData', JSON.stringify(newData));
+        setLastFetchTime(Date.now());
+        setHasPendingChanges(false);
+        needsInitialFetch.current = false;
 
-        if (hasChanges) {
-          console.log('🔄 Данные изменились, обновляем локальное состояние');
-          setTechnologies(newData);
-          localStorage.setItem('techTrackerData', JSON.stringify(newData));
-        } else {
-          console.log('✅ Данные не изменились, пропускаем обновление');
+        if (force) {
+          showSuccess(`Загружено ${data.data.length} технологий из API`);
         }
 
-        setLastFetchTime(Date.now());
         return newData;
       } else {
         throw new Error(data.message || 'Не удалось загрузить данные');
@@ -253,16 +166,169 @@ function useTechnologiesApi() {
       setError(errorMessage);
       console.error('❌ Ошибка при загрузке технологий из API:', err);
 
-      // Если API недоступен, не перезаписываем локальные данные
-      console.log('📦 Оставляем локальные данные без изменений');
+      const saved = localStorage.getItem('techTrackerData');
+      if (saved) {
+        try {
+          const parsedData = JSON.parse(saved);
+          console.log('📦 Возвращаем локальные данные из кэша');
+          needsInitialFetch.current = false;
+          return parsedData;
+        } catch (e) {
+          console.error('Ошибка при загрузке локальных данных:', e);
+        }
+      }
 
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoint, technologies, lastFetchTime]);
+  }, [apiEndpoint, technologies, lastFetchTime, showSuccess]);
 
-  // Поиск технологий с debounce
+  useEffect(() => {
+    if (isInitialized.current) return;
+
+    const initData = () => {
+      try {
+        setInitialLoading(true);
+        isInitialized.current = true;
+
+        const savedEndpoint = localStorage.getItem('apiEndpoint');
+        if (savedEndpoint) {
+          setApiEndpoint(savedEndpoint);
+        }
+
+        const saved = localStorage.getItem('techTrackerData');
+        if (saved) {
+          try {
+            const parsedData = JSON.parse(saved);
+            console.log('📦 Загружено из localStorage:', parsedData.length, 'технологий');
+            setTechnologies(parsedData);
+          } catch (e) {
+            console.error('Ошибка при загрузке локальных данных:', e);
+          }
+        }
+
+        setTimeout(() => {
+          if (needsInitialFetch.current) {
+            fetchTechnologies(true).catch(console.error);
+          }
+        }, 1000);
+
+        console.log('💾 Режим локального хранения: изменения сохраняются только локально');
+
+      } catch (error) {
+        console.error('Ошибка инициализации:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    initData();
+  }, []);
+
+  useEffect(() => {
+    const handleTechnologyUpdate = () => {
+      const saved = localStorage.getItem('techTrackerData');
+      if (saved) {
+        try {
+          const parsedData = JSON.parse(saved);
+          setTechnologies(parsedData);
+        } catch (e) {
+          console.error('Ошибка при обновлении локальных данных:', e);
+        }
+      }
+    };
+
+    window.addEventListener(TECHNOLOGY_UPDATED_EVENT, handleTechnologyUpdate);
+
+    return () => {
+      window.removeEventListener(TECHNOLOGY_UPDATED_EVENT, handleTechnologyUpdate);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      if (pendingUpdates.current.size > 0 && !isSavingToApi.current) {
+        console.log('🚪 Сохраняем изменения в API перед закрытием страницы');
+        e.preventDefault();
+        e.returnValue = 'Изменения сохраняются...';
+
+        await savePendingUpdates();
+        return 'Изменения сохраняются...';
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden' &&
+          pendingUpdates.current.size > 0 &&
+          !isSavingToApi.current) {
+        console.log('🔄 Сохраняем изменения в API при переходе на другую вкладку');
+        await savePendingUpdates();
+        lastSyncTimeRef.current = Date.now();
+      } else if (document.visibilityState === 'visible') {
+        const shouldRefresh = Date.now() - lastSyncTimeRef.current > 5 * 60 * 1000;
+        if (shouldRefresh) {
+          console.log('🔄 Возвращение на вкладку, обновляем данные');
+          fetchTechnologies(true).catch(console.error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      if (pendingUpdates.current.size > 0 && !isSavingToApi.current) {
+        console.log('📤 Сохраняем изменения в API при размонтировании');
+        savePendingUpdates().catch(console.error);
+      }
+    };
+  }, []);
+
+  const savePendingUpdates = async () => {
+    if (pendingUpdates.current.size === 0 || isSavingToApi.current) return;
+
+    try {
+      isSavingToApi.current = true;
+      const updatesCount = pendingUpdates.current.size;
+      console.log('💾 Сохранение изменений в API:', updatesCount);
+
+      const updatesToProcess = new Map(pendingUpdates.current);
+
+      const updatesArray = Array.from(updatesToProcess.entries());
+      const updatePromises = updatesArray.map(([id, updates]) => {
+        console.log(`📤 Отправка обновления для id ${id}:`, updates);
+        return updateTechnologyToApi(id, updates);
+      });
+
+      await Promise.all(updatePromises);
+
+      updatesArray.forEach(([id]) => {
+        pendingUpdates.current.delete(id);
+      });
+
+      setHasPendingChanges(pendingUpdates.current.size > 0);
+      console.log('✅ Изменения сохранены в API');
+      lastSyncTimeRef.current = Date.now();
+
+    } catch (error) {
+      console.error('❌ Ошибка при сохранении изменений в API:', error);
+      setHasPendingChanges(true);
+    } finally {
+      isSavingToApi.current = false;
+    }
+  };
+
+  const saveApiEndpoint = (endpoint: string) => {
+    const normalizedEndpoint = endpoint.trim();
+    setApiEndpoint(normalizedEndpoint);
+    localStorage.setItem('apiEndpoint', normalizedEndpoint);
+    showSuccess('API endpoint сохранен');
+  };
+
   const searchTechnologies = useCallback(
     debounce(async (query: string) => {
       if (!query.trim()) {
@@ -273,9 +339,7 @@ function useTechnologiesApi() {
 
       try {
         setIsSearching(true);
-        setError(null);
 
-        // Ищем локально
         const localResults = technologies.filter(tech =>
           tech.title.toLowerCase().includes(query.toLowerCase()) ||
           tech.description.toLowerCase().includes(query.toLowerCase()) ||
@@ -283,17 +347,20 @@ function useTechnologiesApi() {
         );
 
         setSearchResults(localResults);
+        if (localResults.length === 0) {
+          showInfo('По вашему запросу ничего не найдено');
+        }
 
       } catch (err) {
         console.error('Ошибка при поиске:', err);
+        showError('Ошибка при поиске технологий');
       } finally {
         setIsSearching(false);
       }
     }, 500),
-    [technologies]
+    [technologies, showError, showInfo]
   );
 
-  // Обработчик изменения поискового запроса
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
 
@@ -311,14 +378,12 @@ function useTechnologiesApi() {
     try {
       setLoading(true);
       setError(null);
+      showInfo('Импорт roadmap...');
 
-      // Исправление: правильно получаем base URL
       let importUrl;
       if (apiEndpoint.startsWith('http')) {
-        // Если полный URL (http/https), заменяем путь
         importUrl = apiEndpoint.replace('/api/technologies', '/api/import-roadmap');
       } else {
-        // Если относительный путь, строим правильный URL
         const basePath = apiEndpoint.replace('/api/technologies', '');
         importUrl = `${basePath}/api/import-roadmap`;
       }
@@ -352,18 +417,24 @@ function useTechnologiesApi() {
           id: maxId + index + 1,
           status: 'not-started' as const,
           notes: tech.notes || '',
-          category: tech.category || 'imported'
+          category: tech.category || 'imported',
+          studyStartDate: tech.studyStartDate || new Date().toISOString().split('T')[0],
+          studyEndDate: tech.studyEndDate || ''
         }));
 
         console.log('🆕 Создано импортированных технологий:', importedTechs.length);
 
-        // Добавляем импортированные технологии
         const updatedTechnologies = [...technologies, ...importedTechs];
         setTechnologies(updatedTechnologies);
         localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-        // Отмечаем, что есть изменения для синхронизации
         setHasPendingChanges(true);
+        importedTechs.forEach(tech => {
+          pendingUpdates.current.set(tech.id, tech);
+        });
+        notifyTechnologyUpdate();
+
+        showSuccess(`Импортировано ${importedTechs.length} технологий из "${data.roadmapTitle}"`);
 
         return {
           success: true,
@@ -379,6 +450,7 @@ function useTechnologiesApi() {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
       console.error('❌ Ошибка импорта:', err);
       setError(errorMessage);
+      showError(`Ошибка импорта: ${errorMessage}`);
 
       return {
         success: false,
@@ -427,75 +499,87 @@ function useTechnologiesApi() {
 
       const newTech: Technology = {
         id: maxId + 1,
-        ...techData
+        ...techData,
+        studyStartDate: techData.studyStartDate || new Date().toISOString().split('T')[0],
+        studyEndDate: techData.studyEndDate || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
-      // Добавляем локально
       const updatedTechnologies = [...technologies, newTech];
       setTechnologies(updatedTechnologies);
       localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-      // Отмечаем, что есть изменения для синхронизации
       setHasPendingChanges(true);
+      pendingUpdates.current.set(newTech.id, newTech);
+      notifyTechnologyUpdate();
+
+      showSuccess(`Технология "${newTech.title}" добавлена`);
 
       return newTech;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      showError(`Ошибка при добавлении: ${errorMessage}`);
       throw new Error(`Ошибка при добавлении технологии: ${errorMessage}`);
     }
   };
 
   const updateTechnology = async (id: number, updates: Partial<Technology>): Promise<Technology> => {
     try {
-      // Обновляем локально сразу
-      const updatedTechnologies = technologies.map(tech =>
-        tech.id === id ? { ...tech, ...updates, updatedAt: new Date().toISOString() } : tech
+      const tech = technologies.find(t => t.id === id);
+      if (!tech) throw new Error('Технология не найдена');
+
+      const updatedTech = {
+        ...tech,
+        ...updates,
+        updatedAt: new Date().toISOString(),
+        studyStartDate: updates.studyStartDate || tech.studyStartDate,
+        studyEndDate: updates.studyEndDate || tech.studyEndDate
+      };
+
+      const updatedTechnologies = technologies.map(t =>
+        t.id === id ? updatedTech : t
       );
+
       setTechnologies(updatedTechnologies);
       localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-      // Отмечаем, что есть изменения для синхронизации
       setHasPendingChanges(true);
-
-      // Добавляем в очередь для сохранения в API (отложенное)
       pendingUpdates.current.set(id, updates);
 
-      // Сбрасываем предыдущий таймер
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-
-      // Устанавливаем новый таймер для сохранения в API через 30 секунд
-      saveTimeoutRef.current = setTimeout(async () => {
-        await savePendingUpdates();
-      }, 30000);
-
-      const updatedTech = updatedTechnologies.find(tech => tech.id === id);
-      if (!updatedTech) throw new Error('Технология не найдена');
+      notifyTechnologyUpdate();
+      console.log(`📝 Технология "${tech.title}" обновлена локально`);
 
       return updatedTech;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      showError(`Ошибка при обновлении: ${errorMessage}`);
       throw new Error(`Ошибка при обновлении технологии: ${errorMessage}`);
     }
   };
 
   const deleteTechnology = async (id: number): Promise<boolean> => {
     try {
-      // Удаляем локально
+      const tech = technologies.find(t => t.id === id);
+      if (!tech) throw new Error('Технология не найдена');
+
       const updatedTechnologies = technologies.filter(tech => tech.id !== id);
       setTechnologies(updatedTechnologies);
       localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-      // Отмечаем, что есть изменения для синхронизации
       setHasPendingChanges(true);
+      pendingUpdates.current.set(id, { deleted: true });
+      notifyTechnologyUpdate();
+
+      showSuccess(`Технология "${tech.title}" удалена`);
 
       return true;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      showError(`Ошибка при удалении: ${errorMessage}`);
       throw new Error(`Ошибка при удалении технологии: ${errorMessage}`);
     }
   };
@@ -504,22 +588,20 @@ function useTechnologiesApi() {
     try {
       setLoading(true);
       setError(null);
+      showInfo('Синхронизация с API...');
 
       console.log('🔄 Ручная синхронизация с API');
-
-      // 1. Сначала сохраняем все локальные изменения в API
       if (pendingUpdates.current.size > 0) {
         console.log('💾 Сохраняем локальные изменения в API...');
         await savePendingUpdates();
       }
-
-      // 2. Затем загружаем обновленные данные из API
       console.log('🌐 Загружаем данные из API...');
-      await fetchTechnologies(force);
+      await fetchTechnologies(true);
 
-      // 3. Сбрасываем флаг изменений
       setHasPendingChanges(false);
+      lastSyncTimeRef.current = Date.now();
 
+      showSuccess('Синхронизация завершена');
       console.log('✅ Синхронизация завершена');
       return true;
 
@@ -527,6 +609,7 @@ function useTechnologiesApi() {
       const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
       setError(`Ошибка синхронизации: ${errorMessage}`);
       console.error('❌ Ошибка синхронизации:', err);
+      showError(`Ошибка синхронизации: ${errorMessage}`);
       throw err;
     } finally {
       setLoading(false);
@@ -534,31 +617,53 @@ function useTechnologiesApi() {
   };
 
   const markAllDone = async () => {
-    const updatedTechnologies = technologies.map(tech => ({
-      ...tech,
-      status: 'completed' as const,
-      updatedAt: new Date().toISOString()
-    }));
+    try {
+      const updatedTechnologies = technologies.map(tech => ({
+        ...tech,
+        status: 'completed' as const,
+        updatedAt: new Date().toISOString()
+      }));
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-    setTechnologies(updatedTechnologies);
-    localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
-
-    // Отмечаем, что есть изменения для синхронизации
-    setHasPendingChanges(true);
+      setHasPendingChanges(true);
+      technologies.forEach(tech => {
+        pendingUpdates.current.set(tech.id, { status: 'completed' });
+      });
+      notifyTechnologyUpdate();
+      showSuccess('Все технологии отмечены как завершенные');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      showError(`Ошибка: ${errorMessage}`);
+      throw err;
+    }
   };
 
   const resetAllStatuses = async () => {
-    const updatedTechnologies = technologies.map(tech => ({
-      ...tech,
-      status: 'not-started' as const,
-      updatedAt: new Date().toISOString()
-    }));
+    try {
+      const updatedTechnologies = technologies.map(tech => ({
+        ...tech,
+        status: 'not-started' as const,
+        updatedAt: new Date().toISOString()
+      }));
+      setTechnologies(updatedTechnologies);
+      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
 
-    setTechnologies(updatedTechnologies);
-    localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      setHasPendingChanges(true);
 
-    // Отмечаем, что есть изменения для синхронизации
-    setHasPendingChanges(true);
+      technologies.forEach(tech => {
+        pendingUpdates.current.set(tech.id, { status: 'not-started' });
+      });
+
+      notifyTechnologyUpdate();
+
+      showSuccess('Статусы всех технологий сброшены');
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      showError(`Ошибка: ${errorMessage}`);
+      throw err;
+    }
   };
 
   const exportData = (): string => {
@@ -578,6 +683,7 @@ function useTechnologiesApi() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    showSuccess('Данные успешно экспортированы');
     return dataStr;
   };
 
@@ -589,68 +695,26 @@ function useTechnologiesApi() {
     }
   };
 
-  // Функция для синхронизации только локальных данных с API
   const syncLocalToApi = async (): Promise<boolean> => {
     try {
       console.log('🔄 Синхронизация локальных данных с API...');
+      showInfo('Синхронизация локальных данных с API...');
       setLoading(true);
 
-      // Загружаем текущие данные из API
-      const apiData = await fetchTechnologies(true);
+      await savePendingUpdates();
 
-      // Создаем карту данных из API для быстрого поиска
-      const apiDataMap = new Map(apiData.map(tech => [tech.id, tech]));
-
-      // Получаем локальные данные
-      const localData = technologies;
-
-      // Определяем, какие данные нужно обновить/добавить
-      const updates: Array<{id: number, data: Partial<Technology>}> = [];
-      const newTechs: Technology[] = [];
-
-      localData.forEach(localTech => {
-        const apiTech = apiDataMap.get(localTech.id);
-        if (apiTech) {
-          // Проверяем, есть ли изменения
-          const hasChanges = JSON.stringify(localTech) !== JSON.stringify(apiTech);
-          if (hasChanges) {
-            updates.push({ id: localTech.id, data: localTech });
-          }
-        } else {
-          // Новая технология, которой нет в API
-          newTechs.push(localTech);
-        }
-      });
-
-      console.log(`📊 Найдено ${updates.length} обновлений и ${newTechs.length} новых технологий`);
-
-      // Выполняем обновления
-      if (updates.length > 0) {
-        console.log('📤 Отправляем обновления в API...');
-        const updatePromises = updates.map(({ id, data }) =>
-          updateTechnologyToApi(id, data)
-        );
-        await Promise.all(updatePromises);
-      }
-
-      // Добавляем новые технологии
-      if (newTechs.length > 0) {
-        console.log('📤 Добавляем новые технологии в API...');
-        const addPromises = newTechs.map(tech =>
-          addTechnologyToApi(tech)
-        );
-        await Promise.all(addPromises);
-      }
-
-      // После синхронизации обновляем данные из API
       await fetchTechnologies(true);
-      setHasPendingChanges(false);
 
+      setHasPendingChanges(false);
+      lastSyncTimeRef.current = Date.now();
+
+      showSuccess('Синхронизация завершена успешно');
       console.log('✅ Синхронизация завершена успешно');
       return true;
 
     } catch (error) {
       console.error('❌ Ошибка синхронизации:', error);
+      showError('Ошибка синхронизации');
       throw error;
     } finally {
       setLoading(false);
@@ -658,7 +722,6 @@ function useTechnologiesApi() {
   };
 
   return {
-    // Состояние
     technologies,
     loading: loading || initialLoading,
     initialLoading,
@@ -669,7 +732,6 @@ function useTechnologiesApi() {
     isSearching,
     hasPendingChanges,
 
-    // Действия
     fetchTechnologies,
     addTechnology,
     updateTechnology,
@@ -682,11 +744,9 @@ function useTechnologiesApi() {
     resetAllStatuses,
     exportData,
 
-    // Поиск
     handleSearchChange,
     clearSearch,
 
-    // Утилиты
     savePendingUpdates
   };
 }

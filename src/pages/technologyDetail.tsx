@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './technologyDetail.css';
+import { useNotification } from '../components/NotificationContext';
 
 interface Technology {
   id: number;
@@ -15,21 +16,24 @@ interface Technology {
   updatedAt: string;
 }
 
+// Функция для получения цветовой схемы по статусу (обновленная)
 const getStatusColors = (status: Technology['status']) => {
   switch (status) {
     case 'completed':
       return {
+        // ФОН - светлее чем был
         cardBg: '#2e7d32', // Средний зеленый
-        cardBorder: '#00c853', // Неоново-зеленый (остался)
+        cardBorder: '#00c853', // Неоново-зеленый
         inputBg: '#ffffff', // Чистый белый
         inputText: '#1b5e20', // Темно-зеленый текст
-        inputBorder: '#4caf50', // Приглушенный зеленый вместо неонового
+        inputBorder: '#4caf50', // Приглушенный зеленый
 
-        buttonBg: '#1b5e20', // Темно-зеленый (был cardBg)
+        // КНОПКИ - темнее чем были
+        buttonBg: '#1b5e20', // Темно-зеленый
         buttonHover: '#2e7d32', // Средний зеленый
         buttonText: '#ffffff',
 
-        labelColor: '#e8f5e9', // Светло-зеленый вместо белого
+        labelColor: '#e8f5e9', // Светло-зеленый
         sectionBg: '#388e3c', // Темнее чем фон, светлее чем кнопки
 
         accent: '#69f0ae',
@@ -39,38 +43,42 @@ const getStatusColors = (status: Technology['status']) => {
       };
     case 'in-progress':
       return {
+        // ФОН - светлее чем был
         cardBg: '#ff8f00', // Средний оранжевый
         cardBorder: '#ff9100', // Ярко-оранжевый
         inputBg: '#ffffff', // Чистый белый
         inputText: '#e65100', // Темно-оранжевый текст
         inputBorder: '#ff9800', // Приглушенный оранжевый
 
+        // КНОПКИ - темнее чем были
         buttonBg: '#e65100', // Темно-оранжевый
         buttonHover: '#ff6f00', // Средний оранжевый
-        buttonText: '#ffffff', // Белый текст вместо черного
+        buttonText: '#ffffff',
 
-        labelColor: '#fff3cd', // Светло-желтый вместо белого
+        labelColor: '#fff3cd', // Светло-желтый
         sectionBg: '#f57c00', // Темнее чем фон, светлее чем кнопки
 
         accent: '#ffd180',
         cancelBg: '#ff9800', // Основной оранжевый
         cancelHover: '#ff8f00',
-        cancelText: '#212121' // Темный текст для контраста
+        cancelText: '#212121'
       };
     case 'not-started':
     default:
       return {
+        // ФОН - светлее чем был
         cardBg: '#d32f2f', // Средний красный
         cardBorder: '#ff5252', // Неоново-красный
         inputBg: '#ffffff', // Чистый белый
         inputText: '#b71c1c', // Темно-красный текст
         inputBorder: '#f44336', // Приглушенный красный
 
+        // КНОПКИ - темнее чем были
         buttonBg: '#b71c1c', // Темно-красный
         buttonHover: '#c62828', // Средний красный
         buttonText: '#ffffff',
 
-        labelColor: '#ffebee', // Светло-красный вместо белого
+        labelColor: '#ffebee', // Светло-красный
         sectionBg: '#d32f2f', // Средний красный
 
         accent: '#ff8a80',
@@ -84,6 +92,7 @@ const getStatusColors = (status: Technology['status']) => {
 function TechnologyDetail() {
   const { techId } = useParams<{ techId: string }>();
   const navigate = useNavigate();
+  const { showSuccess, showError } = useNotification();
   const [technology, setTechnology] = useState<Technology | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<Partial<Technology>>({});
@@ -116,6 +125,7 @@ function TechnologyDetail() {
         }
       } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
+        showError('Ошибка при загрузке данных технологии');
       }
     }
     setIsLoading(false);
@@ -260,13 +270,19 @@ function TechnologyDetail() {
         });
 
         localStorage.setItem('techTrackerData', JSON.stringify(updatedData));
+
+        // Уведомляем об обновлении
+        window.dispatchEvent(new CustomEvent('technologyUpdated'));
+
+        showSuccess(`Технология "${formData.title}" успешно обновлена`);
+
         setTimeout(() => {
           navigate('/technologies');
         }, 300);
       }
     } catch (error) {
       console.error('Ошибка при сохранении:', error);
-      alert('Произошла ошибка при сохранении');
+      showError('Произошла ошибка при сохранении');
       setIsSaving(false);
     }
   };
@@ -503,7 +519,7 @@ function TechnologyDetail() {
               style={{
                 backgroundColor: colors.cancelBg,
                 borderColor: colors.inputBorder,
-                color: colors.labelColor
+                color: colors.cancelText
               }}
               onMouseEnter={(e) => {
                 const target = e.currentTarget;

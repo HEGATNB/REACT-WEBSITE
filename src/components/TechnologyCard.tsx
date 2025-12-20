@@ -60,6 +60,24 @@ const getColorByStatus = (status: Status): string => {
   }
 };
 
+// Функция для форматирования даты в формат 00.00.0000
+const formatDateForDisplay = (dateString: string): string => {
+  try {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}.${month}.${year}`;
+  } catch (error) {
+    console.error('Ошибка форматирования даты:', error);
+    return '';
+  }
+};
+
 function Card({
   title,
   description,
@@ -114,6 +132,7 @@ function Card({
       }
     }, 1500);
   };
+
   useEffect(() => {
     return () => {
       if (notesTimeoutRef.current) {
@@ -122,18 +141,6 @@ function Card({
     };
   }, []);
 
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-    } catch (error) {
-      return 'не указана';
-    }
-  };
-
   return (
     <div
       className={`Card ${isEditable ? 'editable-card' : ''} ${isMassEditing ? 'mass-edit-mode' : ''} ${isSelected ? 'selected-card' : ''}`}
@@ -141,7 +148,7 @@ function Card({
       style={{ backgroundColor: cardColor }}
       role={isMassEditing ? "checkbox" : "article"}
       aria-checked={isMassEditing ? isSelected : undefined}
-      aria-label={`Карточка технологии: ${title}. Статус: ${status}. ${studyEndDate ? `Планируемое окончание: ${formatDate(studyEndDate)}` : ''}`}
+      aria-label={`Карточка технологии: ${title}. Статус: ${status}.`}
       tabIndex={isMassEditing ? 0 : undefined}
       onKeyDown={(e) => {
         if (isMassEditing && onSelect && (e.key === 'Enter' || e.key === ' ')) {
@@ -178,22 +185,17 @@ function Card({
         <span className="status-value">{status}</span>
       </div>
 
-      {/* Блок сроков изучения */}
-      <div className="study-timeline" aria-label="Сроки изучения технологии">
-        <div className="timeline-item">
-          <span className="timeline-label"></span>
-          <time className="timeline-date" dateTime={studyStartDate}>
-            {formatDate(studyStartDate)}
-          </time>
-        </div>
-        {studyEndDate && (
-          <div className="timeline-item">
-            <span className="timeline-label">Планируемое окончание:</span>
-            <time className="timeline-date" dateTime={studyEndDate}>
-              {formatDate(studyEndDate)}
-            </time>
-          </div>
-        )}
+      {/* Блок сроков изучения в новом формате */}
+      <div className="study-dates" aria-label="Сроки изучения технологии">
+        {studyStartDate && studyEndDate ? (
+          <span className="study-dates-text">
+            {formatDateForDisplay(studyStartDate)} - {formatDateForDisplay(studyEndDate)}
+          </span>
+        ) : studyStartDate ? (
+          <span className="study-dates-text">
+            С {formatDateForDisplay(studyStartDate)}
+          </span>
+        ) : null}
       </div>
 
       <div className="notes-container">
@@ -222,6 +224,7 @@ function Card({
     </div>
   );
 }
+
 function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }: QuickActionsProps) {
   const [showExportModal, setShowExportModal] = useState(false);
 
@@ -285,7 +288,7 @@ function QuickActions({ onMarkAllDone, onResetAll, onRandomNext, onExportData }:
   );
 }
 
-// Filters компонент (остается без изменений)
+// Filters компонент
 function Filters({ currentFilter, onFilterChange, isVisible, onClose }: FiltersProps) {
   const closeTimerRef = useRef<number | null>(null);
 

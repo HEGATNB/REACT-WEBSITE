@@ -14,12 +14,12 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  position: relative;
 }
 
 .Card.mass-edit-mode {
   cursor: pointer;
   transition: all 0.2s;
-  position: relative;
 }
 
 .Card.mass-edit-mode:hover {
@@ -42,34 +42,64 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
+  display: none;
 }
 
-.study-timeline {
-  margin: 0.75rem 0;
-  padding: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.timeline-item {
+.checkbox-label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  cursor: pointer;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: transparent;
+  transition: all 0.2s;
 }
 
-.timeline-item:last-child {
-  margin-bottom: 0;
+.Card.selected-card .checkbox-label {
+  background-color: #2196f3;
+  color: white;
+  border-color: #2196f3;
 }
 
-.timeline-label {
-  color: rgba(255, 255, 255, 0.8);
+/* Новый стиль для отображения дат */
+.study-dates {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.study-dates-text {
+  font-size: 0.85rem;
+  opacity: 0.9;
   font-weight: 500;
 }
 
+/* Удаляем старый стиль study-timeline */
+.study-timeline {
+  display: none;
+}
+
+.timeline-item {
+  display: none;
+}
+
+.timeline-label {
+  display: none;
+}
+
 .timeline-date {
-  color: white;
-  font-weight: 600;
+  display: none;
 }
 
 .Card.mass-edit-mode textarea {
@@ -528,6 +558,10 @@
     height: 32px;
     padding: 0 12px;
   }
+
+  .study-dates {
+    font-size: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -569,5 +603,9 @@
   .not-started-word {
     display: inline-block;
     margin: 2px 0;
+  }
+
+  .study-dates {
+    font-size: 0.7rem;
   }
 }
