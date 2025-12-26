@@ -13,6 +13,7 @@ export const useSaveData = (technologies: any[], setTechnologies: (tech: any[]) 
       }
     }
   }, [setTechnologies]);
+
   useEffect(() => {
     if (technologies && technologies.length > 0) {
       localStorage.setItem('techTrackerData', JSON.stringify(technologies));
@@ -29,7 +30,6 @@ export function TechnologyNotes({  }: {
   return (
     <div className="notes-section">
       <h4>Мои заметки:</h4>
-
     </div>
   );
 }

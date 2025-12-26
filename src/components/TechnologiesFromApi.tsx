@@ -22,15 +22,18 @@ function TechnologiesFromApi() {
   const {
     technologies,
     loading,
+    initialLoading,
     error,
     fetchTechnologies,
-    deleteTechnology
+    deleteTechnology,
+    savePendingUpdates
   } = useTechnologiesApi();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState<TechnologyStatus | 'all'>('all');
   const [filteredTechnologies, setFilteredTechnologies] = useState<Technology[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Получаем уникальные категории из данных
   const categories = ['all', ...new Set(technologies
@@ -38,14 +41,41 @@ function TechnologiesFromApi() {
     .filter((cat): cat is string => Boolean(cat))
   )];
 
-  // Загружаем технологии при монтировании компонента
+  // Инициализация: НЕ загружаем данные автоматически
   useEffect(() => {
-    if (technologies.length === 0) {
-      fetchTechnologies();
-    }
-  }, []);
+    // Используем уже загруженные данные
+    console.log('TechnologiesFromApi: Используем', technologies.length, 'технологий из локального хранилища');
 
-  // Фильтруем технологии при изменении фильтров или technologies
+    // Фильтруем сразу при загрузке
+    const filtered = technologies.filter(tech => {
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch =
+          tech.title.toLowerCase().includes(searchLower) ||
+          tech.description.toLowerCase().includes(searchLower) ||
+          (tech.notes && tech.notes.toLowerCase().includes(searchLower)) ||
+          (tech.tags && tech.tags.some(tag => tag.toLowerCase().includes(searchLower)));
+
+        if (!matchesSearch) return false;
+      }
+
+      if (categoryFilter !== 'all') {
+        if (!tech.category || tech.category !== categoryFilter) {
+          return false;
+        }
+      }
+
+      if (statusFilter !== 'all' && tech.status !== statusFilter) {
+        return false;
+      }
+
+      return true;
+    });
+
+    setFilteredTechnologies(filtered);
+  }, []); // Только при монтировании
+
+  // Фильтруем технологии при изменении фильтров или данных
   useEffect(() => {
     const filtered = technologies.filter(tech => {
       // Фильтр по поиску (ищем в названии, описании и заметках)
@@ -78,12 +108,22 @@ function TechnologiesFromApi() {
     setFilteredTechnologies(filtered);
   }, [technologies, searchTerm, categoryFilter, statusFilter]);
 
+  // Ручное обновление данных по кнопке
+  const handleManualRefresh = async () => {
+    try {
+      await fetchTechnologies(true);
+      setHasFetched(true);
+    } catch (err) {
+      console.error('Ошибка при ручном обновлении:', err);
+    }
+  };
+
   const handleDelete = async (id: number, title: string) => {
     if (confirm(`Удалить технологию "${title}"?`)) {
       try {
         await deleteTechnology(id);
-        // После успешного удаления перезагружаем данные
-        await fetchTechnologies();
+        // После удаления автоматически сохраняем изменения
+        await savePendingUpdates();
       } catch (err) {
         alert(`Ошибка при удалении: ${err instanceof Error ? err.message : 'Неизвестная ошибка'}`);
       }
@@ -108,11 +148,12 @@ function TechnologiesFromApi() {
     }
   };
 
-  if (loading && technologies.length === 0) {
+  // Используем initialLoading для начальной загрузки
+  if (initialLoading && technologies.length === 0) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Загрузка технологий из API...</p>
+        <p>Загрузка технологий...</p>
       </div>
     );
   }
@@ -122,8 +163,8 @@ function TechnologiesFromApi() {
       <div className="error-container">
         <h3>Ошибка загрузки данных</h3>
         <p>{error}</p>
-        <button onClick={() => fetchTechnologies()} className="retry-btn">
-          Попробовать снова
+        <button onClick={handleManualRefresh} className="retry-btn">
+          Попробовать загрузить с сервера
         </button>
       </div>
     );
@@ -134,8 +175,8 @@ function TechnologiesFromApi() {
       <div className="api-header">
         <h2>Технологии из API ({technologies.length})</h2>
         <div className="api-actions">
-          <button onClick={() => fetchTechnologies()} className="refresh-btn">
-            Обновить из API
+          <button onClick={handleManualRefresh} className="refresh-btn" disabled={loading}>
+            {loading ? 'Обновление...' : 'Обновить из API'}
           </button>
           <span className="filtered-count">
             Отфильтровано: {filteredTechnologies.length}

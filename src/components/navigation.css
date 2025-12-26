@@ -1,4 +1,4 @@
-.main-navigation {
+main-navigation {
   background: #262332;
   color: white;
   padding: 15px 20px;
@@ -15,6 +15,8 @@
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;
+  gap: 200px;
+  height: 70px;
   margin: 0 auto;
   position: relative;
 }
@@ -462,5 +464,71 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+}
+
+/* Добавляем в navigation.css */
+
+.auth-item {
+  margin-left: auto;
+}
+
+.auth-item-mobile {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-modal-header{
+  background: #262332;
+  border-radius: 25px 25px 0 0;
+}
+
+.auth-modal-header h3{
+  color: white !important;
+}
+
+.auth-form{
+  background: #262332;
+  border-radius: 0 0 25px 25px;
+}
+
+.auth-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.auth-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.username {
+  font-weight: 500;
+}
+
+/* Для мобильной версии */
+@media (max-width: 768px) {
+  .auth-item {
+    display: none;
+  }
+
+  .auth-item-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .auth-item-mobile {
+    display: none;
   }
 }

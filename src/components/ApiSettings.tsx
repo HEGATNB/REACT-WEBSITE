@@ -9,7 +9,9 @@ function ApiSettings() {
     importRoadmap,
     loading,
     error,
-    syncWithApi
+    syncWithApi,
+    hasPendingChanges,
+    savePendingUpdates
   } = useTechnologiesApi();
 
   const [newEndpoint, setNewEndpoint] = useState(apiEndpoint || '');
@@ -34,6 +36,9 @@ function ApiSettings() {
       const result = await importRoadmap(roadmapUrl);
       alert(`Успешно импортировано ${result.importedCount} из ${result.totalCount} технологий`);
       setRoadmapUrl('');
+
+      // Сохраняем изменения после импорта
+      await savePendingUpdates();
     } catch (err) {
       alert(`Ошибка импорта: ${err instanceof Error ? err.message : 'Неизвестная ошибка'}`);
     }
@@ -44,6 +49,13 @@ function ApiSettings() {
       setIsSyncing(true);
       setSyncMessage('Синхронизация...');
 
+      // Сначала сохраняем все локальные изменения
+      if (hasPendingChanges) {
+        setSyncMessage('Сохранение локальных изменений...');
+        await savePendingUpdates();
+      }
+
+      // Затем синхронизируем
       await syncWithApi();
       setSyncMessage('Данные успешно синхронизированы!');
 
@@ -155,6 +167,12 @@ function ApiSettings() {
         <p className="sync-hint">
           Синхронизирует локальные данные с сервером
         </p>
+
+        {hasPendingChanges && (
+          <div className="pending-changes">
+            <p>⚠️ Есть несохраненные изменения. Нажмите "Синхронизировать с API" для сохранения.</p>
+          </div>
+        )}
       </div>
 
       {error && (

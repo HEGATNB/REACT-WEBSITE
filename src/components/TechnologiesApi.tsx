@@ -15,6 +15,7 @@ export interface Technology {
   studyEndDate: string;
   createdAt?: string;
   updatedAt?: string;
+  userId?: string; // Новое поле для пользователя
 }
 
 interface ApiResponse {
@@ -58,6 +59,9 @@ function useTechnologiesApi() {
     }
     return 'http://localhost:5000/api/technologies';
   });
+  const [currentUser, setCurrentUser] = useState<string | null>(() => {
+    return localStorage.getItem('apiUser') || null;
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Technology[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -75,6 +79,33 @@ function useTechnologiesApi() {
   const notifyTechnologyUpdate = useCallback(() => {
     window.dispatchEvent(new CustomEvent(TECHNOLOGY_UPDATED_EVENT));
   }, []);
+
+  const getUserDataKey = useCallback(() => {
+    return currentUser ? `techTrackerData_${currentUser}` : 'techTrackerData';
+  }, [currentUser]);
+
+  useEffect(() => {
+    const handleUserChange = (event: CustomEvent) => {
+      const username = event.detail;
+      setCurrentUser(username);
+      console.log('User changed to:', username);
+
+      setTechnologies([]);
+      setLastFetchTime(0);
+      needsInitialFetch.current = true;
+
+      if (username) {
+        fetchTechnologies(true).catch(console.error);
+      }
+    };
+
+    window.addEventListener('userChanged', handleUserChange as EventListener);
+
+    return () => {
+      window.removeEventListener('userChanged', handleUserChange as EventListener);
+    };
+  }, []);
+
   const updateTechnologyToApi = async (id: number, updates: Partial<Technology>) => {
     try {
       console.log(`📤 Отправка обновления в API для id ${id}:`, updates);
@@ -105,24 +136,36 @@ function useTechnologiesApi() {
   };
 
   const fetchTechnologies = useCallback(async (force = false) => {
-    if (!force && technologies.length > 0 && !needsInitialFetch.current) {
-      const timeSinceLastFetch = Date.now() - lastFetchTime;
-      if (timeSinceLastFetch < 5 * 60 * 1000) { // 5 минут
-        console.log('📦 Используем локальные данные');
-        return technologies;
-      }
+    // Если нет пользователя, не загружаем данные
+    if (!currentUser) {
+      console.log('❌ Нет пользователя, пропускаем загрузку');
+      return [];
+    }
+
+    // Если у нас уже есть локальные данные и не принудительная загрузка, используем их
+    if (!force && technologies.length > 0) {
+      console.log('📦 Используем существующие локальные данные для пользователя:', currentUser);
+      return technologies;
+    }
+
+    // Если данные были загружены менее 5 минут назад, не загружаем снова
+    const timeSinceLastFetch = Date.now() - lastFetchTime;
+    if (!force && timeSinceLastFetch < 5 * 60 * 1000) {
+      console.log('📦 Используем локальные данные (загружены менее 5 минут назад)');
+      return technologies;
     }
 
     try {
       setLoading(true);
       setError(null);
 
-      console.log('🌐 Загрузка технологий из API:', apiEndpoint);
+      console.log('🌐 Загрузка технологий из API для пользователя:', currentUser);
 
       const response = await fetch(apiEndpoint, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-User-Id': currentUser // Добавляем заголовок с пользователем
         },
         mode: 'cors',
         credentials: 'omit',
@@ -143,11 +186,12 @@ function useTechnologiesApi() {
           studyStartDate: tech.studyStartDate || new Date().toISOString().split('T')[0],
           studyEndDate: tech.studyEndDate || '',
           notes: tech.notes || '',
-          category: tech.category || ''
+          category: tech.category || '',
+          userId: currentUser // Убедимся, что userId установлен
         }));
 
         setTechnologies(newData);
-        localStorage.setItem('techTrackerData', JSON.stringify(newData));
+        localStorage.setItem(getUserDataKey(), JSON.stringify(newData));
         setLastFetchTime(Date.now());
         setHasPendingChanges(false);
         needsInitialFetch.current = false;
@@ -166,11 +210,13 @@ function useTechnologiesApi() {
       setError(errorMessage);
       console.error('❌ Ошибка при загрузке технологий из API:', err);
 
-      const saved = localStorage.getItem('techTrackerData');
+      // Всегда используем локальные данные как fallback
+      const saved = localStorage.getItem(getUserDataKey());
       if (saved) {
         try {
           const parsedData = JSON.parse(saved);
-          console.log('📦 Возвращаем локальные данные из кэша');
+          console.log('📦 Возвращаем локальные данные из кэша для пользователя:', currentUser);
+          setTechnologies(parsedData);
           needsInitialFetch.current = false;
           return parsedData;
         } catch (e) {
@@ -182,7 +228,7 @@ function useTechnologiesApi() {
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoint, technologies, lastFetchTime, showSuccess]);
+  }, [apiEndpoint, technologies, lastFetchTime, showSuccess, currentUser, getUserDataKey]);
 
   useEffect(() => {
     if (isInitialized.current) return;
@@ -197,24 +243,41 @@ function useTechnologiesApi() {
           setApiEndpoint(savedEndpoint);
         }
 
-        const saved = localStorage.getItem('techTrackerData');
+        // Проверяем, есть ли пользователь
+        const savedUser = localStorage.getItem('apiUser');
+        if (savedUser) {
+          setCurrentUser(savedUser);
+          console.log('Инициализация для пользователя:', savedUser);
+        }
+
+        // ВСЕГДА сначала загружаем из localStorage
+        const saved = localStorage.getItem(getUserDataKey());
         if (saved) {
           try {
             const parsedData = JSON.parse(saved);
-            console.log('📦 Загружено из localStorage:', parsedData.length, 'технологий');
+            console.log('📦 Загружено из localStorage для пользователя', currentUser, ':', parsedData.length, 'технологий');
             setTechnologies(parsedData);
+            setLastFetchTime(Date.now());
           } catch (e) {
             console.error('Ошибка при загрузке локальных данных:', e);
           }
         }
 
-        setTimeout(() => {
-          if (needsInitialFetch.current) {
-            fetchTechnologies(true).catch(console.error);
-          }
-        }, 1000);
-
-        console.log('💾 Режим локального хранения: изменения сохраняются только локально');
+        // Только ПОСЛЕ загрузки локальных данных пытаемся синхронизировать с API
+        if (savedUser) {
+          setTimeout(async () => {
+            if (needsInitialFetch.current) {
+              try {
+                await fetchTechnologies(true);
+              } catch (error) {
+                console.error('Не удалось загрузить данные из API, используем локальные:', error);
+              }
+            }
+          }, 100);
+        } else {
+          console.log('Пользователь не аутентифицирован, пропускаем загрузку из API');
+          setInitialLoading(false);
+        }
 
       } catch (error) {
         console.error('Ошибка инициализации:', error);
@@ -228,7 +291,7 @@ function useTechnologiesApi() {
 
   useEffect(() => {
     const handleTechnologyUpdate = () => {
-      const saved = localStorage.getItem('techTrackerData');
+      const saved = localStorage.getItem(getUserDataKey());
       if (saved) {
         try {
           const parsedData = JSON.parse(saved);
@@ -244,32 +307,35 @@ function useTechnologiesApi() {
     return () => {
       window.removeEventListener(TECHNOLOGY_UPDATED_EVENT, handleTechnologyUpdate);
     };
-  }, []);
+  }, [getUserDataKey]);
 
   useEffect(() => {
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
       if (pendingUpdates.current.size > 0 && !isSavingToApi.current) {
-        console.log('🚪 Сохраняем изменения в API перед закрытием страницы');
+        console.log('🚪 Сохраняем изменения в API перед закрытием страницы для пользователя:', currentUser);
         e.preventDefault();
         e.returnValue = 'Изменения сохраняются...';
 
-        await savePendingUpdates();
-        return 'Изменения сохраняются...';
+        try {
+          await savePendingUpdates();
+          console.log('✅ Изменения сохранены перед закрытием');
+        } catch (error) {
+          console.error('❌ Ошибка сохранения перед закрытием:', error);
+        }
       }
     };
 
     const handleVisibilityChange = async () => {
+      // Сохраняем изменения при уходе
       if (document.visibilityState === 'hidden' &&
           pendingUpdates.current.size > 0 &&
           !isSavingToApi.current) {
         console.log('🔄 Сохраняем изменения в API при переходе на другую вкладку');
-        await savePendingUpdates();
-        lastSyncTimeRef.current = Date.now();
-      } else if (document.visibilityState === 'visible') {
-        const shouldRefresh = Date.now() - lastSyncTimeRef.current > 5 * 60 * 1000;
-        if (shouldRefresh) {
-          console.log('🔄 Возвращение на вкладку, обновляем данные');
-          fetchTechnologies(true).catch(console.error);
+        try {
+          await savePendingUpdates();
+          lastSyncTimeRef.current = Date.now();
+        } catch (error) {
+          console.error('❌ Ошибка сохранения при смене вкладки:', error);
         }
       }
     };
@@ -281,6 +347,7 @@ function useTechnologiesApi() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
 
+      // Сохраняем при размонтировании компонента
       if (pendingUpdates.current.size > 0 && !isSavingToApi.current) {
         console.log('📤 Сохраняем изменения в API при размонтировании');
         savePendingUpdates().catch(console.error);
@@ -294,7 +361,7 @@ function useTechnologiesApi() {
     try {
       isSavingToApi.current = true;
       const updatesCount = pendingUpdates.current.size;
-      console.log('💾 Сохранение изменений в API:', updatesCount);
+      console.log('💾 Сохранение изменений в API для пользователя:', currentUser);
 
       const updatesToProcess = new Map(pendingUpdates.current);
 
@@ -375,6 +442,10 @@ function useTechnologiesApi() {
   }, [searchTechnologies]);
 
   const importRoadmap = async (roadmapUrl: string): Promise<ImportResult> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для импорта данных');
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -395,6 +466,7 @@ function useTechnologiesApi() {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-User-Id': currentUser
         },
         body: JSON.stringify({ url: roadmapUrl })
       });
@@ -419,14 +491,15 @@ function useTechnologiesApi() {
           notes: tech.notes || '',
           category: tech.category || 'imported',
           studyStartDate: tech.studyStartDate || new Date().toISOString().split('T')[0],
-          studyEndDate: tech.studyEndDate || ''
+          studyEndDate: tech.studyEndDate || '',
+          userId: currentUser // Добавляем userId
         }));
 
         console.log('🆕 Создано импортированных технологий:', importedTechs.length);
 
         const updatedTechnologies = [...technologies, ...importedTechs];
         setTechnologies(updatedTechnologies);
-        localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+        localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
         setHasPendingChanges(true);
         importedTechs.forEach(tech => {
@@ -469,6 +542,7 @@ function useTechnologiesApi() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-User-Id': currentUser || ''
         },
         body: JSON.stringify(techData)
       });
@@ -492,6 +566,10 @@ function useTechnologiesApi() {
   };
 
   const addTechnology = async (techData: Omit<Technology, 'id'>): Promise<Technology> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для добавления технологий');
+    }
+
     try {
       const maxId = technologies.length > 0
         ? Math.max(...technologies.map(t => t.id))
@@ -503,12 +581,13 @@ function useTechnologiesApi() {
         studyStartDate: techData.studyStartDate || new Date().toISOString().split('T')[0],
         studyEndDate: techData.studyEndDate || '',
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        userId: currentUser // Добавляем userId
       };
 
       const updatedTechnologies = [...technologies, newTech];
       setTechnologies(updatedTechnologies);
-      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
       setHasPendingChanges(true);
       pendingUpdates.current.set(newTech.id, newTech);
@@ -526,6 +605,10 @@ function useTechnologiesApi() {
   };
 
   const updateTechnology = async (id: number, updates: Partial<Technology>): Promise<Technology> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для обновления технологий');
+    }
+
     try {
       const tech = technologies.find(t => t.id === id);
       if (!tech) throw new Error('Технология не найдена');
@@ -535,7 +618,8 @@ function useTechnologiesApi() {
         ...updates,
         updatedAt: new Date().toISOString(),
         studyStartDate: updates.studyStartDate || tech.studyStartDate,
-        studyEndDate: updates.studyEndDate || tech.studyEndDate
+        studyEndDate: updates.studyEndDate || tech.studyEndDate,
+        userId: currentUser // Обновляем userId
       };
 
       const updatedTechnologies = technologies.map(t =>
@@ -543,7 +627,7 @@ function useTechnologiesApi() {
       );
 
       setTechnologies(updatedTechnologies);
-      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
       setHasPendingChanges(true);
       pendingUpdates.current.set(id, updates);
@@ -561,13 +645,17 @@ function useTechnologiesApi() {
   };
 
   const deleteTechnology = async (id: number): Promise<boolean> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для удаления технологий');
+    }
+
     try {
       const tech = technologies.find(t => t.id === id);
       if (!tech) throw new Error('Технология не найдена');
 
       const updatedTechnologies = technologies.filter(tech => tech.id !== id);
       setTechnologies(updatedTechnologies);
-      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
       setHasPendingChanges(true);
       pendingUpdates.current.set(id, { deleted: true });
@@ -585,12 +673,16 @@ function useTechnologiesApi() {
   };
 
   const syncWithApi = async (force = false): Promise<boolean> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для синхронизации');
+    }
+
     try {
       setLoading(true);
       setError(null);
       showInfo('Синхронизация с API...');
 
-      console.log('🔄 Ручная синхронизация с API');
+      console.log('🔄 Ручная синхронизация с API для пользователя:', currentUser);
       if (pendingUpdates.current.size > 0) {
         console.log('💾 Сохраняем локальные изменения в API...');
         await savePendingUpdates();
@@ -617,6 +709,10 @@ function useTechnologiesApi() {
   };
 
   const markAllDone = async () => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт');
+    }
+
     try {
       const updatedTechnologies = technologies.map(tech => ({
         ...tech,
@@ -624,7 +720,7 @@ function useTechnologiesApi() {
         updatedAt: new Date().toISOString()
       }));
       setTechnologies(updatedTechnologies);
-      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
       setHasPendingChanges(true);
       technologies.forEach(tech => {
@@ -640,6 +736,10 @@ function useTechnologiesApi() {
   };
 
   const resetAllStatuses = async () => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт');
+    }
+
     try {
       const updatedTechnologies = technologies.map(tech => ({
         ...tech,
@@ -647,7 +747,7 @@ function useTechnologiesApi() {
         updatedAt: new Date().toISOString()
       }));
       setTechnologies(updatedTechnologies);
-      localStorage.setItem('techTrackerData', JSON.stringify(updatedTechnologies));
+      localStorage.setItem(getUserDataKey(), JSON.stringify(updatedTechnologies));
 
       setHasPendingChanges(true);
 
@@ -667,8 +767,13 @@ function useTechnologiesApi() {
   };
 
   const exportData = (): string => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для экспорта');
+    }
+
     const data = {
       exportedAt: new Date().toISOString(),
+      user: currentUser,
       technologies: technologies
     };
     const dataStr = JSON.stringify(data, null, 2);
@@ -677,7 +782,7 @@ function useTechnologiesApi() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tech-tracker-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `tech-tracker-${currentUser}-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -696,6 +801,10 @@ function useTechnologiesApi() {
   };
 
   const syncLocalToApi = async (): Promise<boolean> => {
+    if (!currentUser) {
+      throw new Error('Необходимо войти в аккаунт для синхронизации');
+    }
+
     try {
       console.log('🔄 Синхронизация локальных данных с API...');
       showInfo('Синхронизация локальных данных с API...');
@@ -721,12 +830,66 @@ function useTechnologiesApi() {
     }
   };
 
+  // Функция для получения данных пользователя с сервера
+  const fetchUserTechnologiesFromApi = async (username: string): Promise<Technology[]> => {
+    try {
+      const response = await fetch(`${apiEndpoint}/user/${username}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Пользователь не найден, возвращаем пустой массив
+          return [];
+        }
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data: ApiResponse = await response.json();
+
+      if (data.success && Array.isArray(data.data)) {
+        return data.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching user technologies:', error);
+      return [];
+    }
+  };
+
+  // Функция сохранения данных пользователя на сервер
+  const saveUserTechnologiesToApi = async (username: string, techs: Technology[]): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiEndpoint}/user/${username}/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ technologies: techs })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data: ApiResponse = await response.json();
+      return data.success || false;
+    } catch (error) {
+      console.error('Error saving user technologies:', error);
+      return false;
+    }
+  };
+
   return {
     technologies,
     loading: loading || initialLoading,
     initialLoading,
     error,
     apiEndpoint,
+    currentUser, // Добавляем текущего пользователя
     searchQuery,
     searchResults,
     isSearching,
@@ -747,7 +910,9 @@ function useTechnologiesApi() {
     handleSearchChange,
     clearSearch,
 
-    savePendingUpdates
+    savePendingUpdates,
+    fetchUserTechnologiesFromApi,
+    saveUserTechnologiesToApi
   };
 }
 

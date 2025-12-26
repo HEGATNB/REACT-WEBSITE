@@ -13,6 +13,9 @@ import ApiSettings from './components/ApiSettings';
 import TechnologiesFromApi from './components/TechnologiesFromApi';
 import MassEditPanel from './components/MassEditPanel';
 import { NotificationProvider } from './components/NotificationContext';
+import { AuthProvider, useAuth } from './components/AuthContext';
+import LoginPrompt from './components/LoginPrompt';
+import { FaUserCircle } from "react-icons/fa";
 
 type Status = 'completed' | 'in-progress' | 'not-started';
 
@@ -29,7 +32,7 @@ interface Technology {
   updatedAt: string;
 }
 
-function App() {
+function AppContent() {
   const {
     technologies: apiTechnologies,
     loading,
@@ -43,9 +46,11 @@ function App() {
     savePendingUpdates,
     deleteTechnology,
     syncLocalToApi,
-    hasPendingChanges
+    hasPendingChanges,
+    currentUser
   } = useTechnologiesApi();
 
+  const { isAuthenticated } = useAuth();
   const technologies = apiTechnologies.map(tech => ({
     ...tech,
     studyStartDate: (tech as any).studyStartDate || tech.createdAt || new Date().toISOString(),
@@ -62,23 +67,13 @@ function App() {
   const [showMassEditPanel, setShowMassEditPanel] = useState(false);
   const location = useLocation();
 
+  // УПРОЩАЕМ инициализацию - данные уже загружаются в хуке
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        console.log('Загрузка технологий из API...');
-        await fetchTechnologies();
-        setIsInitialized(true);
-        console.log(`Загружено ${technologies.length} технологий`);
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-        setIsInitialized(true);
-      }
-    };
-
-    if (!isInitialized) {
-      loadData();
+    if (!isInitialized && isAuthenticated) {
+      setIsInitialized(true);
+      console.log(`Используем ${technologies.length} технологий для пользователя ${currentUser}`);
     }
-  }, [fetchTechnologies, isInitialized]);
+  }, [technologies.length, isAuthenticated, currentUser]);
 
   useEffect(() => {
     if (location.pathname !== '/') {
@@ -89,7 +84,7 @@ function App() {
   }, [location.pathname]);
 
   const changeStatus = async (id: number) => {
-    if (isMassEditing) return;
+    if (isMassEditing || !isAuthenticated) return;
 
     const statusOrder: Status[] = ['not-started', 'in-progress', 'completed'];
     const tech = technologies.find(t => t.id === id);
@@ -110,6 +105,8 @@ function App() {
   };
 
   const updateTechnologyNotes = async (techId: number, newNotes: string) => {
+    if (!isAuthenticated) return;
+
     try {
       await updateTechnology(techId, {
         notes: newNotes,
@@ -121,24 +118,28 @@ function App() {
   };
 
   const handleMarkAllDone = async () => {
+    if (!isAuthenticated) return;
+
     try {
       await markAllDone();
-      await fetchTechnologies();
     } catch (err) {
       console.error('Failed to mark all as done:', err);
     }
   };
 
   const handleResetAllStatuses = async () => {
+    if (!isAuthenticated) return;
+
     try {
       await resetAllStatuses();
-      await fetchTechnologies();
     } catch (err) {
       console.error('Failed to reset all statuses:', err);
     }
   };
 
   const randomNextTechnology = async () => {
+    if (!isAuthenticated) return;
+
     const notStartedTech = technologies.filter(tech => tech.status === 'not-started');
 
     if (notStartedTech.length === 0) {
@@ -169,11 +170,18 @@ function App() {
   };
 
   const handleExportData = (): string => {
+    if (!isAuthenticated) {
+      alert('Необходимо войти в аккаунт для экспорта данных');
+      return '';
+    }
+
     const dataStr = exportData();
     return dataStr;
   };
 
   const handleSelectCard = (id: number, selected: boolean) => {
+    if (!isAuthenticated) return;
+
     setSelectedIds(prev => {
       if (selected) {
         if (prev.includes(id)) {
@@ -187,6 +195,8 @@ function App() {
   };
 
   const handleMassEditClick = () => {
+    if (!isAuthenticated) return;
+
     setIsMassEditing(true);
     setSelectedIds([]);
     setShowMassEditPanel(false);
@@ -199,6 +209,8 @@ function App() {
   };
 
   const handleDeleteSelected = async (ids: number[]) => {
+    if (!isAuthenticated) return;
+
     try {
       const deletePromises = ids.map(id => deleteTechnology(id));
       await Promise.all(deletePromises);
@@ -210,6 +222,8 @@ function App() {
   };
 
   const handleStatusChangeSelected = async (ids: number[], status: Status) => {
+    if (!isAuthenticated) return;
+
     try {
       const updatePromises = ids.map(id =>
         updateTechnology(id, {
@@ -254,7 +268,7 @@ function App() {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Загрузка данных из API...</p>
+        <p>Загрузка данных...</p>
       </div>
     );
   }
@@ -264,9 +278,19 @@ function App() {
       <div className="error-container">
         <h3>Ошибка загрузки данных</h3>
         <p>{error}</p>
-        <button onClick={() => fetchTechnologies()} className="retry-btn">
-          Попробовать снова
+        <button onClick={() => fetchTechnologies(true)} className="retry-btn">
+          Попробовать снова загрузить с сервера
         </button>
+      </div>
+    );
+  }
+
+  // Если пользователь не аутентифицирован, показываем приглашение к входу
+  if (!isAuthenticated) {
+    return (
+      <div className="App">
+        <Navigation />
+        <LoginPrompt />
       </div>
     );
   }
@@ -333,7 +357,7 @@ function App() {
                           <p>Ничего не найдено. Попробуйте другой запрос или измените фильтр.</p>
                           {technologies.length === 0 ? (
                             <button
-                              onClick={() => fetchTechnologies()}
+                              onClick={() => fetchTechnologies(true)}
                               className="refresh-btn"
                               style={{ marginTop: '10px' }}
                             >
@@ -419,11 +443,13 @@ function App() {
 
 function AppWrapper() {
   return (
-    <NotificationProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </NotificationProvider>
+    <AuthProvider>
+      <NotificationProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }
 
